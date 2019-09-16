@@ -1,0 +1,14 @@
+{
+  "config": {
+      "sort-packages": true
+  },
+  "require": {
+      "php": ">=7.3"
+  },
+  "autoload": {
+      "psr-4": {
+          "engine\\": "engine/",
+          "application\\": "application/"
+      }
+  }
+}
