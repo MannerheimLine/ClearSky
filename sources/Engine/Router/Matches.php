@@ -1,42 +1,30 @@
 <?php
 
-
 declare(strict_types = 1);
 
 namespace Engine\Router;
 
-
-class Route
+class Matches
 {
     private $_name;
-    private $_pattern;
     private $_controller;
     private $_action;
-    private $_methods;
+    private $_params;
 
-    public function __construct(string $name, string $pattern, string $controller, string $action, array $methods)
+    public function __construct(string $name, string $controller, string $action, array $params)
     {
         $this->_name = $name;
-        $this->_pattern = $pattern;
         $this->_controller = $controller;
         $this->_action = $action;
-        $this->_methods = $methods;
+        $this->_params = $params;
     }
 
     /**
      * @return string
      */
-    public function getName(): string
+    public function getName() : string
     {
         return $this->_name;
-    }
-
-    /**
-     * @return string
-     */
-    public function getPattern(): string
-    {
-        return $this->_pattern;
     }
 
     /**
@@ -58,9 +46,9 @@ class Route
     /**
      * @return array
      */
-    public function getMethods(): array
+    public function getParams(): array
     {
-        return $this->_methods;
+        return $this->_params;
     }
 
 }
