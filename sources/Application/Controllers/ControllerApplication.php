@@ -4,11 +4,14 @@
 namespace Application\Controllers;
 
 
+use Zend\Diactoros\Response\HtmlResponse;
+
 class ControllerApplication
 {
-    public function e(){
-        echo '<br>';
-        echo 'This is application Controller';
+    public function actionIndex(){
+        $html = file_get_contents('storage/page.php') ;
+        $response = new HtmlResponse($html);
+        return $response;
     }
 
 }

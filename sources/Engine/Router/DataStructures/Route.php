@@ -3,7 +3,7 @@
 
 declare(strict_types = 1);
 
-namespace Engine\Router;
+namespace Engine\Router\DataStructures;
 
 
 class Route
@@ -12,14 +12,25 @@ class Route
     private $_pattern;
     private $_controller;
     private $_action;
+    private $_attributes;
     private $_methods;
 
-    public function __construct(string $name, string $pattern, string $controller, string $action, array $methods)
+    /**
+     * Route constructor.
+     * @param string $name
+     * @param string $pattern
+     * @param string $controller
+     * @param string $action
+     * @param array $attributes
+     * @param array $methods
+     */
+    public function __construct(string $name, string $pattern, string $controller, string $action, array $attributes, array $methods)
     {
         $this->_name = $name;
         $this->_pattern = $pattern;
         $this->_controller = $controller;
         $this->_action = $action;
+        $this->_attributes = $attributes;
         $this->_methods = $methods;
     }
 
@@ -58,9 +69,19 @@ class Route
     /**
      * @return array
      */
+    public function getAttributes(): array
+    {
+        return $this->_attributes;
+    }
+
+    /**
+     * @return array
+     */
     public function getMethods(): array
     {
         return $this->_methods;
     }
+
+
 
 }

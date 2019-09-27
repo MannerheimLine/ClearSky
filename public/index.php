@@ -1,8 +1,9 @@
 <?php
 
+use Engine\Router\Exceptions\RequestNotMatchedException;
 use Engine\Router\Matcher;
 use Engine\Router\RouteCollection;
-use Zend\Diactoros\Response\HtmlResponse;
+use Engine\Router\Router;
 use Zend\Diactoros\ServerRequestFactory;
 use Zend\HttpHandlerRunner\Emitter\SapiEmitter;
 
@@ -10,26 +11,39 @@ use Zend\HttpHandlerRunner\Emitter\SapiEmitter;
 chdir(dirname(__DIR__));
 require "vendor/autoload.php";
 
+#Коллекция маршрутов
+$routes = new RouteCollection();
+$routes->get('blog', '/blog/{id}', 'BlogController', 'actionIndex', ['id' => '\d+']);
+$routes->get('catalog/view/details', '/catalog/{id}/view/{number}-{detail}', 'CatalogController', 'actionViewDetails', ['id' => '\d+', 'number' => '\d+', 'detail' => '\d+']);
+$routes->get('catalog/view', '/catalog/{id}/view/{number}', 'CatalogController', 'actionView', ['id' => '\d+', 'number' => '\d+']);
+$routes->get('catalog/show', '/catalog/{id}/show/{number}', 'CatalogController', 'actionShow', ['id' => '\d+', 'number' => '\d+']);
+$routes->get('home', '/', Application\Controllers\ControllerApplication::class, 'actionIndex', []);
+
 #Получение данных запроса
 $request = ServerRequestFactory::fromGlobals();
 
-#Коллекция маршрутов
-$routes = new RouteCollection();
-$routes->get('home', '^/$', 'HomeController', 'actionIndex');
-$routes->get('blog', '^/blog/\d+', 'BlogController', 'actionIndex');
-$routes->get('catalog/view', '^/catalog/\d+/view/\d+', 'CatalogController', 'actionView');
-
 #Сопоставления по регулярным выражениям
 $matcher = new Matcher($routes);
-$a = $matcher->match($request);
+try {
+    $matches = $matcher->match($request);
+}
+catch (RequestNotMatchedException $e) {
+    //Обработать пойманное исключение
+}
 
-$response = new HtmlResponse('');
+#Создание маршрутизатора
+$router = new Router($matches);
+$response = $router->run($request);
+
+#Добавление пост-заголовков
 $response = $response->withAddedHeader('Header1', 'Value1');
 $response = $response->withAddedHeader('Header2', 'Value12');
 
+#Отправка клиенту
 $emitter = new SapiEmitter();
 $emitter->emit($response);
 
+#Отладочная нформация
 function convert($size)
 {
     $unit=array('b','kb','mb','gb','tb','pb');
