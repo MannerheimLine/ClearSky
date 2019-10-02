@@ -1,39 +1,49 @@
 <?php
 
-use Engine\Router\Exceptions\RequestNotMatchedException;
-use Engine\Router\Matcher;
-use Engine\Router\RouteCollection;
-use Engine\Router\Router;
+use Aura\Router\RouterContainer;
+use Engine\Middleware\ProfilerMiddleware;
+use Psr\Http\Message\ResponseInterface;
 use Zend\Diactoros\ServerRequestFactory;
 use Zend\HttpHandlerRunner\Emitter\SapiEmitter;
+use Zend\Stratigility\MiddlewarePipe;
+
+use function Zend\Stratigility\path;
 
 #Автозагрузка
 chdir(dirname(__DIR__));
 require "vendor/autoload.php";
 
 #Коллекция маршрутов
-$routes = new RouteCollection();
-$routes->get('blog', '/blog/{id}', 'BlogController', 'actionIndex', ['id' => '\d+']);
-$routes->get('catalog/view/details', '/catalog/{id}/view/{number}-{detail}', 'CatalogController', 'actionViewDetails', ['id' => '\d+', 'number' => '\d+', 'detail' => '\d+']);
-$routes->get('catalog/view', '/catalog/{id}/view/{number}', 'CatalogController', 'actionView', ['id' => '\d+', 'number' => '\d+']);
-$routes->get('catalog/show', '/catalog/{id}/show/{number}', 'CatalogController', 'actionShow', ['id' => '\d+', 'number' => '\d+']);
-$routes->get('home', '/', Application\Controllers\ControllerApplication::class, 'actionIndex', []);
+$aura = new RouterContainer();
+$map = $aura->getMap();
+$map->get('home', '/', Application\Blog\Action\BlogIndexAction::class);
+$map->get('catalog/show', '/blog/{id}', Application\Blog\Action\CstegoryShowAction::class)->tokens(['id' => '\d+']);
+$map->get('catalog/view', '/blog/{id}/view/{number}', Application\Blog\Action\CategoryIndexAction::class)->tokens(['id' => '\d+', 'number' => '\d+']);
+$map->get('catalog/detail', '/blog/{id}/view/{number}-{detail}', Application\Blog\Action\DetailsIndexAction::class)->tokens(['id' => '\d+', 'number' => '\d+', 'detail' => '\d+']);
 
-#Получение данных запроса
+#Запуск
 $request = ServerRequestFactory::fromGlobals();
+$matcher = $aura->getMatcher();
+$route = $matcher->match($request);
 
-#Сопоставления по регулярным выражениям
-$matcher = new Matcher($routes);
-try {
-    $matches = $matcher->match($request);
-}
-catch (RequestNotMatchedException $e) {
-    //Обработать пойманное исключение
+foreach ($route->attributes as $key => $val) {
+    $request = $request->withAttribute($key, $val);
 }
 
-#Создание маршрутизатора
-$router = new Router($matches);
-$response = $router->run($request);
+$actionClass = $route->handler;
+$action = new $actionClass(); //Action
+/**
+ * @var ResponseInterface $response
+ */
+
+#Загрузка в трубопровод
+$pipeline = new MiddlewarePipe();
+$pipeline->pipe(new ProfilerMiddleware());
+$pipeline->pipe(path('/', new ProfilerMiddleware()));
+$pipeline->pipe(path('/blog', new \Engine\Middleware\BasicAuthMiddleware()));
+$pipeline->pipe(new \Zend\Stratigility\Middleware\PathMiddlewareDecorator('/blog{id}/view/', new \Engine\Middleware\ModifyMiddleware()));
+#Запуск трубопровода
+$response = $pipeline->process($request, $action);
 
 #Добавление пост-заголовков
 $response = $response->withAddedHeader('Header1', 'Value1');
@@ -46,7 +56,7 @@ $emitter->emit($response);
 #Отладочная нформация
 function convert($size)
 {
-    $unit=array('b','kb','mb','gb','tb','pb');
+    $unit = array('b','kb','mb','gb','tb','pb');
     return @round($size/pow(1024,($i=floor(log($size,1024)))),2).' '.$unit[$i];
 }
 echo convert(memory_get_usage(true)).' Затрачено памяти';
