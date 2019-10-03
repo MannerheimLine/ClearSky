@@ -4,6 +4,7 @@
 namespace Application\Blog\Action;
 
 
+use Application\Blog\Domain\Inject;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
@@ -11,6 +12,11 @@ use Zend\Diactoros\Response\HtmlResponse;
 
 class BlogIndexAction implements RequestHandlerInterface
 {
+    public function __construct(Inject $inject)
+    {
+        $this->_inject = $inject;
+    }
+
     /**
      * Handles a request and produces a response.
      *

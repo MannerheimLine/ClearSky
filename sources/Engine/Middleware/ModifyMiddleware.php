@@ -21,6 +21,7 @@ class ModifyMiddleware implements MiddlewareInterface
      */
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
+        //sleep(1);
         $response = $handler->handle($request);
         return $response->withHeader('X-MODIFY-TITLE', 'MODIFiED');
     }

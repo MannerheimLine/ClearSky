@@ -1,10 +1,13 @@
 <?php
 
 use Aura\Router\RouterContainer;
+use Engine\Middleware\BasicAuthMiddleware;
+use Engine\Middleware\ModifyMiddleware;
 use Engine\Middleware\ProfilerMiddleware;
 use Psr\Http\Message\ResponseInterface;
 use Zend\Diactoros\ServerRequestFactory;
 use Zend\HttpHandlerRunner\Emitter\SapiEmitter;
+use Zend\Stratigility\Middleware\PathMiddlewareDecorator;
 use Zend\Stratigility\MiddlewarePipe;
 
 use function Zend\Stratigility\path;
@@ -21,6 +24,26 @@ $map->get('catalog/show', '/blog/{id}', Application\Blog\Action\CstegoryShowActi
 $map->get('catalog/view', '/blog/{id}/view/{number}', Application\Blog\Action\CategoryIndexAction::class)->tokens(['id' => '\d+', 'number' => '\d+']);
 $map->get('catalog/detail', '/blog/{id}/view/{number}-{detail}', Application\Blog\Action\DetailsIndexAction::class)->tokens(['id' => '\d+', 'number' => '\d+', 'detail' => '\d+']);
 
+#DI Container
+$definitions = [
+   \Application\Blog\Domain\Inject::class => \DI\create(\Application\Blog\Domain\Inject::class),
+    \Application\Blog\Domain\DataProvider::class => \DI\create(\Application\Blog\Domain\DataProvider::class),
+    /*\Application\Blog\Domain\Injectable::class => \DI\factory(function (\DI\Container $c){
+        return new \Application\Blog\Domain\Inject($c->get(\Application\Blog\Domain\DataProvider::class));
+    }),*/
+    \Application\Blog\Domain\Injectable::class => \DI\factory(function (\Application\Blog\Domain\DataProvider $provider){
+        return new \Application\Blog\Domain\Inject($provider);
+    }),
+    //B::class => \DI\factory(function (Container $c) {
+    //    return new B($c->get(A::class)->getData());
+    //}),
+];
+$builder = new \DI\ContainerBuilder();
+$builder->addDefinitions($definitions);
+$container = $builder->build();
+
+
+
 #Запуск
 $request = ServerRequestFactory::fromGlobals();
 $matcher = $aura->getMatcher();
@@ -31,29 +54,28 @@ foreach ($route->attributes as $key => $val) {
 }
 
 $actionClass = $route->handler;
-$action = new $actionClass(); //Action
+$action = $container->get($actionClass);
 /**
  * @var ResponseInterface $response
  */
 
 #Загрузка в трубопровод
 $pipeline = new MiddlewarePipe();
-$pipeline->pipe(new ProfilerMiddleware());
 $pipeline->pipe(path('/', new ProfilerMiddleware()));
-$pipeline->pipe(path('/blog', new \Engine\Middleware\BasicAuthMiddleware()));
-$pipeline->pipe(new \Zend\Stratigility\Middleware\PathMiddlewareDecorator('/blog{id}/view/', new \Engine\Middleware\ModifyMiddleware()));
+$pipeline->pipe(path('/', new \Engine\Middleware\ClientIpMiddleware()));
+$pipeline->pipe(path('blog', new BasicAuthMiddleware()));
+$pipeline->pipe(new PathMiddlewareDecorator('blog', new ModifyMiddleware()));
 #Запуск трубопровода
 $response = $pipeline->process($request, $action);
 
 #Добавление пост-заголовков
 $response = $response->withAddedHeader('Header1', 'Value1');
 $response = $response->withAddedHeader('Header2', 'Value12');
-
 #Отправка клиенту
 $emitter = new SapiEmitter();
 $emitter->emit($response);
 
-#Отладочная нформация
+#Отладочная информация
 function convert($size)
 {
     $unit = array('b','kb','mb','gb','tb','pb');
