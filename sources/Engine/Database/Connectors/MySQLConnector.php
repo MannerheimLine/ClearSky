@@ -1,5 +1,6 @@
 <?php
 
+declare(strict_types = 1);
 
 namespace Engine\Database\Connectors;
 
@@ -10,9 +11,13 @@ class MySQLConnector implements ConnectorInterface
     //private function __construct() {}
     private function __clone() {}
 
-    public function getConnection() {
+    /**
+     * @return PDOEmulator|null
+     */
+    public static function getConnection() {
         if (is_null(self::$_instance)) {
-            try {
+            self::$_instance = new PDOEmulator();
+            /*try {
                 $params = include ROOT.'/configs/db_configs.php';//Config::getDbConfigs();
                 $host = $params['host'];
                 $db = $params['dbname'];
@@ -29,8 +34,9 @@ class MySQLConnector implements ConnectorInterface
                 self::$_instance = new \PDO($dsn, $user, $password, $options);
             } catch (PDOException $e) {
                 throw new Exception('Ошибка соединения с базой данных '.$e->getMessage());
-            }
+            }*/
         }
         return self::$_instance;
     }
+
 }

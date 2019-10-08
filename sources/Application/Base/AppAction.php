@@ -4,7 +4,7 @@
 namespace Application\Base;
 
 
-class Action
+class AppAction
 {
     protected $_variable;
 

@@ -1,5 +1,6 @@
 <?php
 
+declare(strict_types = 1);
 
 namespace Application\EMR\Person\Actions;
 
@@ -20,7 +21,8 @@ class PersonIndexAction implements RequestHandlerInterface
     }
 
     public function handle(ServerRequestInterface $request) : ResponseInterface{
-        $response = new JsonResponse($this->_person->getPersonalData());
+        $personalData = $this->_person->getPersonalData();
+        $response = new JsonResponse($personalData);
         return $response;
     }
 

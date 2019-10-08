@@ -23,16 +23,20 @@ require "vendor/autoload.php";
 #Коллекция маршрутов
 $aura = new RouterContainer();
 $map = $aura->getMap();
-$map->get('home', '/person', PersonIndexAction::class);
+$map->get('home', '/', PersonIndexAction::class);
+//$map->get('catalog/detail', '/blog/{id}/view/{number}-{detail}', Application\Blog\Action\DetailsIndexAction::class)->tokens(['id' => '\d+', 'number' => '\d+', 'detail' => '\d+']);
+
 #DI Container
 $definitions = [
-
-    ConnectorInterface::class => DI\create(MySQLConnector::class) ,//Так обьявляется через интерфейс
+    ConnectorInterface::class => DI\create(MySQLConnector::class)->method('getConnection'),
 ];
 
 $builder = new ContainerBuilder();
 $builder->addDefinitions($definitions);
 $container = $builder->build();
+
+
+
 
 #Запуск
 $request = ServerRequestFactory::fromGlobals();

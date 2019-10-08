@@ -9,7 +9,7 @@ interface ConnectorInterface
     /**
      * Вернет подключение к базе данных
      * --------------------------------
-     * @return \PDO
+     * @return \Engine\Database\Connectors\PDOEmulator
      */
-    public function getConnection();
+    public static function getConnection();
 }
