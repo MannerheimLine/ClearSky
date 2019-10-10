@@ -1,5 +1,6 @@
 <?php
 
+use Application\EMR\Person\Actions\PersonEditAction;
 use Application\EMR\Person\Actions\PersonIndexAction;
 use Aura\Router\RouterContainer;
 use DI\ContainerBuilder;
@@ -23,7 +24,8 @@ require "vendor/autoload.php";
 #Коллекция маршрутов
 $aura = new RouterContainer();
 $map = $aura->getMap();
-$map->get('home', '/', PersonIndexAction::class);
+$map->get('person', '/', PersonIndexAction::class);
+$map->get('person/edit', '/person/edit/{id}', PersonEditAction::class)->tokens(['id' => '\d+']);
 //$map->get('catalog/detail', '/blog/{id}/view/{number}-{detail}', Application\Blog\Action\DetailsIndexAction::class)->tokens(['id' => '\d+', 'number' => '\d+', 'detail' => '\d+']);
 
 #DI Container

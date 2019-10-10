@@ -41,11 +41,14 @@ class Person extends AppDomain implements \JsonSerializable
 
     }
 
+    public function edit(int $id){
+        return 'You wanna edit this id'.$id;
+    }
+
     /**
      * @return Person
      */
     public function getPersonalData() : Person {
-        //return $this->_dbConnection->getData();
         $this->_id = 1;
         $this->_cardNumber = '12345';
         $this->_surname = 'Иванов';

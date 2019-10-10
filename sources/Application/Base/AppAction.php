@@ -1,20 +1,14 @@
 <?php
 
+declare(strict_types = 1);
 
 namespace Application\Base;
 
 
 class AppAction
 {
-    protected $_variable;
+    protected $_person;
+    protected $_responder;
 
-    public function __construct()
-    {
-        $this->_variable = 'This is protected Variable';
-    }
-
-    protected function AnotherHeader(){
-        return 'Another Header';
-    }
 
 }
