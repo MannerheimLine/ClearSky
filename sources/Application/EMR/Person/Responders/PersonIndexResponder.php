@@ -18,8 +18,8 @@ class PersonIndexResponder extends AppResponder
      */
     public function respond(ServerRequestInterface $request, $payload = null): Response
     {
-        $name = 'Mikki';
-        $html = require 'sources/Application/Templates/Person/index.page.php';
+        //$data = $payload;
+        $html = $this->_template->render('person/index.page', $payload);
         return new Response\HtmlResponse($html);
     }
 }

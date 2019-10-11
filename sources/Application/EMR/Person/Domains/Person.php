@@ -32,7 +32,7 @@ class Person extends AppDomain implements \JsonSerializable
     private $_profession;
 
     /**
-     * Person constructor.
+     * person constructor.
      * @param ConnectorInterface $dbConnector
      */
     public function __construct(ConnectorInterface $dbConnector)

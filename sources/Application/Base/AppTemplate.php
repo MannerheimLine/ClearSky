@@ -5,15 +5,31 @@ declare(strict_types = 1);
 namespace Application\Base;
 
 
-class AppTemplate
+use Engine\Base\Template;
+
+class AppTemplate extends Template
 {
-    private $_templatesFolder ='sources/Application/Templates/Person/';
+    /**
+     * AppTemplate constructor.
+     */
+    public function __construct()
+    {
+        $this->setLayout();
+        $this->setPagesFolder();
+    }
 
-    public function render(string $page){
+    /**
+     * Установка Layout
+     */
+    protected function setLayout() : void {
+        $this->_layout = 'sources/Application/Templates/layout/index.php';
+    }
 
-        return require $this->_templatesFolder.'/'.$page.'.php';
-        //$p = 'sources/Application/Templates/Person/index.php';
-        //return $p;
+    /**
+     * Указывает папку со страницами дляподгрузки
+     */
+    protected function setPagesFolder() : void {
+        $this->_pagesFolder = 'sources/Application/Templates/';
     }
 
 }
