@@ -6,8 +6,10 @@ use Aura\Router\RouterContainer;
 use DI\ContainerBuilder;
 use Engine\Database\Connectors\ConnectorInterface;
 use Engine\Database\Connectors\MySQLConnector;
+use Engine\Http\MimeTypeResolver;
 use Engine\Middleware\BasicAuthMiddleware;
 use Engine\Middleware\ClientIpMiddleware;
+use Engine\Middleware\MemoryUsageMiddleware;
 use Engine\Middleware\ModifyMiddleware;
 use Engine\Middleware\ProfilerMiddleware;
 use Psr\Http\Message\ResponseInterface;
@@ -32,46 +34,41 @@ $map->get('person/edit', '/person/edit/{id}', PersonEditAction::class)->tokens([
 $definitions = [
     ConnectorInterface::class => DI\create(MySQLConnector::class)->method('getConnection'),
 ];
-
 $builder = new ContainerBuilder();
 $builder->addDefinitions($definitions);
 $container = $builder->build();
 
-
-
-
 #Запуск
 $request = ServerRequestFactory::fromGlobals();
+#Решение проблем с определением типа Content Type для js/css файлов
+$resolver = new MimeTypeResolver();
+$resolver->resolve($request);
+#Парсинг роутов
 $matcher = $aura->getMatcher();
 $route = $matcher->match($request);
-foreach ($route->attributes as $key => $val) {
-    $request = $request->withAttribute($key, $val);
-}
-$actionClass = $route->handler;
-$action = $container->get($actionClass);
-/**
- * @var ResponseInterface $response
- */
+if ($route){
+    foreach ($route->attributes as $key => $val) {
+        $request = $request->withAttribute($key, $val);
+    }
+    $actionClass = $route->handler;
+    $action = $container->get($actionClass);
+    /**
+     * @var ResponseInterface $response
+     */
 #Загрузка в трубопровод
-$pipeline = new MiddlewarePipe();
-$pipeline->pipe(path('/', new ProfilerMiddleware()));
-$pipeline->pipe(path('/', new ClientIpMiddleware()));
-$pipeline->pipe(path('person', new BasicAuthMiddleware()));
-$pipeline->pipe(new PathMiddlewareDecorator('person', new ModifyMiddleware()));
+    $pipeline = new MiddlewarePipe();
+    $pipeline->pipe(path('/', new ProfilerMiddleware()));
+    $pipeline->pipe(path('/', new ClientIpMiddleware()));
+    $pipeline->pipe(path('/', new MemoryUsageMiddleware()));
+    $pipeline->pipe(path('person', new BasicAuthMiddleware()));
+    $pipeline->pipe(new PathMiddlewareDecorator('person', new ModifyMiddleware()));
 #Запуск трубопровода
-$response = $pipeline->process($request, $action);
+    $response = $pipeline->process($request, $action);
 #Добавление пост-заголовков
-$response = $response->withAddedHeader('Header1', 'Value1');
-$response = $response->withAddedHeader('Header2', 'Value12');
+    $response = $response->withAddedHeader('Header1', 'Value1');
+    $response = $response->withAddedHeader('Header2', 'Value12');
 #Отправка клиенту
-$emitter = new SapiEmitter();
-$emitter->emit($response);
-#Отладочная информация
-function convert($size)
-{
-    $unit = array('b','kb','mb','gb','tb','pb');
-    return @round($size/pow(1024,($i=floor(log($size,1024)))),2).' '.$unit[$i];
+    $emitter = new SapiEmitter();
+    $emitter->emit($response);
+
 }
-echo convert(memory_get_usage(true)).' Затрачено памяти';
-echo '<br>';
-echo memory_get_peak_usage();

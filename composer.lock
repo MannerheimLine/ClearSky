@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "1f85addc3dfc6a318c227571122887cd",
+    "content-hash": "caadfac6d6485639511c1bd86aa13997",
     "packages": [
         {
             "name": "aura/router",
@@ -2527,7 +2527,8 @@
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {
-        "php": ">=7.3"
+        "php": ">=7.3",
+        "ext-json": "*"
     },
     "platform-dev": []
 }
