@@ -26,7 +26,7 @@ abstract class Template
      * -----------------------------------------------------------------
      * @param string $title
      */
-    protected function setTitle(string $title) : void {
+    public function setTitle(string $title) : void {
         $this->_title = $title;
     }
 

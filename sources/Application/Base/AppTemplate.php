@@ -22,14 +22,14 @@ class AppTemplate extends Template
      * Установка Layout
      */
     protected function setLayout() : void {
-        $this->_layout = 'sources/Application/Templates/layout/index.php';
+        $this->_layout = 'resources/templates/application/layout/index.php';
     }
 
     /**
      * Указывает папку со страницами дляподгрузки
      */
     protected function setPagesFolder() : void {
-        $this->_pagesFolder = 'sources/Application/Templates/';
+        $this->_pagesFolder = 'resources/templates/application/pages/';
     }
 
 }
