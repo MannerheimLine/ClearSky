@@ -6,7 +6,7 @@ use Aura\Router\RouterContainer;
 use DI\ContainerBuilder;
 use Engine\Database\Connectors\ConnectorInterface;
 use Engine\Database\Connectors\MySQLConnector;
-use Engine\Http\MimeTypeResolver;
+use Engine\Http\MimeType\MimeTypeResolver;
 use Engine\Middleware\BasicAuthMiddleware;
 use Engine\Middleware\ClientIpMiddleware;
 use Engine\Middleware\MemoryUsageMiddleware;
@@ -33,6 +33,7 @@ $map->get('person/edit', '/person/edit/{id}', PersonEditAction::class)->tokens([
 #DI Container
 $definitions = [
     ConnectorInterface::class => DI\create(MySQLConnector::class)->method('getConnection'),
+    \Engine\Database\Creators\MySQLCreator::class => new \Engine\Database\Creators\MySQLCreator(new MySQLConnector),
 ];
 $builder = new ContainerBuilder();
 $builder->addDefinitions($definitions);
@@ -52,6 +53,17 @@ if ($route){
     }
     $actionClass = $route->handler;
     $action = $container->get($actionClass);
+
+
+
+
+    $db = $container->get(\Engine\Database\Creators\MySQLCreator::class);
+    //$db = $db->
+    $db->createDataBase('db');
+    $db->createTable('table');
+
+
+
     /**
      * @var ResponseInterface $response
      */
@@ -70,5 +82,4 @@ if ($route){
 #Отправка клиенту
     $emitter = new SapiEmitter();
     $emitter->emit($response);
-
 }
