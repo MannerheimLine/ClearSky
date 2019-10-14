@@ -33,7 +33,7 @@ $map->get('person/edit', '/person/edit/{id}', PersonEditAction::class)->tokens([
 #DI Container
 $definitions = [
     ConnectorInterface::class => DI\create(MySQLConnector::class)->method('getConnection'),
-    \Engine\Database\Creators\MySQLCreator::class => new \Engine\Database\Creators\MySQLCreator(new MySQLConnector),
+    \Engine\Database\Creators\DbCreator::class => new \Engine\Database\Creators\DbCreator(new MySQLConnector),
 ];
 $builder = new ContainerBuilder();
 $builder->addDefinitions($definitions);
@@ -57,7 +57,7 @@ if ($route){
 
 
 
-    $db = $container->get(\Engine\Database\Creators\MySQLCreator::class);
+    $db = $container->get(\Engine\Database\Creators\DbCreator::class);
     //$db = $db->
     $db->createDataBase('db');
     $db->createTable('table');

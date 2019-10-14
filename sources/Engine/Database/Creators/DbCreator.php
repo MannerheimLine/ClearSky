@@ -6,12 +6,11 @@ namespace Engine\Database\Creators;
 
 
 use Engine\Database\Connectors\ConnectorInterface;
-use Engine\Database\Connectors\MySQLConnector;
+use PDO;
+use PDOException;
 
-class MySQLCreator
+class DbCreator
 {
-    private $_user;
-    private $_password;
     const DB_EXIST = 'Такая Бд уже существует';
     const DB_CREATED = 'База данных успешно создана';
 
@@ -20,18 +19,18 @@ class MySQLCreator
         $this->_connection = $connection;
     }
 
-    private function isExist(\PDO $pdo, string $dbName) : bool {
+    private function isExist(PDO $pdo, string $dbName) : bool {
         try{
             $pdo->query("use $dbName");
             return true;
-        }catch (\PDOException $e){
+        }catch (PDOException $e){
             return false;
         }
     }
 
     public function createDataBase(string $dbName) : string {
-        $pdo = new \PDO("mysql:host=localhost", 'root', '');
-        $pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
+        $pdo = new PDO("mysql:host=localhost", 'root', '');
+        $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         if (!$this->isExist($pdo, $dbName)){
             $dbName = "`".str_replace("`","``", $dbName)."`";
             $pdo->query("CREATE DATABASE IF NOT EXISTS $dbName DEFAULT CHARACTER SET utf8;");
@@ -41,7 +40,7 @@ class MySQLCreator
         return self::DB_EXIST;
     }
 
-    public function createTable(string $tableName){
+    /*public function createTable(string $tableName){
         $db = $this->_connection::getConnection()->connect();
         $query = ("CREATE TABLE `users` (
                     `id` int(10) UNSIGNED NOT NULL COMMENT 'id - пользователя',
@@ -59,6 +58,6 @@ class MySQLCreator
         $result = $db->prepare($query);
         $result->execute();
 
-    }
+    }*/
 
 }
