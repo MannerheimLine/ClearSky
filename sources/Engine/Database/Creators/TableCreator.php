@@ -6,32 +6,39 @@ namespace Engine\Database\Creators;
 
 
 use Engine\Database\Connectors\ConnectorInterface;
+use Engine\Database\Creators\DataStructures\Scheme;
 
+/**
+ * Class TableCreator
+ * @package Engine\Database\Creators
+ */
 class TableCreator
 {
-    private $_fields = []; //Содержит в себе объекты полей таблицы
-    private $_tableInfo = [];
     private $_connection;
+    private $_scheme;
 
-    public function __construct(ConnectorInterface $connector, SchemeExplorer $schemeExplorer)
+    /**
+     * 1 Схема = 1 Таблица. Так можно будет запускать создание через цикл
+     * $schemes = $schemeCollection->getSchemes();
+     * $foreach ($schemes as $scheme){$creator->create}
+     * ------------------------------------------------------------------
+     * TableCreator constructor.
+     * @param ConnectorInterface $connector
+     * @param Scheme $scheme
+     */
+    public function __construct(ConnectorInterface $connector, Scheme $scheme)
     {
         $this->_connection = $connector::getConnection();
-        $this->_tableInfo = $schemeExplorer->getTableInfo();
-        $this->_fields = $schemeExplorer->getFields();
-        ;
+        $this->_scheme = $scheme;
     }
 
-    private function convertFields() : string {
+    private function convertToSQLString(array $field) : string {
         //инициализация полей уже в форме SQL запроса
-        foreach ($this->_fields as $field) {
-            $string ='';
-        }
-        return $string;
+
     }
 
-    private function createQuery(string $fields){
+    private function createQuery(){
         //Инициализация имени, типа таблицы, комментариев и тд уже в форме SQL запроса
-
         /*
          * $query = ("CREATE TABLE `users` (
                     `id` int(10) UNSIGNED NOT NULL COMMENT 'id - пользователя',
@@ -49,17 +56,19 @@ class TableCreator
          *
          */
 
-        $name = $this->_tableInfo['name']; //обернуть
-        $charset = $this->_tableInfo['charset']; //обернуть
-        $engine = $this->_tableInfo['engine']; //обернуть
-        $comment = $this->_tableInfo['comment']; //обернуть
-        $string =("CREATE TABLE $name ($fields) ENGINE=$engine DEFAULT CHARSET=$charset COMMENT=$comment;");
+        $fields = $this->_scheme->getFields();
+        $info = $this->_scheme->getInfo();
+        $sqlString = '(';
+        foreach ($fields as $field){
+            $sqlString = $sqlString.$this->convertToSQLString($field).',';
+        }
+        $sqlString = $sqlString.')';
+        $string =("CREATE TABLE :tableName ($fields) ENGINE=$engine DEFAULT CHARSET=$charset COMMENT=$comment;");
         return $string;
     }
 
     public function create(){
-        $fields = $this->convertFields();
-        $query = $this->createQuery($fields);
+        $query = $this->createQuery();
         $result = $this->_connection->connect()->prepare($query);
         $result->execute();
     }

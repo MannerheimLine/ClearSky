@@ -1,10 +1,11 @@
 <?php
 return [
-    'table_info' => [
+    'info' => [
         'name' => 'users',
         'charset' => 'utf8',
         'engine' => 'InnoDB',
-        'comment' => 'Таблица с данными о пользователях системы'
+        'comment' => 'Таблица с данными о пользователях системы',
+        'version' => 1.0
     ],
     'fields' => [
         'id' => [
