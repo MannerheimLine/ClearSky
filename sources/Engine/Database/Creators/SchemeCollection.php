@@ -10,6 +10,9 @@ use Engine\Database\Creators\DataStructures\Scheme;
 class SchemeCollection
 {
     private $_schemes = [];
+    private $_availableExtensions = [
+        'php'
+    ];
 
     public function __construct(string $schemesFolder)
     {
@@ -19,12 +22,17 @@ class SchemeCollection
     private function init(string $schemesFolder) {
         $schemeFiles = array_slice(scandir($schemesFolder), 2);
         foreach ($schemeFiles as $schemeFile){
-            $this->_schemes[] = new Scheme($schemeFile);
+            $extension  = pathinfo($schemeFile, PATHINFO_EXTENSION);
+            if (in_array($extension, $this->_availableExtensions)){
+                $schemeFile = include $schemesFolder.'/'.$schemeFile;
+                $this->_schemes[] = new Scheme($schemeFile);
+            }
+
         }
     }
 
-    public function getScheme(){
-
+    public function getSchemes(){
+        return $this->_schemes;
     }
 
 

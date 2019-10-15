@@ -15,7 +15,6 @@ use Engine\Database\Creators\DataStructures\Scheme;
 class TableCreator
 {
     private $_connection;
-    private $_scheme;
 
     /**
      * 1 Схема = 1 Таблица. Так можно будет запускать создание через цикл
@@ -26,10 +25,9 @@ class TableCreator
      * @param ConnectorInterface $connector
      * @param Scheme $scheme
      */
-    public function __construct(ConnectorInterface $connector, Scheme $scheme)
+    public function __construct(ConnectorInterface $connector)
     {
         $this->_connection = $connector::getConnection();
-        $this->_scheme = $scheme;
     }
 
     private function convertToSQLString(array $field) : string {
@@ -37,7 +35,7 @@ class TableCreator
 
     }
 
-    private function createQuery(){
+    private function createQuery(Scheme $scheme){
         //Инициализация имени, типа таблицы, комментариев и тд уже в форме SQL запроса
         /*
          * $query = ("CREATE TABLE `users` (
@@ -56,8 +54,8 @@ class TableCreator
          *
          */
 
-        $fields = $this->_scheme->getFields();
-        $info = $this->_scheme->getInfo();
+        $fields = $scheme->getFields();
+        $info = $scheme->getInfo();
         $sqlString = '(';
         foreach ($fields as $field){
             $sqlString = $sqlString.$this->convertToSQLString($field).',';
@@ -67,10 +65,30 @@ class TableCreator
         return $string;
     }
 
-    public function create(){
-        $query = $this->createQuery();
-        $result = $this->_connection->connect()->prepare($query);
-        $result->execute();
+    public function create(Scheme $scheme){
+        $arr = [
+            'name' => 'id',
+            'type' => 'int',
+            'size' => 10,
+            'defaultValue' => '1',
+            'charset' => 'utf8',
+            'attributes' => 'UNSIGNED',
+            'allowNull' => false,
+            'index' => 'PRIMARY',
+            'allowAI' => true,
+            'comment' => 'id - пользователя'];
+        //`id` int(10) UNSIGNED NOT NULL DEFAULT '1' COMMENT 'comment'
+        $name = '`'.$arr['name'].'`';
+        $type = $arr['type'].'('.$arr['size'].')';
+        $attributes = $arr['attributes'];
+        $allowNull = $arr['allowNull'] ? '':'NOT NULL';
+        $default = 'DEFAULT'.' '."'".$arr['defaultValue']."'";
+        $comment = 'COMMENT'.' '."'".$arr['comment']."'";
+        $string = $name.' '.$type.' '.$attributes.' '.$allowNull.' '.$default.' '.$comment;
+        $a = 1;
+        //$query = $this->createQuery($scheme);
+        //$result = $this->_connection->connect()->prepare($query);
+        //$result->execute();
     }
 
 }
