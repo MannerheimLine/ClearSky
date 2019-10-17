@@ -1,7 +1,8 @@
 <?php
 
-use Application\EMR\Person\Actions\PersonEditAction;
-use Application\EMR\Person\Actions\PersonIndexAction;
+use Application\EMR\PatientCard\Actions\PatientCardEditAction;
+use Application\EMR\PatientCard\Actions\PatientCardIndexAction;
+use Application\EMR\PatientCard\Actions\PatientCardShowAction;
 use Aura\Router\RouterContainer;
 use DI\ContainerBuilder;
 use Engine\Database\Connectors\ConnectorInterface;
@@ -26,8 +27,9 @@ require "vendor/autoload.php";
 #Коллекция маршрутов
 $aura = new RouterContainer();
 $map = $aura->getMap();
-$map->get('person', '/', PersonIndexAction::class);
-$map->get('person/edit', '/person/edit/{id}', PersonEditAction::class)->tokens(['id' => '\d+']);
+$map->get('person', '/', PatientCardIndexAction::class);
+$map->get('person/show', '/show/{id}', PatientCardShowAction::class)->tokens(['id' => '\d+']);
+$map->get('person/edit', '/person/edit/{id}', PatientCardEditAction::class)->tokens(['id' => '\d+']);
 //$map->get('catalog/detail', '/blog/{id}/view/{number}-{detail}', Application\Blog\Action\DetailsIndexAction::class)->tokens(['id' => '\d+', 'number' => '\d+', 'detail' => '\d+']);
 
 #DI Container

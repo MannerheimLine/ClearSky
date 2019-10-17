@@ -1,19 +1,19 @@
 <?php
 
 
-namespace Application\EMR\Person\Actions;
+namespace Application\EMR\PatientCard\Actions;
 
 
 use Application\Base\AppAction;
-use Application\EMR\Person\Domains\Person;
-use Application\EMR\Person\Responders\PersonEditResponder;
+use Application\EMR\PatientCard\Domains\PatientCard;
+use Application\EMR\PatientCard\Responders\PersonEditResponder;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 
-class PersonEditAction extends AppAction implements RequestHandlerInterface
+class PatientCardEditAction extends AppAction implements RequestHandlerInterface
 {
-    public function __construct(Person $person, PersonEditResponder $responder)
+    public function __construct(PatientCard $person, PersonEditResponder $responder)
     {
         $this->_person = $person;
         $this->_responder = $responder;

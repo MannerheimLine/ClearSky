@@ -2,13 +2,13 @@
 
 declare(strict_types = 1);
 
-namespace Application\EMR\Person\Domains;
+namespace Application\EMR\PatientCard\Domains;
 
 
 use Application\Base\AppDomain;
 use Engine\Database\Connectors\ConnectorInterface;
 
-class Person extends AppDomain implements \JsonSerializable
+class PatientCard extends AppDomain implements \JsonSerializable
 {
     private $_dbConnection;
     private $_id;
@@ -18,13 +18,17 @@ class Person extends AppDomain implements \JsonSerializable
     private $_secondName;
     private $_gender;
     private $_dateBirth;
+    private $_telephone;
+    private $_email;
     private $_policyNumber;
+    private $_insuranceCompany;
     private $_insuranceCertificate;
     private $_passportSerial;
     private $_passportNumber;
+    private $_fmsDepartment;
     private $_region;
     private $_district;
-    private $_village;
+    private $_locality;
     private $_street;
     private $_houseNumber;
     private $_apartment;
@@ -46,29 +50,73 @@ class Person extends AppDomain implements \JsonSerializable
     }
 
     /**
-     * @return Person
+     * @return PatientCard
      */
-    public function getPersonalData() : Person {
-        $this->_id = 1;
+    public function getCardData($id) : PatientCard {
+        $query = ("SELECT 
+        `patient_cards`.`id`,
+        `patient_cards`.`card_number` as `card_number`,
+        `patient_cards`.`surname` as `surname`,
+        `patient_cards`.`firstname` as `firstname`,
+        `patient_cards`.`secondname` as `secondname`,
+        `gender`.`description` as `gender`
+        FROM `patient_cards` 
+        LEFT JOIN `gender` ON `patient_cards`.`gender` = `gender`.`id` 
+        WHERE `patient_cards`.`id` = :id");
+        $result = $this->_dbConnection->prepare($query);
+        $result->execute([
+            'id' => $id
+        ]);
+        if ($result->rowCount() > 0){
+            while ($row = $result->fetch()){
+                $this->_id = $row['id'];
+                $this->_cardNumber = $row['card_number'];
+                $this->_surname = $row['surname'];
+                $this->_firstName = $row['firstname'];
+                $this->_secondName = $row['secondname'];
+                $this->_gender = $row['gender'];
+                $this->_dateBirth = $row['date_birth'];
+                $this->_telephone = $row['telephone_number'];
+                $this->_emaile = $row['email'];
+                $this->_insuranceCertificate = $row['insurance'];
+                $this->_policyNumber = $row['policy_number'];
+                $this->_insuranceCompany = $row['insurance_company'];
+                $this->_passportSerial = $row['passport_serial'];
+                $this->_passportNumber = $row['passport_number'];
+                $this->_fmsDepartment = $row['fms_department'];
+                $this->_region = $row['region'];
+                $this->_district = $row['district'];
+                $this->_locality = $row['locality'];
+                $this->_street = $row['street'];
+                $this->_houseNumber = $row['houseNumber'];
+                $this->_apartment = $row['apartment'];
+                $this->_workPlace = $row['work_place'];
+                $this->_profession = $row['profession'];
+            }
+        }
+        return $this;
+        /*$this->_id = 1;
         $this->_cardNumber = '12345';
         $this->_surname = 'Иванов';
         $this->_firstName = 'Юрий';
         $this->_secondName = 'Витальевич';
         $this->_gender = 'мужчина';
         $this->_dateBirth = '01.03.1967';
+        $this->_telephone = '89145432672';
+        $this->_email = 'ivanov@mail.ru';
         $this->_policyNumber = '2549320879000095';
-        $this->_insuranceCertificate = '043-971-390-72';
+        $this->_insuranceCertificate = '043-971-390 72';
         $this->_passportSerial = '0502';
         $this->_passportNumber = '220551';
         $this->_region = 'Приморский край';
         $this->_district = 'Чугуевский район';
-        $this->_village = 'Чугуевка';
+        $this->_locality = 'Чугуевка';
         $this->_street = '50 лет Октября';
         $this->_houseNumber = '335';
         $this->_apartment = '1';
         $this->_workPlace = 'Отдел соцзащиты';
         $this->_profession = 'работник отдела кадров';
-        return $this;
+        return $this;*/
 
     }
 
@@ -88,19 +136,21 @@ class Person extends AppDomain implements \JsonSerializable
             'firstName' => $this->getFirstName(),
             'secondName' => $this->getSecondName(),
             'gender' => $this->getGender(),
-            'dateBirth' => $this->getDateBirth(),
+            /*'dateBirth' => $this->getDateBirth(),
+            'telephone' => $this->getTelephone(),
+            'email' => $this->getEmail(),
             'policeNumber' => $this->getPolicyNumber(),
             'insuranceCertificate' => $this->getInsuranceCertificate(),
             'passportSerial' => $this->getPassportSerial(),
             'passportNumber' => $this->getPassportNumber(),
             'region' => $this->getRegion(),
             'district' => $this->getDistrict(),
-            'village' => $this->getVillage(),
+            'locality' => $this->getLocality(),
             'street' => $this->getStreet(),
             'houseNumber' => $this->getHouseNumber(),
             'apartment' => $this->getApartment(),
             'workPlace' => $this->getWorkPlace(),
-            'profession' => $this->getProfession()
+            'profession' => $this->getProfession()*/
         ];
     }
 
@@ -161,11 +211,35 @@ class Person extends AppDomain implements \JsonSerializable
     }
 
     /**
+     * @return mixed
+     */
+    public function getTelephone()
+    {
+        return $this->_telephone;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getEmail()
+    {
+        return $this->_email;
+    }
+
+    /**
      * @return string
      */
     public function getPolicyNumber() : string
     {
         return $this->_policyNumber;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getInsuranceCompany()
+    {
+        return $this->_insuranceCompany;
     }
 
     /**
@@ -193,6 +267,14 @@ class Person extends AppDomain implements \JsonSerializable
     }
 
     /**
+     * @return mixed
+     */
+    public function getFmsDepartment()
+    {
+        return $this->_fmsDepartment;
+    }
+
+    /**
      * @return string
      */
     public function getRegion() : string
@@ -211,9 +293,9 @@ class Person extends AppDomain implements \JsonSerializable
     /**
      * @return string
      */
-    public function getVillage() : string
+    public function getLocality() : string
     {
-        return $this->_village;
+        return $this->_locality;
     }
 
     /**
@@ -255,4 +337,8 @@ class Person extends AppDomain implements \JsonSerializable
     {
         return $this->_profession;
     }
+
+
+
+
 }

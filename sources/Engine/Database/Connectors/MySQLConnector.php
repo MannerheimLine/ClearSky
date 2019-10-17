@@ -11,14 +11,14 @@ class MySQLConnector implements ConnectorInterface
     //private function __construct() {}
     private function __clone() {}
 
+
     /**
-     * @return PDOEmulator|null
+     * @return PDOEmulator|\PDO|null
      */
     public static function getConnection() {
         if (is_null(self::$_instance)) {
-            self::$_instance = new PDOEmulator();
-            /*try {
-                $params = include ROOT.'/configs/db_configs.php';//Config::getDbConfigs();
+            try {
+                $params = include 'config/db_configs.php';
                 $host = $params['host'];
                 $db = $params['dbname'];
                 $charset = $params['charset'];
@@ -32,9 +32,9 @@ class MySQLConnector implements ConnectorInterface
                     \PDO::ATTR_EMULATE_PREPARES   => false,
                 );
                 self::$_instance = new \PDO($dsn, $user, $password, $options);
-            } catch (PDOException $e) {
-                throw new Exception('Ошибка соединения с базой данных '.$e->getMessage());
-            }*/
+            } catch (\PDOException $e) {
+                throw new \Exception('Ошибка соединения с базой данных '.$e->getMessage());
+            }
         }
         return self::$_instance;
     }

@@ -2,19 +2,19 @@
 
 declare(strict_types = 1);
 
-namespace Application\EMR\Person\Actions;
+namespace Application\EMR\PatientCard\Actions;
 
 
 use Application\Base\AppAction;
-use Application\EMR\Person\Domains\Person;
-use Application\EMR\Person\Responders\PersonIndexResponder;
+use Application\EMR\PatientCard\Domains\PatientCard;
+use Application\EMR\PatientCard\Responders\PersonIndexResponder;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 
-class PersonIndexAction extends AppAction implements RequestHandlerInterface
+class PatientCardIndexAction extends AppAction implements RequestHandlerInterface
 {
-    public function __construct(Person $person, PersonIndexResponder $responder)
+    public function __construct(PatientCard $person, PersonIndexResponder $responder)
     {
         $this->_person = $person;
         $this->_responder = $responder;
@@ -26,12 +26,13 @@ class PersonIndexAction extends AppAction implements RequestHandlerInterface
          * Можно не использовать Payload а напрямую передавать объект person
          * Request используется для пердачи параметров
          */
-        $payload = $this->_person->getPersonalData(); //return person
+        $id = 1;
+        $payload = $this->_person->getCardData($id); //return person
         /**
          * В респондер пока не вижу смысла передавать request
          */
         $response = $this->_responder->respond($request, $payload);
-        $response = $response->withAddedHeader('PersonIndexAction', 'Handled');
+        $response = $response->withAddedHeader('PatientCardIndexAction', 'Handled');
         return $response;
     }
 

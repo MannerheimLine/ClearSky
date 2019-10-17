@@ -1,16 +1,16 @@
 <?php
 
+declare(strict_types = 1);
 
-namespace Application\EMR\Person\Responders;
+namespace Application\EMR\PatientCard\Responders;
 
 
 use Application\Base\AppResponder;
 use Psr\Http\Message\ServerRequestInterface;
 use Zend\Diactoros\Response;
 
-class PersonEditResponder extends AppResponder
+class PersonIndexResponder extends AppResponder
 {
-
     /**
      * @param ServerRequestInterface $request
      * @param null $payload
@@ -18,6 +18,8 @@ class PersonEditResponder extends AppResponder
      */
     public function respond(ServerRequestInterface $request, $payload = null): Response
     {
-        return new Response\JsonResponse(['Data' => $payload], 201);
+        $this->_template->setTitle('Главная');
+        $html = $this->_template->render('person/index.page', $payload);
+        return new Response\HtmlResponse($html);
     }
 }

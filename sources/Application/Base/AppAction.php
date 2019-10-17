@@ -7,7 +7,6 @@ namespace Application\Base;
 
 class AppAction
 {
-    protected $_person;
     protected $_responder;
 
 
