@@ -19,7 +19,7 @@ class PersonIndexResponder extends AppResponder
     public function respond(ServerRequestInterface $request, $payload = null): Response
     {
         $this->_template->setTitle('Главная');
-        $html = $this->_template->render('person/index.page', $payload);
+        $html = $this->_template->render('patient_card/index.page', $payload);
         return new Response\HtmlResponse($html);
     }
 }

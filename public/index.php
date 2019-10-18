@@ -27,9 +27,9 @@ require "vendor/autoload.php";
 #Коллекция маршрутов
 $aura = new RouterContainer();
 $map = $aura->getMap();
-$map->get('person', '/', PatientCardIndexAction::class);
-$map->get('person/show', '/show/{id}', PatientCardShowAction::class)->tokens(['id' => '\d+']);
-$map->get('person/edit', '/person/edit/{id}', PatientCardEditAction::class)->tokens(['id' => '\d+']);
+$map->get('patient_card', '/', PatientCardIndexAction::class);
+$map->get('patient_card/show', '/show/{id}', PatientCardShowAction::class)->tokens(['id' => '\d+']);
+$map->get('patient_card/edit', '/patient_card/edit/{id}', PatientCardEditAction::class)->tokens(['id' => '\d+']);
 //$map->get('catalog/detail', '/blog/{id}/view/{number}-{detail}', Application\Blog\Action\DetailsIndexAction::class)->tokens(['id' => '\d+', 'number' => '\d+', 'detail' => '\d+']);
 
 #DI Container
@@ -77,8 +77,8 @@ if ($route){
     $pipeline->pipe(path('/', new ProfilerMiddleware()));
     $pipeline->pipe(path('/', new ClientIpMiddleware()));
     $pipeline->pipe(path('/', new MemoryUsageMiddleware()));
-    $pipeline->pipe(path('person', new BasicAuthMiddleware()));
-    $pipeline->pipe(new PathMiddlewareDecorator('person', new ModifyMiddleware()));
+    $pipeline->pipe(path('patient_card', new BasicAuthMiddleware()));
+    $pipeline->pipe(new PathMiddlewareDecorator('patient_card', new ModifyMiddleware()));
 #Запуск трубопровода
     $response = $pipeline->process($request, $action);
 #Добавление пост-заголовков

@@ -36,13 +36,12 @@ class PatientCard extends AppDomain implements \JsonSerializable
     private $_profession;
 
     /**
-     * person constructor.
+     * patient_card constructor.
      * @param ConnectorInterface $dbConnector
      */
     public function __construct(ConnectorInterface $dbConnector)
     {
         $this->_dbConnection = $dbConnector->getConnection();
-
     }
 
     public function edit(int $id){
@@ -59,9 +58,29 @@ class PatientCard extends AppDomain implements \JsonSerializable
         `patient_cards`.`surname` as `surname`,
         `patient_cards`.`firstname` as `firstname`,
         `patient_cards`.`secondname` as `secondname`,
-        `gender`.`description` as `gender`
+        `gender`.`description` as `gender`,
+        `patient_cards`.`date_birth` as `date_birth`,
+        `patient_cards`.`telephone_number` as `telephone_number`,
+        `patient_cards`.`email` as `email`,
+        `patient_cards`.`insurance` as `insurance`,
+        `patient_cards`.`policy_number` as `policy_number`,
+        `patient_cards`.`insurance_company` as `insurance_company`,
+        `patient_cards`.`passport_serial` as `passport_serial`,
+        `patient_cards`.`passport_number` as `passport_number`,
+        `patient_cards`.`fms_department` as `fms_department`,
+        `regions`.`region_name` as `region`,
+        `districts`.`district_name` as `district`,
+        `localities`.`locality_name` as `locality`,
+        `patient_cards`.`street` as `street`,
+        `patient_cards`.`house_number` as `house_number`,
+        `patient_cards`.`apartment` as `apartment`,
+        `patient_cards`.`work_place` as `work_place`,
+        `patient_cards`.`profession` as `profession`
         FROM `patient_cards` 
         LEFT JOIN `gender` ON `patient_cards`.`gender` = `gender`.`id` 
+        LEFT JOIN `regions` ON `patient_cards`.`region` = `regions`.`id` 
+        LEFT JOIN `districts` ON `patient_cards`.`district` = `districts`.`id` 
+        LEFT JOIN `localities` ON `patient_cards`.`locality` = `localities`.`id` 
         WHERE `patient_cards`.`id` = :id");
         $result = $this->_dbConnection->prepare($query);
         $result->execute([
@@ -88,36 +107,13 @@ class PatientCard extends AppDomain implements \JsonSerializable
                 $this->_district = $row['district'];
                 $this->_locality = $row['locality'];
                 $this->_street = $row['street'];
-                $this->_houseNumber = $row['houseNumber'];
+                $this->_houseNumber = $row['house_number'];
                 $this->_apartment = $row['apartment'];
                 $this->_workPlace = $row['work_place'];
                 $this->_profession = $row['profession'];
             }
         }
         return $this;
-        /*$this->_id = 1;
-        $this->_cardNumber = '12345';
-        $this->_surname = 'Иванов';
-        $this->_firstName = 'Юрий';
-        $this->_secondName = 'Витальевич';
-        $this->_gender = 'мужчина';
-        $this->_dateBirth = '01.03.1967';
-        $this->_telephone = '89145432672';
-        $this->_email = 'ivanov@mail.ru';
-        $this->_policyNumber = '2549320879000095';
-        $this->_insuranceCertificate = '043-971-390 72';
-        $this->_passportSerial = '0502';
-        $this->_passportNumber = '220551';
-        $this->_region = 'Приморский край';
-        $this->_district = 'Чугуевский район';
-        $this->_locality = 'Чугуевка';
-        $this->_street = '50 лет Октября';
-        $this->_houseNumber = '335';
-        $this->_apartment = '1';
-        $this->_workPlace = 'Отдел соцзащиты';
-        $this->_profession = 'работник отдела кадров';
-        return $this;*/
-
     }
 
     /**
@@ -136,7 +132,7 @@ class PatientCard extends AppDomain implements \JsonSerializable
             'firstName' => $this->getFirstName(),
             'secondName' => $this->getSecondName(),
             'gender' => $this->getGender(),
-            /*'dateBirth' => $this->getDateBirth(),
+            'dateBirth' => $this->getDateBirth(),
             'telephone' => $this->getTelephone(),
             'email' => $this->getEmail(),
             'policeNumber' => $this->getPolicyNumber(),
@@ -150,7 +146,7 @@ class PatientCard extends AppDomain implements \JsonSerializable
             'houseNumber' => $this->getHouseNumber(),
             'apartment' => $this->getApartment(),
             'workPlace' => $this->getWorkPlace(),
-            'profession' => $this->getProfession()*/
+            'profession' => $this->getProfession()
         ];
     }
 
@@ -301,7 +297,7 @@ class PatientCard extends AppDomain implements \JsonSerializable
     /**
      * @return string
      */
-    public function getStreet() : string
+    public function getStreet()
     {
         return $this->_street;
     }
@@ -337,8 +333,5 @@ class PatientCard extends AppDomain implements \JsonSerializable
     {
         return $this->_profession;
     }
-
-
-
 
 }

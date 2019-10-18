@@ -29,8 +29,7 @@ class PatientCardShowAction extends AppAction implements RequestHandlerInterface
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
         $id = $request->getAttribute('id');
-        $payload = $this->_patientCard->getCardData($id); //return person
-        //$payload = json_encode($payload); //JSON
+        $payload = $this->_patientCard->getCardData($id); //return json
         /**
          * В респондер пока не вижу смысла передавать request
          */
