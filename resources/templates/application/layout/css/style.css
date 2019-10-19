@@ -2,6 +2,77 @@ html, body {
     margin:0;
     padding:0;
 }
+
+#header_section{
+    height: 50px;
+    background-color: grey;
+}
+#main_section{
+    background-color: #6f42c1;
+    color: royalblue;
+}
+#footer_section{
+    height: 200px;
+    background-color: #0b2e13;
+}
+#sidebar_section{
+    width: 250px;
+    background-color: darkblue;
+    float: left;
+    height: calc(100vh - 50px);
+}
 #content_section{
-    color: gold;
+    width: 100%;
+    min-height: calc(100vh - 50px); /*Учитывая размер хидера, должен отнять*/
+    background-color: white;
+}
+.module-wrapper{
+    background-color: #eeeeee;
+    border: solid 1px;
+    border-color: #c1c1c1;
+    border-radius: 10px;
+    width: 100%;
+    padding: 15px;
+}
+.patient-card-menu{
+    height: 50px;
+    width: 100%;
+    background-color: white;
+    margin-bottom: 10px;
+    padding: 6px;
+    border: solid 1px;
+    border-radius: 5px;
+    border-color: #dce1e5;
+}
+.patient-card-body{
+    width: 100%;
+    /*background-color: white;*/
+    padding: 10px;
+}
+.patient-card-information-section{
+    border: solid 1px;
+    background-color: white;
+    border-radius: 5px;
+    border-color: #dce1e5;
+}
+.box-shadow--2dp {
+    box-shadow: 0 2px 2px 0 rgba(0, 0, 0, .14), 0 3px 1px -2px rgba(0, 0, 0, .2), 0 1px 5px 0 rgba(0, 0, 0, .12)
+}
+.patient-card-information-section-header{
+    background-color: #37474F;
+    color: white;
+    font-size: 16px;
+    font-weight: bold;
+    padding: 5px;
+}
+.patient-card-information-section-body{
+    padding: 5px;
+}
+.patient-card-status{
+    border: solid 1px;
+    font-size: 40px;
+    padding: 3px;
+    width: 50px;
+    height: 50px;
+    text-align: center;
 }

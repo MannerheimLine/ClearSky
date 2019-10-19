@@ -30,7 +30,10 @@ class MimeTypeResolver
         'txt' => 'text/plain',
         'htm' => 'text/html',
         'html' => 'text/html',
-        'pdf' => 'application/pdf'
+        'pdf' => 'application/pdf',
+        'woff' => 'application/font-woff',
+        'woff2' => 'application/font-woff2',
+        'ttf' => 'application/x-font-ttf'
     ];
 
     /**

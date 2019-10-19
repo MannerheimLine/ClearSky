@@ -64,14 +64,14 @@ class PatientCard extends AppDomain implements \JsonSerializable
         `patient_cards`.`email` as `email`,
         `patient_cards`.`insurance` as `insurance`,
         `patient_cards`.`policy_number` as `policy_number`,
-        `patient_cards`.`insurance_company` as `insurance_company`,
+        `insurance_companies`.`insurance_name` as `insurance_company`,
         `patient_cards`.`passport_serial` as `passport_serial`,
         `patient_cards`.`passport_number` as `passport_number`,
-        `patient_cards`.`fms_department` as `fms_department`,
+        `fms_departments`.`fms_department_name` as `fms_department`,
         `regions`.`region_name` as `region`,
         `districts`.`district_name` as `district`,
         `localities`.`locality_name` as `locality`,
-        `patient_cards`.`street` as `street`,
+        `streets`.`street_name` as `street`,
         `patient_cards`.`house_number` as `house_number`,
         `patient_cards`.`apartment` as `apartment`,
         `patient_cards`.`work_place` as `work_place`,
@@ -81,6 +81,9 @@ class PatientCard extends AppDomain implements \JsonSerializable
         LEFT JOIN `regions` ON `patient_cards`.`region` = `regions`.`id` 
         LEFT JOIN `districts` ON `patient_cards`.`district` = `districts`.`id` 
         LEFT JOIN `localities` ON `patient_cards`.`locality` = `localities`.`id` 
+        LEFT JOIN `insurance_companies` ON `patient_cards`.`insurance_company` = `insurance_companies`.`id` 
+        LEFT JOIN `streets` ON `patient_cards`.`street` = `streets`.`id` 
+        LEFT JOIN `fms_departments` ON `patient_cards`.`fms_department` = `fms_departments`.`id` 
         WHERE `patient_cards`.`id` = :id");
         $result = $this->_dbConnection->prepare($query);
         $result->execute([
@@ -187,7 +190,7 @@ class PatientCard extends AppDomain implements \JsonSerializable
      */
     public function getSecondName() : string
     {
-        return $this->_secondName;
+        return $this->_secondName ?: '';
     }
 
     /**
@@ -203,23 +206,23 @@ class PatientCard extends AppDomain implements \JsonSerializable
      */
     public function getDateBirth() : string
     {
-        return $this->_dateBirth;
+        return $this->_dateBirth ?: '';
     }
 
     /**
      * @return mixed
      */
-    public function getTelephone()
+    public function getTelephone() : string
     {
-        return $this->_telephone;
+        return $this->_telephone ?: '';
     }
 
     /**
      * @return mixed
      */
-    public function getEmail()
+    public function getEmail() : string
     {
-        return $this->_email;
+        return $this->_email ?: '';
     }
 
     /**
@@ -233,9 +236,9 @@ class PatientCard extends AppDomain implements \JsonSerializable
     /**
      * @return mixed
      */
-    public function getInsuranceCompany()
+    public function getInsuranceCompany() : string
     {
-        return $this->_insuranceCompany;
+        return $this->_insuranceCompany ?: '';
     }
 
     /**
@@ -243,7 +246,7 @@ class PatientCard extends AppDomain implements \JsonSerializable
      */
     public function getInsuranceCertificate() : string
     {
-        return $this->_insuranceCertificate;
+        return $this->_insuranceCertificate ?: '';
     }
 
     /**
@@ -251,7 +254,7 @@ class PatientCard extends AppDomain implements \JsonSerializable
      */
     public function getPassportSerial() : string
     {
-        return $this->_passportSerial;
+        return $this->_passportSerial ?: '';
     }
 
     /**
@@ -259,15 +262,15 @@ class PatientCard extends AppDomain implements \JsonSerializable
      */
     public function getPassportNumber() : string
     {
-        return $this->_passportNumber;
+        return $this->_passportNumber ?: '';
     }
 
     /**
      * @return mixed
      */
-    public function getFmsDepartment()
+    public function getFmsDepartment() : string
     {
-        return $this->_fmsDepartment;
+        return $this->_fmsDepartment ?: '';
     }
 
     /**
@@ -291,15 +294,15 @@ class PatientCard extends AppDomain implements \JsonSerializable
      */
     public function getLocality() : string
     {
-        return $this->_locality;
+        return $this->_locality ?: '';
     }
 
     /**
      * @return string
      */
-    public function getStreet()
+    public function getStreet() : string
     {
-        return $this->_street;
+        return $this->_street ?: '';
     }
 
     /**
@@ -307,7 +310,7 @@ class PatientCard extends AppDomain implements \JsonSerializable
      */
     public function getHouseNumber() : string
     {
-        return $this->_houseNumber;
+        return $this->_houseNumber ?: '';
     }
 
     /**
@@ -315,7 +318,7 @@ class PatientCard extends AppDomain implements \JsonSerializable
      */
     public function getApartment() : string
     {
-        return $this->_apartment;
+        return $this->_apartment ?: '';
     }
 
     /**
@@ -323,7 +326,7 @@ class PatientCard extends AppDomain implements \JsonSerializable
      */
     public function getWorkPlace() : string
     {
-        return $this->_workPlace;
+        return $this->_workPlace ?: '';
     }
 
     /**
@@ -331,7 +334,7 @@ class PatientCard extends AppDomain implements \JsonSerializable
      */
     public function getProfession() : string
     {
-        return $this->_profession;
+        return $this->_profession ?: '';
     }
 
 }

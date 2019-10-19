@@ -2,6 +2,7 @@
 <html lang="ru">
     <head>
         <link rel="stylesheet" type="text/css" href="/resources/assets/bootstrap/css/bootstrap.css"/>
+        <link rel="stylesheet" type="text/css" href="/resources/assets/fontawesome/css/font-awesome.min.css"/>
         <link rel="stylesheet" type="text/css" href="/resources/templates/application/layout/css/style.css"/>
         <script type="application/javascript" src="/resources/assets/jquery/jquery-3.4.1.min.js"></script>
         <script type="application/javascript" src="/resources/templates/application/layout/js/application.js"></script>
@@ -9,14 +10,12 @@
     </head>
     <body>
     <div id="wrapper">
-        <section id="header_section">
-
-        </section>
-        <section id="sidebar_section"></section>
-        <section id="content_section">
-            <div>
+        <section id="header_section"></section>
+        <section id="main_section">
+            <section id="sidebar_section"></section>
+            <section id="content_section">
                 <?php include $this->_pagesFolder.$page.'.php'; ?>
-            </div>
+            </section>
         </section>
         <section id="footer_section"></section>
     </div>
