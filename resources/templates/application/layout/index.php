@@ -19,6 +19,7 @@
         </section>
         <section id="footer_section"></section>
     </div>
+    <script type="application/javascript" src="/resources/assets/jquery/jquery-3.4.1.min.js"></script>
     <script type="application/javascript" src="/resources/assets/bootstrap/js/bootstrap.js"></script>
     </body>
 </html>

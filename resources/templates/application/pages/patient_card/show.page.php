@@ -7,71 +7,219 @@
             </div>
             <div class="patient-card-body">
                 <div class="row">
-                    <div class="col-3">
+                    <div id="personal-data-section" class="col-3">
                         <div class="patient-card-information-section box-shadow--2dp">
                             <div class="patient-card-information-section-header">
                                 <i class="fa fa-user-circle" aria-hidden="true"></i> Личные данные
                             </div>
                             <div class='patient-card-information-section-body'>
-                                <div class="patient-card-status">
-                                    <i class="fa fa-male"></i>
+                                <div class="row">
+                                    <div class="col-6">
+                                        <div class="patient-card-status">
+                                            <i class="fa fa-male patient-card-status-image"></i>
+                                            <i class="patient-card-status-notation">Живой</i>
+                                        </div>
+                                    </div>
+                                    <div class="col-6">
+                                        <div class="patient-card-status">
+                                            <i class="fa fa-user-plus patient-card-status-image"></i>
+                                            <i class="patient-card-status-notation">Прикреплен</i>
+                                        </div>
+                                    </div>
                                 </div>
                                 <hr>
-                                <p><?=$data->getId();?></p>
-                                <p><?=$data->getCardNumber();?></p>
-                                <p><?=$data->getSurname();?></p>
-                                <p><?=$data->getFirstName();?></p>
-                                <p><?=$data->getSecondName();?></p>
-                                <p><?=$data->getGender();?></p>
-                                <p><?=$data->getDateBirth();?></p>
-                                <p><?=$data->getTelephone();?></p>
-                                <p><?=$data->getEmail();?></p>
+                                <input name="id" value="<?=$data['card_data']->getId();?>" hidden>
+                                <label for="card-number">Номер карты<span class="red-asterisk">*</span>:</label>
+                                <div class="input-group mb-2">
+                                    <div class="input-group-prepend">
+                                        <div class="input-group-text"><i class="fa fa-id-card"></i> </div>
+                                    </div>
+                                    <input type="text" class="form-control" id="card-number" name="card-number" placeholder="ФИО" value="<?=$data['card_data']->getCardNumber();?>" required>
+                                </div>
+                                <label  for="full-name">ФИО<span class="red-asterisk">*</span>:</label>
+                                <div class="input-group mb-2">
+                                    <div class="input-group-prepend">
+                                        <div class="input-group-text"><i class="fa fa-user-circle"></i> </div>
+                                    </div>
+                                    <input type="text" class="form-control" id="full-name" name="full-name" placeholder="ФИО" value="<?=$data['card_data']->getSurname().' '.$data['card_data']->getFirstName().' '.$data['card_data']->getSecondName();?>" required>
+                                </div>
+                                <label  for="gender">Пол:</label>
+                                <div class="input-group mb-2">
+                                    <div class="input-group-prepend">
+                                        <div class="input-group-text"><i class="fa fa-venus-mars"></i> </div>
+                                    </div>
+                                    <select id="gender" name="gender" class="custom-select">
+                                        <?php foreach ($data['genders'] as $gender) :?>
+                                            <option value="<?=$gender['id'];?>" <?=$data['card_data']->getGenderId() == $gender['id'] ?' selected':''?>><?=$gender['description'];?></option>
+                                        <?php endforeach; ?>
+                                    </select>
+                                </div>
+                                <label  for="date-birth">Дата рождения:</label>
+                                <div class="input-group mb-2">
+                                    <div class="input-group-prepend">
+                                        <div class="input-group-text"><i class="fa fa-birthday-cake"></i> </div>
+                                    </div>
+                                    <input type="date" class="form-control" id="date-birth" name="date-birth" value="<?=$data['card_data']->getDateBirth();?>">
+                                </div>
+                                <label  for="telephone">Номер телефона:</label>
+                                <div class="input-group mb-2">
+                                    <div class="input-group-prepend">
+                                        <div class="input-group-text"><i class="fa fa-phone"></i> </div>
+                                    </div>
+                                    <input type="text" class="form-control" id="telephone" name="telephone" placeholder="Номер телефона" value="<?=$data['card_data']->getTelephone();?>">
+                                </div>
+                                <label  for="email">Электронная почта:</label>
+                                <div class="input-group mb-2">
+                                    <div class="input-group-prepend">
+                                        <div class="input-group-text"><i class="fa fa-envelope"></i> </div>
+                                    </div>
+                                    <input type="text" class="form-control" id="email" name="email" placeholder="Email" value="<?=$data['card_data']->getEmail();?>">
+                                </div>
                             </div>
                         </div>
                     </div>
-                    <div class="col-3">
+                    <div id="document-section" class="col-3">
                         <div class="patient-card-information-section box-shadow--2dp">
                             <div class="patient-card-information-section-header">
                                 <i class="fa fa-folder" aria-hidden="true"></i> Документы
                             </div>
                             <div class='patient-card-information-section-body'>
-                                <p><?=$data->getInsuranceCertificate();?></p>
-                                <p><?=$data->getPolicyNumber();?></p>
-                                <p><?=$data->getInsuranceCompany();?></p>
-                                <p><?=$data->getPassportSerial();?></p>
-                                <p><?=$data->getPassportNumber();?></p>
-                                <p><?=$data->getFmsDepartment();?></p>
+                                <label for="insurance-certificate">СНИЛС<span class="red-asterisk">*</span>:</label>
+                                <div class="input-group mb-2">
+                                    <div class="input-group-prepend">
+                                        <div class="input-group-text"><i class="fa fa-id-card"></i> </div>
+                                    </div>
+                                    <input type="text" class="form-control" id="insurance-certificate" name="insurance-certificate" placeholder="СНИЛС" value="<?=$data['card_data']->getInsuranceCertificate();?>" required>
+                                </div>
+                                <hr>
+                                <label for="policy-number">Единый номер полиса<span class="red-asterisk">*</span>:</label>
+                                <div class="input-group mb-2">
+                                    <div class="input-group-prepend">
+                                        <div class="input-group-text"><i class="fa fa-clipboard"></i> </div>
+                                    </div>
+                                    <input type="text" class="form-control" id="policy-number" name="policy-number" placeholder="Номер полиса" value="<?=$data['card_data']->getPolicyNumber();?>" required>
+                                </div>
+                                <label for="insurance-company">Страховая компания:</label>
+                                <div class="input-group mb-2">
+                                    <div class="input-group-prepend">
+                                        <div class="input-group-text"><i class="fa fa-clipboard"></i> </div>
+                                    </div>
+                                    <input type="text" class="form-control" id="insurance-company" name="insurance-company" placeholder="Страховая компания" value="<?=$data['card_data']->getInsuranceCompany();?>">
+                                </div>
+                                <hr>
+                                <label for="passport-serial">Серия паспорта:</label>
+                                <div class="input-group mb-2">
+                                    <div class="input-group-prepend">
+                                        <div class="input-group-text"><i class="fa fa-id-card"></i> </div>
+                                    </div>
+                                    <input type="text" class="form-control" id="passport-serial" name="passport-serial" placeholder="Серия паспорта" value="<?=$data['card_data']->getPassportSerial();?>">
+                                </div>
+                                <label for="passport-number">Номер паспорта:</label>
+                                <div class="input-group mb-2">
+                                    <div class="input-group-prepend">
+                                        <div class="input-group-text"><i class="fa fa-id-card"></i> </div>
+                                    </div>
+                                    <input type="text" class="form-control" id="passport-number" name="passport-number" placeholder="Номер паспорта" value="<?=$data['card_data']->getPassportNumber();?>">
+                                </div>
+                                <label for="fms-department">Отдел ФМС выдавший папорт:</label>
+                                <div class="input-group mb-2">
+                                    <div class="input-group-prepend">
+                                        <div class="input-group-text"><i class="fa fa-id-card"></i> </div>
+                                    </div>
+                                    <textarea class="form-control" id="fms-department" name="fms-department"><?=$data['card_data']->getFmsDepartment();?></textarea>
+                                </div>
                             </div>
                         </div>
                     </div>
-                    <div class="col-3">
+                    <div id="addresses-section" class="col-3">
                         <div class="patient-card-information-section box-shadow--2dp">
                             <div class="patient-card-information-section-header">
                                 <i class="fa fa-address-book" aria-hidden="true"></i> Адреса
                             </div>
                             <div class='patient-card-information-section-body'>
-                                <p><?=$data->getRegion();?></p>
-                                <p><?=$data->getDistrict();?></p>
-                                <p><?=$data->getLocality();?></p>
-                                <p><?=$data->getStreet();?></p>
-                                <p><?=$data->getHouseNumber();?></p>
-                                <p><?=$data->getApartment();?></p>
+                                <label for="region">Регион:</label>
+                                <div class="input-group mb-2">
+                                    <div class="input-group-prepend">
+                                        <div class="input-group-text"><i class="fa fa-address-book"></i> </div>
+                                    </div>
+                                    <input type="text" class="form-control" id="region" name="region" placeholder="Регион" value="<?=$data['card_data']->getRegion();?>">
+                                </div>
+                                <label for="district">Район:</label>
+                                <div class="input-group mb-2">
+                                    <div class="input-group-prepend">
+                                        <div class="input-group-text"><i class="fa fa-address-book"></i> </div>
+                                    </div>
+                                    <input type="text" class="form-control" id="district" name="district" placeholder="Район" value="<?=$data['card_data']->getDistrict();?>">
+                                </div>
+                                <label for="locality">Населенный пункт:</label>
+                                <div class="input-group mb-2">
+                                    <div class="input-group-prepend">
+                                        <div class="input-group-text"><i class="fa fa-address-book"></i> </div>
+                                    </div>
+                                    <input type="text" class="form-control" id="locality" name="locality" placeholder="Населенный пункт" value="<?=$data['card_data']->getLocality();?>">
+                                </div>
+                                <label for="street">Улица:</label>
+                                <div class="input-group mb-2">
+                                    <div class="input-group-prepend">
+                                        <div class="input-group-text"><i class="fa fa-address-book"></i> </div>
+                                    </div>
+                                    <input type="text" class="form-control" id="street" name="street" placeholder="Улица" value="<?=$data['card_data']->getStreet();?>">
+                                </div>
+                                <div class="row">
+                                    <div class="col-6">
+                                        <label for="house-number">Номер дома:</label>
+                                        <div class="input-group mb-2">
+                                            <div class="input-group-prepend">
+                                                <div class="input-group-text"><i class="fa fa-building"></i> </div>
+                                            </div>
+                                            <input type="text" class="form-control" id="house-number" name="house-number" value="<?=$data['card_data']->getHouseNumber();?>">
+                                        </div>
+                                    </div>
+                                    <div class="col-6">
+                                        <label for="apartment">Номер квартиры:</label>
+                                        <div class="input-group mb-2">
+                                            <div class="input-group-prepend">
+                                                <div class="input-group-text"><i class="fa fa-building"></i> </div>
+                                            </div>
+                                            <input type="text" class="form-control" id="apartment" name="apartment" value="<?=$data['card_data']->getApartment();?>">
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
-                    <div class="col-3">
+                    <div id="additionally-section" class="col-3">
                         <div class="patient-card-information-section box-shadow--2dp">
                             <div class="patient-card-information-section-header">
                                 <i class="fa fa-info-circle" aria-hidden="true"></i> Дополнительно
                             </div>
                             <div class='patient-card-information-section-body'>
-                                <p><?=$data->getWorkplace();?></p>
-                                <p><?=$data->getProfession();?></p>
+                                <label for="workplace">Место работы:</label>
+                                <div class="input-group mb-2">
+                                    <div class="input-group-prepend">
+                                        <div class="input-group-text"><i class="fa fa-info-circle"></i> </div>
+                                    </div>
+                                    <input type="text" class="form-control" id="workplace" name="workplace" placeholder="Место работы" value="<?=$data['card_data']->getWorkplace();?>">
+                                </div>
+                                <label for="profession">Профессия:</label>
+                                <div class="input-group mb-2">
+                                    <div class="input-group-prepend">
+                                        <div class="input-group-text"><i class="fa fa-info-circle"></i> </div>
+                                    </div>
+                                    <input type="text" class="form-control" id="profession" name="profession" placeholder="Место работы" value="<?=$data['card_data']->getProfession();?>">
+                                </div>
+                                <hr>
+                                <label for="notation">Примечание:</label>
+                                <div class="input-group mb-2">
+                                    <div class="input-group-prepend">
+                                        <div class="input-group-text"><i class="fa fa-info-circle"></i> </div>
+                                    </div>
+                                    <textarea class="form-control" id="notation" name="notation"><?=$data['card_data']->getNotation();?></textarea>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
-
             </div>
         </div>
     </div>

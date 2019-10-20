@@ -20,6 +20,7 @@ class PatientCardShowResponder extends AppResponder
     {
         $this->_template->setTitle('Карта пациента');
         $html = $this->_template->render('patient_card/show.page', $payload);
-        return new Response\HtmlResponse($html);
+        return new Response\HtmlResponse($html);  //HTML
+        //return new Response\JsonResponse($payload); //JSON
     }
 }

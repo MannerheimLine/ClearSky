@@ -13,9 +13,12 @@ class PatientCard extends AppDomain implements \JsonSerializable
     private $_dbConnection;
     private $_id;
     private $_cardNumber;
+    private $_isAlive;
+    private $_isAttached;
     private $_surname;
     private $_firstName;
     private $_secondName;
+    private $_gender_id;
     private $_gender;
     private $_dateBirth;
     private $_telephone;
@@ -34,6 +37,7 @@ class PatientCard extends AppDomain implements \JsonSerializable
     private $_apartment;
     private $_workPlace;
     private $_profession;
+    private $_notation;
 
     /**
      * patient_card constructor.
@@ -55,9 +59,12 @@ class PatientCard extends AppDomain implements \JsonSerializable
         $query = ("SELECT 
         `patient_cards`.`id`,
         `patient_cards`.`card_number` as `card_number`,
+        `patient_cards`.`is_alive` as `is_alive`,
+        `patient_cards`.`is_attached` as `is_attached`,
         `patient_cards`.`surname` as `surname`,
         `patient_cards`.`firstname` as `firstname`,
         `patient_cards`.`secondname` as `secondname`,
+        `patient_cards`.`gender` as `gender_id`,
         `gender`.`description` as `gender`,
         `patient_cards`.`date_birth` as `date_birth`,
         `patient_cards`.`telephone_number` as `telephone_number`,
@@ -75,7 +82,8 @@ class PatientCard extends AppDomain implements \JsonSerializable
         `patient_cards`.`house_number` as `house_number`,
         `patient_cards`.`apartment` as `apartment`,
         `patient_cards`.`work_place` as `work_place`,
-        `patient_cards`.`profession` as `profession`
+        `patient_cards`.`profession` as `profession`,
+        `patient_cards`.`notation` as `notation`
         FROM `patient_cards` 
         LEFT JOIN `gender` ON `patient_cards`.`gender` = `gender`.`id` 
         LEFT JOIN `regions` ON `patient_cards`.`region` = `regions`.`id` 
@@ -93,13 +101,16 @@ class PatientCard extends AppDomain implements \JsonSerializable
             while ($row = $result->fetch()){
                 $this->_id = $row['id'];
                 $this->_cardNumber = $row['card_number'];
+                $this->_isAlive = $row['is_alive'];
+                $this->_isAttached = $row['is_attached'];
                 $this->_surname = $row['surname'];
                 $this->_firstName = $row['firstname'];
                 $this->_secondName = $row['secondname'];
+                $this->_gender_id = $row['gender_id'];
                 $this->_gender = $row['gender'];
                 $this->_dateBirth = $row['date_birth'];
                 $this->_telephone = $row['telephone_number'];
-                $this->_emaile = $row['email'];
+                $this->_email = $row['email'];
                 $this->_insuranceCertificate = $row['insurance'];
                 $this->_policyNumber = $row['policy_number'];
                 $this->_insuranceCompany = $row['insurance_company'];
@@ -114,9 +125,20 @@ class PatientCard extends AppDomain implements \JsonSerializable
                 $this->_apartment = $row['apartment'];
                 $this->_workPlace = $row['work_place'];
                 $this->_profession = $row['profession'];
+                $this->_notation = $row['notation'];
             }
         }
         return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function getGenders() : array {
+        $query = ("SELECT * FROM `gender`");
+        $result = $this->_dbConnection->prepare($query);
+        $result->execute();
+        return $result->fetchAll();
     }
 
     /**
@@ -129,27 +151,33 @@ class PatientCard extends AppDomain implements \JsonSerializable
     public function jsonSerialize()
     {
         return [
-            'id' => $this->getId(),
-            'cardNumber' => $this->getCardNumber(),
-            'surname' => $this->getSurname(),
-            'firstName' => $this->getFirstName(),
-            'secondName' => $this->getSecondName(),
-            'gender' => $this->getGender(),
-            'dateBirth' => $this->getDateBirth(),
-            'telephone' => $this->getTelephone(),
-            'email' => $this->getEmail(),
-            'policeNumber' => $this->getPolicyNumber(),
-            'insuranceCertificate' => $this->getInsuranceCertificate(),
-            'passportSerial' => $this->getPassportSerial(),
-            'passportNumber' => $this->getPassportNumber(),
-            'region' => $this->getRegion(),
-            'district' => $this->getDistrict(),
-            'locality' => $this->getLocality(),
-            'street' => $this->getStreet(),
-            'houseNumber' => $this->getHouseNumber(),
-            'apartment' => $this->getApartment(),
-            'workPlace' => $this->getWorkPlace(),
-            'profession' => $this->getProfession()
+            'id' => $this->_id,
+            'cardNumber' => $this->_cardNumber,
+            'isAlive' => $this->_isAlive,
+            'isAttached' => $this->_isAttached,
+            'surname' => $this->_surname,
+            'firstName' => $this->_firstName,
+            'secondName' => $this->_secondName,
+            'gender_id' => $this->_gender_id,
+            'gender' => $this->_gender,
+            'dateBirth' => $this->_dateBirth,
+            'telephone' => $this->_telephone,
+            'email' => $this->_email,
+            'policeNumber' => $this->_policyNumber,
+            'insuranceCompany' => $this->_insuranceCompany,
+            'insuranceCertificate' => $this->_insuranceCertificate,
+            'passportSerial' => $this->_passportSerial,
+            'passportNumber' => $this->_passportNumber,
+            'fmsDepartment' => $this->_fmsDepartment,
+            'region' => $this->_region,
+            'district' => $this->_district,
+            'locality' => $this->_locality,
+            'street' => $this->_street,
+            'houseNumber' => $this->_houseNumber,
+            'apartment' => $this->_apartment,
+            'workPlace' => $this->_workPlace,
+            'profession' => $this->_profession,
+            'notation' => $this->_notation
         ];
     }
 
@@ -167,6 +195,22 @@ class PatientCard extends AppDomain implements \JsonSerializable
     public function getCardNumber() : string
     {
         return $this->_cardNumber;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getIsAlive() : int
+    {
+        return $this->_isAlive;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getIsAttached() : int
+    {
+        return $this->_isAttached;
     }
 
     /**
@@ -191,6 +235,14 @@ class PatientCard extends AppDomain implements \JsonSerializable
     public function getSecondName() : string
     {
         return $this->_secondName ?: '';
+    }
+
+    /**
+     * @return int
+     */
+    public function getGenderId() : int
+    {
+        return $this->_gender_id;
     }
 
     /**
@@ -335,6 +387,14 @@ class PatientCard extends AppDomain implements \JsonSerializable
     public function getProfession() : string
     {
         return $this->_profession ?: '';
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getNotation() : string
+    {
+        return $this->_notation ?: '';
     }
 
 }

@@ -67,12 +67,21 @@ html, body {
 }
 .patient-card-information-section-body{
     padding: 5px;
+    color: #37474f;
+    font-weight: bold;
 }
 .patient-card-status{
     border: solid 1px;
-    font-size: 40px;
     padding: 3px;
-    width: 50px;
-    height: 50px;
     text-align: center;
+    color: #1ad81a;
+}
+.red-asterisk{
+    color: red;
+}
+.patient-card-status-image{
+    font-size: 40px;
+}
+.patient-card-status-notation{
+    font-size: 14px;
 }
