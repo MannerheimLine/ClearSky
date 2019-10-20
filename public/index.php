@@ -27,9 +27,8 @@ require "vendor/autoload.php";
 #Коллекция маршрутов
 $aura = new RouterContainer();
 $map = $aura->getMap();
-$map->get('patient_card', '/', PatientCardIndexAction::class);
-$map->get('patient_card/show', '/show/{id}', PatientCardShowAction::class)->tokens(['id' => '\d+']);
-$map->get('patient_card/edit', '/patient-card/edit/{id}', PatientCardEditAction::class)->tokens(['id' => '\d+']);
+$map->get('patient_card', '/patient-card', PatientCardIndexAction::class);
+$map->get('patient_card/show', '/patient-card/show/{id}', PatientCardShowAction::class)->tokens(['id' => '\d+']);
 //$map->get('catalog/detail', '/blog/{id}/view/{number}-{detail}', Application\Blog\Action\DetailsIndexAction::class)->tokens(['id' => '\d+', 'number' => '\d+', 'detail' => '\d+']);
 
 #DI Container

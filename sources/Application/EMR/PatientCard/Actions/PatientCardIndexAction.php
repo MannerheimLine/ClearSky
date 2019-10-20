@@ -7,16 +7,18 @@ namespace Application\EMR\PatientCard\Actions;
 
 use Application\Base\AppAction;
 use Application\EMR\PatientCard\Domains\PatientCard;
-use Application\EMR\PatientCard\Responders\PersonIndexResponder;
+use Application\EMR\PatientCard\Responders\PatientCardIndexResponder;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 
 class PatientCardIndexAction extends AppAction implements RequestHandlerInterface
 {
-    public function __construct(PatientCard $person, PersonIndexResponder $responder)
+    private $_patientCard;
+
+    public function __construct(PatientCard $patientCard, PatientCardIndexResponder $responder)
     {
-        $this->_person = $person;
+        $this->_patientCard = $patientCard;
         $this->_responder = $responder;
     }
 
@@ -27,7 +29,7 @@ class PatientCardIndexAction extends AppAction implements RequestHandlerInterfac
          * Request используется для пердачи параметров
          */
         $id = 1;
-        $payload = $this->_person->getCardData($id); //return patient_card
+        $payload = $this->_patientCard->getCardData($id); //return patient_card
         /**
          * В респондер пока не вижу смысла передавать request
          */
