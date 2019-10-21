@@ -95,6 +95,7 @@
                                     </div>
                                     <input type="text" class="form-control" id="policy-number" name="policy-number" placeholder="Номер полиса" required>
                                 </div>
+                                <input name="insurance-company-id" hidden>
                                 <label for="insurance-company">Страховая компания:</label>
                                 <div class="input-group mb-2">
                                     <div class="input-group-prepend">
@@ -117,6 +118,7 @@
                                     </div>
                                     <input type="text" class="form-control" id="passport-number" name="passport-number" placeholder="Номер паспорта">
                                 </div>
+                                <input name="fms-department-id" hidden>
                                 <label for="fms-department">Отдел ФМС выдавший папорт:</label>
                                 <div class="input-group mb-2">
                                     <div class="input-group-prepend">
@@ -133,6 +135,7 @@
                                 <i class="fa fa-address-book" aria-hidden="true"></i> Адреса
                             </div>
                             <div class='patient-card-information-section-body'>
+                                <input name="region-id" hidden>
                                 <label for="region">Регион:</label>
                                 <div class="input-group mb-2">
                                     <div class="input-group-prepend">
@@ -140,6 +143,7 @@
                                     </div>
                                     <input type="text" class="form-control" id="region" name="region" placeholder="Регион">
                                 </div>
+                                <input name="district-id" hidden>
                                 <label for="district">Район:</label>
                                 <div class="input-group mb-2">
                                     <div class="input-group-prepend">
@@ -147,6 +151,7 @@
                                     </div>
                                     <input type="text" class="form-control" id="district" name="district" placeholder="Район">
                                 </div>
+                                <input name="locality-id" hidden>
                                 <label for="locality">Населенный пункт:</label>
                                 <div class="input-group mb-2">
                                     <div class="input-group-prepend">
@@ -154,6 +159,7 @@
                                     </div>
                                     <input type="text" class="form-control" id="locality" name="locality" placeholder="Населенный пункт">
                                 </div>
+                                <input name="street-id" hidden>
                                 <label for="street">Улица:</label>
                                 <div class="input-group mb-2">
                                     <div class="input-group-prepend">

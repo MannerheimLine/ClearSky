@@ -18,20 +18,26 @@ class PatientCard extends AppDomain implements \JsonSerializable
     private $_surname;
     private $_firstName;
     private $_secondName;
-    private $_gender_id;
+    private $_genderId;
     private $_gender;
     private $_dateBirth;
     private $_telephone;
     private $_email;
     private $_policyNumber;
+    private $_insuranceCompanyId;
     private $_insuranceCompany;
     private $_insuranceCertificate;
     private $_passportSerial;
     private $_passportNumber;
+    private $_fmsDepartmentId;
     private $_fmsDepartment;
+    private $_regionId;
     private $_region;
+    private $_districtId;
     private $_district;
+    private $_localityId;
     private $_locality;
+    private $_streetId;
     private $_street;
     private $_houseNumber;
     private $_apartment;
@@ -48,8 +54,37 @@ class PatientCard extends AppDomain implements \JsonSerializable
         $this->_dbConnection = $dbConnector->getConnection();
     }
 
-    public function edit(int $id){
-        return 'You wanna edit this id'.$id;
+    /**
+     * @param array $updatingData
+     * @return array
+     */
+    private function prepareUpdatingData(array $updatingData) : array {
+        $castedData['id'] = (int)$updatingData['id'];
+        $castedData['cardNumber'] = $updatingData['cardNumber'];
+        $fullName = explode(' ',$updatingData['fullName']);
+        $castedData['surname'] = $fullName[0];
+        $castedData['firstName'] = $fullName[1];
+        $castedData['secondName'] = $fullName[2];
+        $castedData['gender'] = (int)$updatingData['gender'];
+        $castedData['dateBirth'] = $updatingData['dateBirth'];
+        $castedData['telephone'] = $updatingData['telephone'];
+        $castedData['email'] = $updatingData['email'];
+        $castedData['insuranceCertificate'] = $updatingData['insuranceCertificate'];
+        $castedData['policyNumber'] = $updatingData['policyNumber'];
+        $castedData['insuranceCompany'] = (int)$updatingData['insuranceCompany'];
+        $castedData['passportSerial'] = $updatingData['passportSerial'];
+        $castedData['passportNumber'] = $updatingData['passportNumber'];
+        $castedData['fmsDepartment'] = (int)$updatingData['fmsDepartment'];
+        $castedData['region'] = (int)$updatingData['region'];
+        $castedData['district'] = (int)$updatingData['district'];
+        $castedData['locality'] = (int)$updatingData['locality'];
+        $castedData['street'] = (int)$updatingData['street'];
+        $castedData['houseNumber'] = $updatingData['houseNumber'];
+        $castedData['apartment'] = $updatingData['apartment'];
+        $castedData['workplace'] = $updatingData['workplace'];
+        $castedData['profession'] = $updatingData['profession'];
+        $castedData['notation'] = $updatingData['notation'];
+        return $castedData;
     }
 
     /**
@@ -71,13 +106,19 @@ class PatientCard extends AppDomain implements \JsonSerializable
         `patient_cards`.`email` as `email`,
         `patient_cards`.`insurance` as `insurance`,
         `patient_cards`.`policy_number` as `policy_number`,
+        `patient_cards`.`insurance_company` as `insurance_company_id`,
         `insurance_companies`.`insurance_name` as `insurance_company`,
         `patient_cards`.`passport_serial` as `passport_serial`,
         `patient_cards`.`passport_number` as `passport_number`,
+        `patient_cards`.`fms_department` as `fms_department_id`,
         `fms_departments`.`fms_department_name` as `fms_department`,
+        `patient_cards`.`region` as `region_id`,
         `regions`.`region_name` as `region`,
+        `patient_cards`.`district` as `district_id`,
         `districts`.`district_name` as `district`,
+        `patient_cards`.`locality` as `locality_id`,
         `localities`.`locality_name` as `locality`,
+        `patient_cards`.`street` as `street_id`,
         `streets`.`street_name` as `street`,
         `patient_cards`.`house_number` as `house_number`,
         `patient_cards`.`apartment` as `apartment`,
@@ -106,20 +147,26 @@ class PatientCard extends AppDomain implements \JsonSerializable
                 $this->_surname = $row['surname'];
                 $this->_firstName = $row['firstname'];
                 $this->_secondName = $row['secondname'];
-                $this->_gender_id = $row['gender_id'];
+                $this->_genderId = $row['gender_id'];
                 $this->_gender = $row['gender'];
                 $this->_dateBirth = $row['date_birth'];
                 $this->_telephone = $row['telephone_number'];
                 $this->_email = $row['email'];
                 $this->_insuranceCertificate = $row['insurance'];
                 $this->_policyNumber = $row['policy_number'];
+                $this->_insuranceCompanyId = $row['insurance_company_id'];
                 $this->_insuranceCompany = $row['insurance_company'];
                 $this->_passportSerial = $row['passport_serial'];
                 $this->_passportNumber = $row['passport_number'];
+                $this->_fmsDepartmentId = $row['fms_department_id'];
                 $this->_fmsDepartment = $row['fms_department'];
+                $this->_regionId = $row['region_id'];
                 $this->_region = $row['region'];
+                $this->_districtId = $row['district_id'];
                 $this->_district = $row['district'];
+                $this->_localityId = $row['locality_id'];
                 $this->_locality = $row['locality'];
+                $this->_streetId = $row['street_id'];
                 $this->_street = $row['street'];
                 $this->_houseNumber = $row['house_number'];
                 $this->_apartment = $row['apartment'];
@@ -129,6 +176,65 @@ class PatientCard extends AppDomain implements \JsonSerializable
             }
         }
         return $this;
+    }
+
+    public function updateCardData(array $updatingData){
+        $castedData = $this->prepareUpdatingData($updatingData);
+        $query = ("UPDATE `patient_cards` 
+        SET 
+            `card_number` = :cardNumber,
+            `surname` = :surname,
+            `firstname` = :firstName,
+            `secondname` = :secondName,
+            `gender` = :gender,
+            `date_birth` = :dateBirth,
+            `telephone_number` = :telephoneNumber,
+            `email` = :email,
+            `policy_number` = :policyNumber,
+            `insurance_company` = :insuranceCompany,
+            `insurance` = :insuranceCertificate,
+            `passport_serial` = :passportSerial,
+            `passport_number` = :passportNumber,
+            `fms_department` = :fmsDepartment,
+            `region` = :region,
+            `district` = :district,
+            `locality` = :locality,
+            `street` = :street,
+            `house_number` = :houseNumber,
+            `apartment` = :apartment,
+            `work_place` = :workPlace,
+            `profession` = :profession,
+            `notation` = :notation
+        WHERE `patient_cards`.`id` = :id;");
+        $result = $this->_dbConnection->prepare($query);
+        if($result->execute([
+            'id' => $castedData['id'],
+            'cardNumber' => $castedData['cardNumber'],
+            'surname' => $castedData['surname'],
+            'firstName' => $castedData['firstName'],
+            'secondName' => $castedData['secondName'],
+            'gender' => $castedData['gender'],
+            'dateBirth' => $castedData['dateBirth'],
+            'telephoneNumber' => $castedData['telephone'],
+            'email' => $castedData['email'],
+            'policyNumber' => $castedData['policyNumber'],
+            'insuranceCompany' => $castedData['insuranceCompany'],
+            'insuranceCertificate' => $castedData['insuranceCertificate'],
+            'passportSerial' => $castedData['passportSerial'],
+            'passportNumber' => $castedData['passportNumber'],
+            'fmsDepartment' => $castedData['fmsDepartment'],
+            'region' => $castedData['region'],
+            'district' => $castedData['district'],
+            'locality' => $castedData['locality'],
+            'street' => $castedData['street'],
+            'houseNumber' => $castedData['houseNumber'],
+            'apartment' => $castedData['apartment'],
+            'workPlace' => $castedData['workplace'],
+            'profession' => $castedData['profession'],
+            'notation' => $castedData['notation'],
+        ])){
+            return 'Updated';
+        }
     }
 
     /**
@@ -158,20 +264,26 @@ class PatientCard extends AppDomain implements \JsonSerializable
             'surname' => $this->_surname,
             'firstName' => $this->_firstName,
             'secondName' => $this->_secondName,
-            'genderId' => $this->_gender_id,
+            'genderId' => $this->_genderId,
             'gender' => $this->_gender,
             'dateBirth' => $this->_dateBirth,
             'telephone' => $this->_telephone,
             'email' => $this->_email,
             'policyNumber' => $this->_policyNumber,
+            'insuranceCompanyId' => $this->_insuranceCompanyId,
             'insuranceCompany' => $this->_insuranceCompany,
             'insuranceCertificate' => $this->_insuranceCertificate,
             'passportSerial' => $this->_passportSerial,
             'passportNumber' => $this->_passportNumber,
+            'fmsDepartmentId' => $this->_fmsDepartmentId,
             'fmsDepartment' => $this->_fmsDepartment,
+            'regionId' => $this->_regionId,
             'region' => $this->_region,
+            'districtId' => $this->_districtId,
             'district' => $this->_district,
+            'localityId' => $this->_localityId,
             'locality' => $this->_locality,
+            'streetId' => $this->_streetId,
             'street' => $this->_street,
             'houseNumber' => $this->_houseNumber,
             'apartment' => $this->_apartment,
@@ -242,7 +354,7 @@ class PatientCard extends AppDomain implements \JsonSerializable
      */
     public function getGenderId() : int
     {
-        return $this->_gender_id;
+        return $this->_genderId;
     }
 
     /**
