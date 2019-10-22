@@ -81,6 +81,10 @@ const updatePatientCardData = function () {
 const loadPatientCardData = function (id) {
     let id_input = $("input[name='id']");
     let card_number_input = $("input[name='card-number']");
+    let is_alive_id_input = $("input[name='is-alive-id']");
+    let is_alive_input = $("#patient-live-status");
+    let is_attached_id_input = $("input[name='is-attached-id']");
+    let is_attached_input = $("#patient-attach-status");
     let full_name_input = $("input[name='full-name']");
     let gender_input = $("select[name='gender']");
     let date_birth_input = $("input[name='date-birth']");
@@ -107,6 +111,11 @@ const loadPatientCardData = function (id) {
     let workplace_input = $("input[name='workplace']");
     let profession_input = $("input[name='profession']");
     let notation_input = $("textarea[name='notation']");
+    /*
+     * Значки fontawesome для статусов
+     */
+    let is_alive_image = $("#patient-live-image");
+    let is_attached_image = $("#patient-attached-image");
 
     let request = $.ajax({
         type: "GET",
@@ -117,6 +126,10 @@ const loadPatientCardData = function (id) {
         let card_data = response.card_data;
         id_input.val(card_data.id);
         card_number_input.val(card_data.cardNumber);
+        is_alive_id_input.val(card_data.isAliveId);
+        is_alive_input.text(card_data.isAlive);
+        is_attached_id_input.val(card_data.isAttachedId);
+        is_attached_input.text(card_data.isAttached);
         full_name_input.val(card_data.surname + ' ' + card_data.firstName + ' ' + card_data.secondName);
         $.each(response.genders, function (key, value) {
             gender_input.append(`<option value="${value.id}" ${card_data.genderId == value.id ?' selected':''}>${value.description}</option>`)
@@ -145,5 +158,15 @@ const loadPatientCardData = function (id) {
         workplace_input.val(card_data.workPlace);
         profession_input.val(card_data.profession);
         notation_input.val(card_data.notation);
+        switch (card_data.isAliveId) {
+            case 1 : is_alive_image.addClass('fa fa-male patient-card-status-good'); break;
+            case 2 : break;
+
+        }
+        switch (card_data.isAttacheId) {
+            case 1 : is_attached_image.addClass('fa fa-user-plus patient-card-status-good'); break;
+            case 2 : is_attached_image.addClass('fa fa-user-times patient-card-status-bad');break;
+
+        }
     })
 };

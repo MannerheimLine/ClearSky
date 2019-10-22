@@ -74,13 +74,17 @@ html, body {
     border: solid 1px;
     padding: 3px;
     text-align: center;
-    color: #1ad81a;
 }
 .red-asterisk{
     color: red;
 }
-.patient-card-status-image{
+.patient-card-status-good{
     font-size: 40px;
+    color: #1ad81a;
+}
+.patient-card-status-bad{
+    font-size: 40px;
+    color: #d80e1b;
 }
 .patient-card-status-notation{
     font-size: 14px;

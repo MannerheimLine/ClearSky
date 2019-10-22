@@ -13,7 +13,9 @@ class PatientCard extends AppDomain implements \JsonSerializable
     private $_dbConnection;
     private $_id;
     private $_cardNumber;
+    private $_isAliveId;
     private $_isAlive;
+    private $_isAttachedId;
     private $_isAttached;
     private $_surname;
     private $_firstName;
@@ -94,8 +96,10 @@ class PatientCard extends AppDomain implements \JsonSerializable
         $query = ("SELECT 
         `patient_cards`.`id`,
         `patient_cards`.`card_number` as `card_number`,
-        `patient_cards`.`is_alive` as `is_alive`,
-        `patient_cards`.`is_attached` as `is_attached`,
+        `patient_cards`.`is_alive` as `is_alive_id`,
+        `alive_status`.`is_alive` as `is_alive`,
+        `patient_cards`.`is_attached` as `is_attached_id`,
+        `attach_status`.`is_attached` as `is_attached`,
         `patient_cards`.`surname` as `surname`,
         `patient_cards`.`firstname` as `firstname`,
         `patient_cards`.`secondname` as `secondname`,
@@ -133,6 +137,8 @@ class PatientCard extends AppDomain implements \JsonSerializable
         LEFT JOIN `insurance_companies` ON `patient_cards`.`insurance_company` = `insurance_companies`.`id` 
         LEFT JOIN `streets` ON `patient_cards`.`street` = `streets`.`id` 
         LEFT JOIN `fms_departments` ON `patient_cards`.`fms_department` = `fms_departments`.`id` 
+        LEFT JOIN `alive_status` ON `patient_cards`.`is_alive` = `alive_status`.`id` 
+        LEFT JOIN `attach_status` ON `patient_cards`.`is_attached` = `attach_status`.`id` 
         WHERE `patient_cards`.`id` = :id");
         $result = $this->_dbConnection->prepare($query);
         $result->execute([
@@ -142,7 +148,9 @@ class PatientCard extends AppDomain implements \JsonSerializable
             while ($row = $result->fetch()){
                 $this->_id = $row['id'];
                 $this->_cardNumber = $row['card_number'];
+                $this->_isAliveId = $row['is_alive_id'];
                 $this->_isAlive = $row['is_alive'];
+                $this->_isAttachedId = $row['is_attached_id'];
                 $this->_isAttached = $row['is_attached'];
                 $this->_surname = $row['surname'];
                 $this->_firstName = $row['firstname'];
@@ -259,7 +267,9 @@ class PatientCard extends AppDomain implements \JsonSerializable
         return [
             'id' => $this->_id,
             'cardNumber' => $this->_cardNumber,
+            'isAliveId' => $this->_isAliveId,
             'isAlive' => $this->_isAlive,
+            'isAttacheId' => $this->_isAttachedId,
             'isAttached' => $this->_isAttached,
             'surname' => $this->_surname,
             'firstName' => $this->_firstName,
