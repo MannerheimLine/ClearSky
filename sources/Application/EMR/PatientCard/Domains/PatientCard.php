@@ -6,10 +6,14 @@ namespace Application\EMR\PatientCard\Domains;
 
 
 use Application\Base\AppDomain;
+use DateTime;
 use Engine\Database\Connectors\ConnectorInterface;
 
 class PatientCard extends AppDomain implements \JsonSerializable
 {
+    const MAN = 1;
+    const WOMAN = 2;
+    const CHILD = 3;
     private $_dbConnection;
     private $_id;
     private $_cardNumber;
@@ -17,6 +21,7 @@ class PatientCard extends AppDomain implements \JsonSerializable
     private $_isAlive;
     private $_isAttachedId;
     private $_isAttached;
+    private $_humanType;
     private $_surname;
     private $_firstName;
     private $_secondName;
@@ -87,6 +92,20 @@ class PatientCard extends AppDomain implements \JsonSerializable
         $castedData['profession'] = $updatingData['profession'];
         $castedData['notation'] = $updatingData['notation'];
         return $castedData;
+    }
+
+    private function getHumanType(){
+        $today = new DateTime();
+        $dateBirth = DateTime::createFromFormat("Y-m-d H:i", $this->_dateBirth.' 00:00');
+        $difference = $today->diff($dateBirth);
+        if ($difference->y >= 18 ){
+            switch ($this->_genderId){
+                case 1 : return self::MAN; break;
+                case 2 : return self::WOMAN; break;
+            }
+        }else{
+            return self::CHILD;
+        }
     }
 
     /**
@@ -182,6 +201,7 @@ class PatientCard extends AppDomain implements \JsonSerializable
                 $this->_profession = $row['profession'];
                 $this->_notation = $row['notation'];
             }
+            $this->_humanType = $this->getHumanType();
         }
         return $this;
     }
@@ -271,6 +291,7 @@ class PatientCard extends AppDomain implements \JsonSerializable
             'isAlive' => $this->_isAlive,
             'isAttacheId' => $this->_isAttachedId,
             'isAttached' => $this->_isAttached,
+            'humanType' => $this->_humanType,
             'surname' => $this->_surname,
             'firstName' => $this->_firstName,
             'secondName' => $this->_secondName,
@@ -301,222 +322,6 @@ class PatientCard extends AppDomain implements \JsonSerializable
             'profession' => $this->_profession,
             'notation' => $this->_notation
         ];
-    }
-
-    /**
-     * @return int
-     */
-    public function getId() : int
-    {
-        return $this->_id;
-    }
-
-    /**
-     * @return string
-     */
-    public function getCardNumber() : string
-    {
-        return $this->_cardNumber;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getIsAlive() : int
-    {
-        return $this->_isAlive;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getIsAttached() : int
-    {
-        return $this->_isAttached;
-    }
-
-    /**
-     * @return string
-     */
-    public function getSurname() : string
-    {
-        return $this->_surname;
-    }
-
-    /**
-     * @return string
-     */
-    public function getFirstName() : string
-    {
-        return $this->_firstName;
-    }
-
-    /**
-     * @return string
-     */
-    public function getSecondName() : string
-    {
-        return $this->_secondName ?: '';
-    }
-
-    /**
-     * @return int
-     */
-    public function getGenderId() : int
-    {
-        return $this->_genderId;
-    }
-
-    /**
-     * @return string
-     */
-    public function getGender() : string
-    {
-        return $this->_gender;
-    }
-
-    /**
-     * @return string
-     */
-    public function getDateBirth() : string
-    {
-        return $this->_dateBirth ?: '';
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getTelephone() : string
-    {
-        return $this->_telephone ?: '';
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getEmail() : string
-    {
-        return $this->_email ?: '';
-    }
-
-    /**
-     * @return string
-     */
-    public function getPolicyNumber() : string
-    {
-        return $this->_policyNumber;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getInsuranceCompany() : string
-    {
-        return $this->_insuranceCompany ?: '';
-    }
-
-    /**
-     * @return string
-     */
-    public function getInsuranceCertificate() : string
-    {
-        return $this->_insuranceCertificate ?: '';
-    }
-
-    /**
-     * @return string
-     */
-    public function getPassportSerial() : string
-    {
-        return $this->_passportSerial ?: '';
-    }
-
-    /**
-     * @return string
-     */
-    public function getPassportNumber() : string
-    {
-        return $this->_passportNumber ?: '';
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getFmsDepartment() : string
-    {
-        return $this->_fmsDepartment ?: '';
-    }
-
-    /**
-     * @return string
-     */
-    public function getRegion() : string
-    {
-        return $this->_region;
-    }
-
-    /**
-     * @return string
-     */
-    public function getDistrict() : string
-    {
-        return $this->_district;
-    }
-
-    /**
-     * @return string
-     */
-    public function getLocality() : string
-    {
-        return $this->_locality ?: '';
-    }
-
-    /**
-     * @return string
-     */
-    public function getStreet() : string
-    {
-        return $this->_street ?: '';
-    }
-
-    /**
-     * @return string
-     */
-    public function getHouseNumber() : string
-    {
-        return $this->_houseNumber ?: '';
-    }
-
-    /**
-     * @return string
-     */
-    public function getApartment() : string
-    {
-        return $this->_apartment ?: '';
-    }
-
-    /**
-     * @return string
-     */
-    public function getWorkPlace() : string
-    {
-        return $this->_workPlace ?: '';
-    }
-
-    /**
-     * @return string
-     */
-    public function getProfession() : string
-    {
-        return $this->_profession ?: '';
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getNotation() : string
-    {
-        return $this->_notation ?: '';
     }
 
 }

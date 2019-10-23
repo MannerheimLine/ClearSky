@@ -17,11 +17,28 @@ const additionally_section = $('#additionally-section');
 $(function () {
     loadPatientCardData(1);
     $(".patient-card-body :input").change(function() {updatePatientCardData()});
+
+    /*$("#patient-card-alive-section").click(function () {
+        //Можно менять id и дергать функцию update, потом функцию load
+        let is_alive_id_input = $("input[name='is-alive-id']");
+        if (is_alive_id_input.val() == 1){
+            is_alive_id_input.val(2);
+            alert(is_alive_id_input.val());
+        }else {
+            is_alive_id_input.val(1);
+            alert(is_alive_id_input.val());
+        }
+
+    });
+    $("#patient-card-attached-section").click(function () {
+        alert('attached');
+    })*/
 });
 
 const updatePatientCardData = function () {
     let id_value = $("input[name='id']").val();
     let card_number_value = $("input[name='card-number']").val();
+    //let is_alive_id_value = $("input[name='is-alive-id']").val();
     let full_name_value = $("input[name='full-name']").val();
     let gender_value = $("select[name='gender']").val();
     let date_birth_value = $("input[name='date-birth']").val();
@@ -49,6 +66,7 @@ const updatePatientCardData = function () {
         data: {
             'id' : id_value,
             'cardNumber' : card_number_value,
+            //'isAlive' : is_alive_id_value,
             'fullName' : full_name_value,
             'gender' : gender_value,
             'dateBirth' : date_birth_value,
@@ -111,11 +129,6 @@ const loadPatientCardData = function (id) {
     let workplace_input = $("input[name='workplace']");
     let profession_input = $("input[name='profession']");
     let notation_input = $("textarea[name='notation']");
-    /*
-     * Значки fontawesome для статусов
-     */
-    let is_alive_image = $("#patient-live-image");
-    let is_attached_image = $("#patient-attached-image");
 
     let request = $.ajax({
         type: "GET",
@@ -158,14 +171,45 @@ const loadPatientCardData = function (id) {
         workplace_input.val(card_data.workPlace);
         profession_input.val(card_data.profession);
         notation_input.val(card_data.notation);
-        switch (card_data.isAliveId) {
-            case 1 : is_alive_image.addClass('fa fa-male patient-card-status-good'); break;
-            case 2 : break;
 
+        /*
+        * Значки fontawesome для статусов
+        */
+        let patient_card_alive_section = $('#patient-card-alive-section');
+        let patient_card_attached_section = $('#patient-card-attached-section');
+        let is_alive_image = $("#patient-alive-image");
+        let is_attached_image = $("#patient-attached-image");
+        /*
+         * Статус по карте: жив/мертв, прикреплен/откреплен
+         */
+        $('#patient-alive-status').text(card_data.isAlive);
+        $('#patient-attached-status').text(card_data.isAttached);
+
+        switch (card_data.isAliveId) {
+            //Если пациент жив.
+            case 1 :
+                patient_card_alive_section.css({'color' : '#1ad81a'});
+                switch (card_data.humanType) {
+                    case 1 : is_alive_image.addClass('fa fa-male'); break;
+                    case 2 : is_alive_image.addClass('fa fa-female'); break;
+                    case 3 : is_alive_image.addClass('fa fa-child'); break;
+                    default : is_alive_image.addClass('fa fa-male');
+                }
+                break;
+            case 2 :
+                patient_card_alive_section.css({'color' : '#d80e1b'});
+                is_alive_image.addClass('fa fa-skull');
+                break;
         }
         switch (card_data.isAttacheId) {
-            case 1 : is_attached_image.addClass('fa fa-user-plus patient-card-status-good'); break;
-            case 2 : is_attached_image.addClass('fa fa-user-times patient-card-status-bad');break;
+            case 1 :
+                patient_card_attached_section.css({'color' : '#1ad81a'});
+                is_attached_image.addClass('fa fa-user-plus')
+                break;
+            case 2 :
+                patient_card_attached_section.css({'color' : '#d80e1b'});
+                is_attached_image.addClass('fa fa-user-times');
+                break;
 
         }
     })

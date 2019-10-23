@@ -15,17 +15,17 @@
                             <div class='patient-card-information-section-body'>
                                 <div class="row">
                                     <div class="col-6">
-                                        <div class="patient-card-status">
+                                        <div id="patient-card-alive-section" class="patient-card-status">
                                             <input name="is-alive-id" hidden>
-                                            <i id="patient-live-image"></i>
-                                            <i id="patient-live-status">Живой</i>
+                                            <i id="patient-alive-image"></i>
+                                            <i id="patient-alive-status">Живой</i>
                                         </div>
                                     </div>
                                     <div class="col-6">
-                                        <div class="patient-card-status">
+                                        <div id="patient-card-attached-section" class="patient-card-status">
                                             <input name="is-attached" hidden>
                                             <i id="patient-attached-image"></i>
-                                            <i id="patient-attach-status">Прикреплен</i>
+                                            <i id="patient-attached-status">Прикреплен</i>
                                         </div>
                                     </div>
                                 </div>
