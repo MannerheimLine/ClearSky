@@ -85,3 +85,10 @@ html, body {
 #patient-attached-image{
     font-size: 40px;
 }
+.patient-card-status:hover{
+    background: #eeeeee;
+    color:blue; !important;
+}
+.patient-card-status:hover i{
+    color: #37474F;
+}

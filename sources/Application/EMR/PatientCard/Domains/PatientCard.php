@@ -68,6 +68,8 @@ class PatientCard extends AppDomain implements \JsonSerializable
     private function prepareUpdatingData(array $updatingData) : array {
         $castedData['id'] = (int)$updatingData['id'];
         $castedData['cardNumber'] = $updatingData['cardNumber'];
+        $castedData['isAlive'] = (int)$updatingData['isAlive'];
+        $castedData['isAttach'] = (int)$updatingData['isAttach'];
         $fullName = explode(' ',$updatingData['fullName']);
         $castedData['surname'] = $fullName[0];
         $castedData['firstName'] = $fullName[1];
@@ -211,6 +213,8 @@ class PatientCard extends AppDomain implements \JsonSerializable
         $query = ("UPDATE `patient_cards` 
         SET 
             `card_number` = :cardNumber,
+            `is_alive` = :isAlive,
+            `is_attached` = :isAttach,
             `surname` = :surname,
             `firstname` = :firstName,
             `secondname` = :secondName,
@@ -237,6 +241,8 @@ class PatientCard extends AppDomain implements \JsonSerializable
         $result = $this->_dbConnection->prepare($query);
         if($result->execute([
             'id' => $castedData['id'],
+            'isAlive' => $castedData['isAlive'],
+            'isAttach' => $castedData['isAttach'],
             'cardNumber' => $castedData['cardNumber'],
             'surname' => $castedData['surname'],
             'firstName' => $castedData['firstName'],
@@ -289,7 +295,7 @@ class PatientCard extends AppDomain implements \JsonSerializable
             'cardNumber' => $this->_cardNumber,
             'isAliveId' => $this->_isAliveId,
             'isAlive' => $this->_isAlive,
-            'isAttacheId' => $this->_isAttachedId,
+            'isAttachId' => $this->_isAttachedId,
             'isAttached' => $this->_isAttached,
             'humanType' => $this->_humanType,
             'surname' => $this->_surname,

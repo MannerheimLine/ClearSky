@@ -16,14 +16,14 @@
                                 <div class="row">
                                     <div class="col-6">
                                         <div id="patient-card-alive-section" class="patient-card-status">
-                                            <input name="is-alive-id" hidden>
+                                            <input name="is-alive-id" >
                                             <i id="patient-alive-image"></i>
                                             <i id="patient-alive-status">Живой</i>
                                         </div>
                                     </div>
                                     <div class="col-6">
                                         <div id="patient-card-attached-section" class="patient-card-status">
-                                            <input name="is-attached" hidden>
+                                            <input name="is-attach-id" >
                                             <i id="patient-attached-image"></i>
                                             <i id="patient-attached-status">Прикреплен</i>
                                         </div>
