@@ -61,14 +61,28 @@ $(".patient-card-body :input").change(function() {updatePatientCardData()});
 patient_card_alive_section.click(function () {
     flipPatientCardStatus('is-alive-id');
     let updatedCardId = updatePatientCardData();
-    loadPatientCardData(updatedCardId);
+    /**
+     * Идея в том чтобы заморозить запрос на получение данных у БД хотя бы на немного.
+     * Тем самы запрос на обновление записей всегда пройдет первым, а запрос на получение всегда будет вторым
+     * соответсвенн овозвращая всегда актуальные данные.
+     * -------------------------------------------------------------------------------------------------------
+     * Решит ьпроблему нужно в любом случае через promise или callback, так как вставка данных может длиться и больше
+     * 50 мс, а значит в этом случае, функция по запросу будет отправленна первой!.
+     */
+
+    let freezeToSql = function (){
+        loadPatientCardData(updatedCardId);
+    };
+    setTimeout(freezeToSql, 50);
 });
 
 patient_card_attached_section.click(function () {
     flipPatientCardStatus('is-attach-id');
-    updatePatientCardData();
     let updatedCardId = updatePatientCardData();
-    loadPatientCardData(updatedCardId);
+    let freezeToSql = function (){
+        loadPatientCardData(updatedCardId);
+    };
+    setTimeout(freezeToSql, 50);
 });
 
 const flipPatientCardStatus = function (name) {
