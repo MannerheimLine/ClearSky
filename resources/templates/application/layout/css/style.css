@@ -34,7 +34,7 @@ html, body {
     width: 100%;
     padding: 15px;
 }
-.patient-card-menu{
+#patient-card-menu{
     height: 50px;
     width: 100%;
     background-color: white;
@@ -44,7 +44,7 @@ html, body {
     border-radius: 5px;
     border-color: #dce1e5;
 }
-.patient-card-body{
+#patient-card-body{
     width: 100%;
     /*background-color: white;*/
     padding: 10px;
@@ -91,4 +91,35 @@ html, body {
 }
 .patient-card-status:hover i{
     color: #37474F;
+}
+.right-border{
+    border-right: solid 1px;
+    border-color: #dce1e5;
+    height: 37px;
+}
+.table-mine{
+    border-collapse: separate;
+    border-spacing: 1px;
+    margin-bottom: 5px;
+    width: 100%;
+}
+.table-mine thead{
+    background-color: #37474F;
+    color: white;
+    font-size: 12px;
+}
+.table-mine > thead > tr > th,
+.table-mine > tbody > tr > th,
+.table-mine > tfoot > tr > th,
+.table-mine > thead > tr > td,
+.table-mine > tbody > tr > td,
+.table-mine > tfoot > tr > td {
+    padding: 8px;
+    line-height: 1.42857143;
+    text-align: center;
+}
+.table-mine tbody{
+    color: #37474F;
+    background-color: white;
+    font-size: 12px;
 }

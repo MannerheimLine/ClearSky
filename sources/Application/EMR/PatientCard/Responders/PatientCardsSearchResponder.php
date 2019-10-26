@@ -9,7 +9,7 @@ use Application\Base\AppResponder;
 use Psr\Http\Message\ServerRequestInterface;
 use Zend\Diactoros\Response;
 
-class PatientCardShowResponder extends AppResponder
+class PatientCardsSearchResponder extends AppResponder
 {
 
     /**
@@ -19,6 +19,6 @@ class PatientCardShowResponder extends AppResponder
      */
     public function respond(ServerRequestInterface $request, $payload = null): Response
     {
-        return new Response\JsonResponse($payload); //JSON
+        return new Response\JsonResponse($payload);
     }
 }

@@ -1,11 +1,29 @@
 <div class="container-fluid">
     <div class="row" style="padding: 10px">
         <div class="module-wrapper">
-            <div class="patient-card-menu">
-                <button class="btn btn-success">Кнопка</button>
-                <button class="btn btn-primary">Кнопка</button>
+            <div id="patient-card-menu">
+                <div class="row">
+                    <div id="buttons" class="col-6 right-border">
+                        <button class="btn btn-success btn-sm">Создать</button>
+                        <button class="btn btn-danger btn-sm">Удалить</button>
+                    </div>
+                    <div id="search" class="col-6 right-border">
+                        <div class="input-group mb-2">
+                            <div class="input-group-prepend">
+                                <div class="input-group-text"><i class="fa fa-search"></i> </div>
+                            </div>
+                            <input type="text" class="form-control" id="card-search" name="card-search" placeholder="Поиск">
+                            <div class="input-group-append">
+                                <div  class="input-group-text"><b>Найдено:</b></div>
+                            </div>
+                            <div class="input-group-append">
+                                <div class="input-group-text"><span id="patient-card-found-records" class="badge badge-dark">0</span></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div class="patient-card-body">
+            <div id="patient-card-body">
                 <div class="row">
                     <div id="personal-data-section" class="col-3">
                         <div class="patient-card-information-section box-shadow--2dp">
@@ -16,14 +34,14 @@
                                 <div class="row">
                                     <div class="col-6">
                                         <div id="patient-card-alive-section" class="patient-card-status">
-                                            <input name="is-alive-id" >
+                                            <input name="is-alive-id" hidden>
                                             <i id="patient-alive-image"></i>
                                             <i id="patient-alive-status">Живой</i>
                                         </div>
                                     </div>
                                     <div class="col-6">
                                         <div id="patient-card-attached-section" class="patient-card-status">
-                                            <input name="is-attach-id" >
+                                            <input name="is-attach-id" hidden>
                                             <i id="patient-attached-image"></i>
                                             <i id="patient-attached-status">Прикреплен</i>
                                         </div>
@@ -52,7 +70,7 @@
                                     </div>
                                     <select id="gender" name="gender" class="custom-select"></select>
                                 </div>
-                                <label  for="date-birth">Дата рождения:</label>
+                                <label  for="date-birth">Дата рождения<span class="red-asterisk">*</span>:</label>
                                 <div class="input-group mb-2">
                                     <div class="input-group-prepend">
                                         <div class="input-group-text"><i class="fa fa-birthday-cake"></i> </div>

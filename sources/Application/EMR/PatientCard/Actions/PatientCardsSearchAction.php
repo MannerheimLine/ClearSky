@@ -6,20 +6,19 @@ namespace Application\EMR\PatientCard\Actions;
 
 
 use Application\Base\AppAction;
-use Application\EMR\PatientCard\Domains\PatientCard;
-use Application\EMR\PatientCard\Responders\PatientCardUpdateResponder;
+use Application\EMR\PatientCard\Domains\PatientCards;
+use Application\EMR\PatientCard\Responders\PatientCardsSearchResponder;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
-use Zend\Diactoros\Response\JsonResponse;
 
-class PatientCardUpdateAction extends AppAction implements RequestHandlerInterface
+class PatientCardsSearchAction extends AppAction implements RequestHandlerInterface
 {
-    private $_patientCard;
+    private $_patientCards;
 
-    public function __construct(PatientCard $patientCard, PatientCardUpdateResponder $responder)
+    public function __construct(PatientCards $patientCards, PatientCardsSearchResponder $responder)
     {
-        $this->_patientCard = $patientCard;
+        $this->_patientCards = $patientCards;
         $this->_responder = $responder;
     }
 
@@ -30,8 +29,8 @@ class PatientCardUpdateAction extends AppAction implements RequestHandlerInterfa
      */
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
-        $updatingData = $request->getParsedBody();
-        $payload = $this->_patientCard->updateCardData($updatingData);
+        $searchString = $request->getParsedBody()['searchString'];
+        $payload = $this->_patientCards->getCardsData($searchString);
         $response = $this->_responder->respond($request, $payload);
 
         return $response;
