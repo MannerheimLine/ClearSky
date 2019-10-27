@@ -1,5 +1,6 @@
 <?php
 
+use Application\EMR\PatientCard\Actions\PatientCardAddAction;
 use Application\EMR\PatientCard\Actions\PatientCardIndexAction;
 use Application\EMR\PatientCard\Actions\PatientCardShowAction;
 use Application\EMR\PatientCard\Actions\PatientCardsSearchAction;
@@ -32,6 +33,7 @@ $aura = new RouterContainer();
 $map = $aura->getMap();
 $map->get('patient_card', '/patient-card', PatientCardIndexAction::class);
 $map->post('patient_card/update', '/patient-card/update', PatientCardUpdateAction::class);
+$map->post('patient_card/add', '/patient-card/add', PatientCardAddAction::class);
 $map->get('patient_card/show', '/patient-card/show/{id}', PatientCardShowAction::class)->tokens(['id' => '\d+']);
 $map->post('patient_card/search_cards', '/patient-card/search-cards/', PatientCardsSearchAction::class)->tokens(['searchString' => '\w+']);
 //$map->get('catalog/detail', '/blog/{id}/view/{number}-{detail}', Application\Blog\Action\DetailsIndexAction::class)->tokens(['id' => '\d+', 'number' => '\d+', 'detail' => '\d+']);

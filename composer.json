@@ -11,7 +11,8 @@
     "zendframework/zend-diactoros": "^2.1",
     "zendframework/zend-httphandlerrunner": "^1.1",
     "zendframework/zend-stratigility": "^3.2",
-    "ext-pdo": "*"
+    "ext-pdo": "*",
+    "ext-mbstring": "*"
   },
   "autoload": {
       "psr-4": {

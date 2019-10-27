@@ -87,7 +87,6 @@ html, body {
 }
 .patient-card-status:hover{
     background: #eeeeee;
-    color:blue; !important;
 }
 .patient-card-status:hover i{
     color: #37474F;
@@ -122,4 +121,8 @@ html, body {
     color: #37474F;
     background-color: white;
     font-size: 12px;
+}
+#addPatientCardModal{
+    font-weight: bold;
+    color: #37474f;
 }

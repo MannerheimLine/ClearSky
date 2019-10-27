@@ -78,21 +78,35 @@ class PatientCard extends AppDomain implements \JsonSerializable
         $castedData['dateBirth'] = $updatingData['dateBirth'];
         $castedData['telephone'] = $updatingData['telephone'];
         $castedData['email'] = $updatingData['email'];
-        $castedData['insuranceCertificate'] = $updatingData['insuranceCertificate'];
+        $castedData['insuranceCertificate'] = $updatingData['insuranceCertificate'] ?: null;
         $castedData['policyNumber'] = $updatingData['policyNumber'];
         $castedData['insuranceCompany'] = (int)$updatingData['insuranceCompany'];
         $castedData['passportSerial'] = $updatingData['passportSerial'];
-        $castedData['passportNumber'] = $updatingData['passportNumber'];
-        $castedData['fmsDepartment'] = (int)$updatingData['fmsDepartment'];
+        $castedData['passportNumber'] = $updatingData['passportNumber'] ?: null;
+        $castedData['fmsDepartment'] = (int)$updatingData['fmsDepartment'] ?: null;
         $castedData['region'] = (int)$updatingData['region'];
         $castedData['district'] = (int)$updatingData['district'];
         $castedData['locality'] = (int)$updatingData['locality'];
-        $castedData['street'] = (int)$updatingData['street'];
+        $castedData['street'] = (int)$updatingData['street'] ?: null;
         $castedData['houseNumber'] = $updatingData['houseNumber'];
         $castedData['apartment'] = $updatingData['apartment'];
         $castedData['workplace'] = $updatingData['workplace'];
         $castedData['profession'] = $updatingData['profession'];
         $castedData['notation'] = $updatingData['notation'];
+        return $castedData;
+    }
+
+    private function prepareAddingData(array $addingData){
+        $castedData['cardNumber'] = $this->sanitize($addingData['cardNumber']);
+        $fullName = explode(' ',$addingData['fullName']);
+        $castedData['surname'] = $this->sanitize($fullName[0]);
+        $castedData['firstName'] = $this->sanitize($fullName[1]);
+        $castedData['secondName'] = $this->sanitize($fullName[2]);
+        $castedData['gender'] = $this->sanitize($addingData['gender']);
+        $castedData['dateBirth'] = $this->sanitize($addingData['dateBirth']);
+        $castedData['insurance'] = $this->sanitize($addingData['insurance']);
+        $castedData['policyNumber'] = $this->sanitize($addingData['policyNumber']);
+        $castedData['insuranceCompany'] = $this->sanitize($addingData['insuranceCompany']);
         return $castedData;
     }
 
@@ -268,6 +282,45 @@ class PatientCard extends AppDomain implements \JsonSerializable
             'notation' => $castedData['notation'],
         ])){
             return 'Updated';
+        }
+    }
+
+    public function addCardData(array $addingData){
+        $castedData = $this->prepareAddingData($addingData);
+        $query = ("INSERT INTO `patient_cards` 
+        (`card_number`,  
+         `surname`, 
+         `firstname`, 
+         `secondname`, 
+         `gender`, 
+         `date_birth`, 
+         `insurance`, 
+         `policy_number`, 
+         `insurance_company`) 
+         VALUES (
+        :cardNumber,
+        :surname,
+        :firstName,
+        :secondName,
+        :gender,
+        :dateBirth,
+        :insurance,
+        :policyNumber,
+        :insuranceCompany)");
+        $result = $this->_dbConnection->prepare($query);
+        $result->execute([
+            'cardNumber' => $castedData['cardNumber'],
+            'surname' => $castedData['surname'],
+            'firstName' => $castedData['firstName'],
+            'secondName' => $castedData['secondName'],
+            'gender' => $castedData['gender'],
+            'dateBirth' => $castedData['dateBirth'],
+            'insurance' => $castedData['insurance'],
+            'policyNumber' => $castedData['policyNumber'],
+            'insuranceCompany' => $castedData['insuranceCompany'],
+        ]);
+        if ($result){
+            return $this->_dbConnection->lastInsertId();
         }
     }
 

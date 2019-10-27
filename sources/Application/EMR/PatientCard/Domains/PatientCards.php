@@ -18,7 +18,8 @@ class PatientCards extends AppDomain
     }
 
     public function getCardsData(string $searchString){
-        $query = ("SELECT `id`, `surname`, `firstname`, `secondname`, `policy_number`, `insurance`
+        $searchString = $this->sanitize($searchString);
+        $query = ("SELECT `id`, `card_number`, `is_alive`, `is_attached`, `surname`, `firstname`, `secondname`, `policy_number`, `insurance`
         FROM `patient_cards`
         WHERE `policy_number` LIKE '%$searchString%' OR CONCAT(`surname`, ' ', `firstname`, ' ', `secondname`) LIKE '%$searchString%'");
         $result = $this->_dbConnection->prepare($query);

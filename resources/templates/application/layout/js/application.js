@@ -56,6 +56,8 @@ const is_attached_image = $("#patient-attached-image");*/
 
 $(function () {
     loadPatientCardData(1);
+    //loadMasksForDynamicInputs();
+    loadMasksForStaticInputs();
 });
 
 $("#patient-card-body :input").change(function() {updatePatientCardData()});
@@ -89,8 +91,8 @@ $('#patient-card-attached-section').click(function () {
 
 card_search_input.keyup(function (e) {
     let searchString = card_search_input.val();
-    let recordBadge = $('#patient-card-found-records');
     if (e.which === 13){
+        let recordBadge = $('#patient-card-found-records');
         if (searchString.length > 0){
             patient_card_body.empty();
             patient_card_body.append(loadPatientCardSearchTemplate());
@@ -108,14 +110,23 @@ card_search_input.keyup(function (e) {
                     let line = loadCardsDataTableContentLine(value);
                     recordBadge.text(recordCount);
                     tableContent.append(line);
+                    console.log(response);
                 });
             });
         }else {
             alert('Введите данные для поиска');
+            return false;
         }
     }
     if (searchString.length === 0){
-        loadPatientCard(1);
+        patient_card_body.empty();
+        /**
+         * Легкая задержка чтобы не делать кучу запросов к БД, когда отпускаешь ЗАЖАТУЮ клавишу
+         */
+        setTimeout(function () {
+            loadPatientCard(1)
+        }, 100);
+        //loadMasksForDynamicInputs();
     }
 });
 
@@ -189,6 +200,35 @@ const updatePatientCardData = function () {
         console.log('Id '+ id_value + ' updated');
     });
     return id_value;
+};
+
+const addPatientCardData = function () {
+    let card_number_value = $("input[name='add-card-number']").val();
+    let full_name_value = $("input[name='add-full-name']").val();
+    let gender_value = $("select[name='add-gender']").val();
+    let date_birth_value = $("input[name='add-date-birth']").val();
+    let insurance_certificate_value = $("input[name='add-insurance-certificate']").val();
+    let policy_number_value = $("input[name='add-policy-number']").val();
+    let insurance_company_value = $("input[name='add-insurance-company-id']").val();
+    let request = $.ajax({
+        type: "POST",
+        url: "/patient-card/add",
+        data: {
+            'cardNumber' : card_number_value,
+            'fullName' : full_name_value,
+            'gender' : gender_value,
+            'dateBirth' : date_birth_value,
+            'insurance' : insurance_certificate_value,
+            'policyNumber' : policy_number_value,
+            'insuranceCompany' : insurance_company_value
+        },
+        cache: false
+    });
+    request.done(function (response) {
+        $("#addPatientCardModal").modal('hide');
+        patient_card_body.empty();
+        loadPatientCard(response);
+    });
 };
 
 const loadPatientCardData = function (id) {
@@ -282,7 +322,7 @@ const loadPatientCardData = function (id) {
         switch (card_data.isAliveId) {
             //Если пациент жив.
             case 1 :
-                patient_card_alive_section.css({'color' : '#1ad81a'});
+                patient_card_alive_section.css({'color' : '#28a745'});
                 switch (card_data.humanType) {
                     case 1 : is_alive_image.attr('class', 'fa fa-male'); break;
                     case 2 : is_alive_image.attr('class', 'fa fa-female'); break;
@@ -297,7 +337,7 @@ const loadPatientCardData = function (id) {
         }
         switch (card_data.isAttachId) {
             case 1 :
-                patient_card_attached_section.css({'color' : '#1ad81a'});
+                patient_card_attached_section.css({'color' : '#28a745'});
                 is_attached_image.attr('class', 'fa fa-user-plus');
                 break;
             case 2 :
@@ -536,10 +576,13 @@ const loadPatientCardSearchTemplate = function () {
             <table id="cards-data-table" class="table-striped table-mine full-width box-shadow--2dp">
                  <thead>
                      <tr>
-                         <th style="width: 25%;">ФИО</th>
-                         <th style="width: 25%;">Полис</th>
-                         <th style="width: 25%;">Снилс</th>
-                         <th style="width: 25%;">Действия</th>
+                         <th style="width: 20%;">ФИО</th>
+                         <th style="width: 10%;">Номер карты</th>
+                         <th style="width: 15%;">Полис</th>
+                         <th style="width: 15%;">Снилс</th>
+                         <th style="width: 10%;">Статус</th>
+                         <th style="width: 10%;">Прикрепление</th>
+                         <th style="width: 20%;">Действия</th>
                      </tr>
                  </thead>
                  <tbody id="cards-data-table-content"></tbody>
@@ -548,11 +591,36 @@ const loadPatientCardSearchTemplate = function () {
 };
 
 const loadCardsDataTableContentLine = function(response){
+    let live_status_image;
+    let attached_status_image;
+    switch (response.is_alive) {
+        case 1 :
+            live_status_image = 'fa fa-user';
+            break;
+        case 2 :
+            live_status_image = 'fa fa-skull';
+            break;
+    }
+    switch (response.is_attached) {
+        case 1 :
+            attached_status_image = 'fa fa-plus';
+            break;
+        case 2 :
+            attached_status_image = 'fa fa-minus';
+            break;
+    }
     return $(`<tr class="tr-table-content">
                     <td>${response.surname} ${response.firstname} ${response.secondname}</td>
+                    <td>${response.card_number}</td>
                     <td>${response.policy_number}</td>
                     <td>${response.insurance}</td>
-                    <td></td>
+                    <td><i class="${live_status_image}" style="font-size: 18px;"></i></td>
+                    <td><i class="${attached_status_image}" style="font-size: 18px;"></i></td>
+                    <td>
+                        <button class="btn btn-outline-success btn-sm" onclick="loadPatientCard(${response.id})">
+                            <i class="fa fa-search"></i> Посмотреть
+                        </button>
+                    </td>
                 </tr>`).hide().fadeIn(1000);
 };
 
@@ -588,4 +656,12 @@ const loadPatientCard = function (id) {
     });
     $('#cards-data-search-section').remove();
     recordBadge.text(0);
+};
+
+const loadMasksForDynamicInputs = function(){
+    $("#insurance-certificate").inputmask("999-999-999 99");
+};
+
+const loadMasksForStaticInputs = function(){
+    $("#add-insurance-certificate").inputmask("999-999-999 99");
 };

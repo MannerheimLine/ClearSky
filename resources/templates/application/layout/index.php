@@ -2,8 +2,7 @@
 <html lang="ru">
     <head>
         <link rel="stylesheet" type="text/css" href="/resources/assets/bootstrap/css/bootstrap.css"/>
-        <!--<link rel="stylesheet" type="text/css" href="/resources/assets/fontawesome/css/font-awesome.min.css"/>-->
-        <link rel="stylesheet" type="text/css" href="/resources/assets/fontawesome-free/css/all.css"/>
+        <link rel="stylesheet" type="text/css" href="/resources/assets/fontawesome/css/all.css"/>
         <link rel="stylesheet" type="text/css" href="/resources/templates/application/layout/css/style.css"/>
         <script type="application/javascript" src="/resources/assets/jquery/jquery-3.4.1.min.js"></script>
         <title id="title"><?=$this->_title?></title>
@@ -22,5 +21,6 @@
     <script type="application/javascript" src="/resources/templates/application/layout/js/application.js"></script>
     <script type="application/javascript" src="/resources/assets/jquery/jquery-3.4.1.min.js"></script>
     <script type="application/javascript" src="/resources/assets/bootstrap/js/bootstrap.js"></script>
+    <script type="application/javascript" src="/resources/assets/jquery.masked-input/jquery.input-mask.min.js"></script>
     </body>
 </html>
