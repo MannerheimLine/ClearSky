@@ -6,6 +6,8 @@
  *
  */
 
+let typingTimer;
+
 const module_wrapper = $('.module-wrapper');
 const patient_card_menu = $('.patient-card-menu');
 const patient_card_body = $('#patient-card-body');
@@ -56,7 +58,7 @@ const is_attached_image = $("#patient-attached-image");*/
 
 $(function () {
     loadPatientCardData(1);
-    //loadMasksForDynamicInputs();
+    loadMasksForDynamicInputs();
     loadMasksForStaticInputs();
 });
 
@@ -98,7 +100,7 @@ card_search_input.keyup(function (e) {
             patient_card_body.append(loadPatientCardSearchTemplate());
             let request = $.ajax({
                 type: "POST",
-                url: "/patient-card/search-cards/",
+                url: "/patient-card/search-cards",
                 data: {'searchString' : searchString},
                 cache: false
             });
@@ -118,7 +120,7 @@ card_search_input.keyup(function (e) {
             return false;
         }
     }
-    if (searchString.length === 0){
+    if (searchString.length === 0 && e.which === 8){
         patient_card_body.empty();
         /**
          * Легкая задержка чтобы не делать кучу запросов к БД, когда отпускаешь ЗАЖАТУЮ клавишу
@@ -126,8 +128,13 @@ card_search_input.keyup(function (e) {
         setTimeout(function () {
             loadPatientCard(1)
         }, 100);
-        //loadMasksForDynamicInputs();
+        loadMasksForDynamicInputs();
     }
+});
+
+patient_card_body.on('keyup', '#region', function () {
+    clearTimeout(typingTimer);
+    typingTimer = setTimeout(searchRegion, 500);
 });
 
 const flipPatientCardStatus = function (name) {
@@ -624,6 +631,10 @@ const loadCardsDataTableContentLine = function(response){
                 </tr>`).hide().fadeIn(1000);
 };
 
+const loadSearchRegionLine = function (response) {
+    return $(`<div style="width: 100%; height: 30px; border: solid 1px;">${response.region_name}</div>`).hide().fadeIn(1000);
+};
+
 const loadPatientCard = function (id) {
     patient_card_body.append(loadPatientCardTemplate());
     let recordBadge = $('#patient-card-found-records');
@@ -656,12 +667,42 @@ const loadPatientCard = function (id) {
     });
     $('#cards-data-search-section').remove();
     recordBadge.text(0);
+    loadMasksForDynamicInputs();
 };
 
-const loadMasksForDynamicInputs = function(){
-    $("#insurance-certificate").inputmask("999-999-999 99");
+const loadMasksForDynamicInputs = function() {
+    let patient_card_body = $("#patient-card-body");
+    setTimeout(function () {
+        let insurance_certificate = patient_card_body.find($("#insurance-certificate"));
+        let telephone = patient_card_body.find($("#telephone"));
+        insurance_certificate.mask("999-999-999 99");
+        telephone.mask("9(999)999-99-99");
+    }, 100);
 };
 
 const loadMasksForStaticInputs = function(){
-    $("#add-insurance-certificate").inputmask("999-999-999 99");
+    $("#add-insurance-certificate").mask("999-999-999 99");
+};
+
+const searchRegion = function () {
+    let searchString = $("input[name='region']").val();
+    let regionSearchResult = $('#region-search-result');
+    if (searchString.length > 0){
+        let request = $.ajax({
+            type: "POST",
+            url: "/patient-card/search-region",
+            data: {'searchString' : searchString},
+            cache: false
+        });
+        request.done(function (response) {
+            regionSearchResult.empty();
+            $.each(response, function (key, value) {
+                let line = loadSearchRegionLine(value);
+                regionSearchResult.append(line);
+                console.log(response);
+            })
+        })
+    }else {
+        regionSearchResult.empty();
+    }
 };

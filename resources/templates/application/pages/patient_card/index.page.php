@@ -157,11 +157,12 @@
                             <div class='patient-card-information-section-body'>
                                 <input name="region-id" hidden>
                                 <label for="region">Регион:</label>
-                                <div class="input-group mb-2">
+                                <div  class="input-group mb-2">
                                     <div class="input-group-prepend">
                                         <div class="input-group-text"><i class="fa fa-address-book"></i> </div>
                                     </div>
                                     <input type="text" class="form-control" id="region" name="region" placeholder="Регион">
+                                    <div id="region-search-result" style="width: 100%;"></div>
                                 </div>
                                 <input name="district-id" hidden>
                                 <label for="district">Район:</label>
