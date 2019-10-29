@@ -162,7 +162,7 @@
                                         <div class="input-group-text"><i class="fa fa-address-book"></i> </div>
                                     </div>
                                     <input type="text" class="form-control" id="region" name="region" placeholder="Регион">
-                                    <div id="region-search-result" style="width: 100%;"></div>
+                                    <div id="region-search-result-area"></div>
                                 </div>
                                 <input name="district-id" hidden>
                                 <label for="district">Район:</label>

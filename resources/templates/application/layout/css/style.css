@@ -126,3 +126,23 @@ html, body {
     font-weight: bold;
     color: #37474f;
 }
+#region-search-result{
+    width: 100%;
+    border: solid 1px;
+    border-color: #dce1e5;
+    border-bottom-left-radius: 5px;
+    border-bottom-right-radius: 5px;
+}
+#region-search-result-area{
+    width: 100%;
+}
+.patient-card-search-result-line{
+    width: 100%;
+    padding: 7px;
+
+}
+.patient-card-search-result-line:hover{
+    background-color: #007bff;
+    color: white;
+    cursor: pointer;
+}

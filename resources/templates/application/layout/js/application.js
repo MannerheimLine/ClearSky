@@ -62,7 +62,9 @@ $(function () {
     loadMasksForStaticInputs();
 });
 
-$("#patient-card-body :input").change(function() {updatePatientCardData()});
+$("#patient-card-body :input").not('#region').not('#district').change(function() {
+    updatePatientCardData();
+});
 
 $('#patient-card-alive-section').click(function () {
     flipPatientCardStatus('is-alive-id');
@@ -135,6 +137,18 @@ card_search_input.keyup(function (e) {
 patient_card_body.on('keyup', '#region', function () {
     clearTimeout(typingTimer);
     typingTimer = setTimeout(searchRegion, 500);
+});
+
+patient_card_body.on('click', '.patient-card-search-result-line', function () {
+    let regionId = $("input[name='region-id']");
+    let selectedValue = $(this).children('.search-id').text();
+    let selectedText = $(this).children('.search-text').text();
+    let regionSearchResultArea = $('#region-search-result-area');
+    let regionInputText = $("input[name='region']");
+    regionId.val(selectedValue);
+    regionSearchResultArea.empty();
+    regionInputText.val(selectedText);
+    updatePatientCardData();
 });
 
 const flipPatientCardStatus = function (name) {
@@ -495,6 +509,7 @@ const loadPatientCardTemplate = function () {
                                         <div class="input-group-text"><i class="fa fa-address-book"></i> </div>
                                     </div>
                                     <input type="text" class="form-control" id="region" name="region" placeholder="Регион">
+                                    <div id="region-search-result-area"></div>
                                 </div>
                                 <input name="district-id" hidden>
                                 <label for="district">Район:</label>
@@ -631,15 +646,13 @@ const loadCardsDataTableContentLine = function(response){
                 </tr>`).hide().fadeIn(1000);
 };
 
-const loadSearchRegionLine = function (response) {
-    return $(`<div style="width: 100%; height: 30px; border: solid 1px;">${response.region_name}</div>`).hide().fadeIn(1000);
-};
+
 
 const loadPatientCard = function (id) {
     patient_card_body.append(loadPatientCardTemplate());
     let recordBadge = $('#patient-card-found-records');
     loadPatientCardData(id);
-    $("#patient-card-body :input").change(function() {updatePatientCardData()});
+    $("#patient-card-body :input").not('#region').not('#district').change(function() {updatePatientCardData()});
     $('#patient-card-alive-section').click(function () {
         flipPatientCardStatus('is-alive-id');
         let updatedCardId = updatePatientCardData();
@@ -684,9 +697,12 @@ const loadMasksForStaticInputs = function(){
     $("#add-insurance-certificate").mask("999-999-999 99");
 };
 
+/**
+ * Поиск внутри карты
+ */
 const searchRegion = function () {
     let searchString = $("input[name='region']").val();
-    let regionSearchResult = $('#region-search-result');
+    let regionSearchResultArea = $('#region-search-result-area');
     if (searchString.length > 0){
         let request = $.ajax({
             type: "POST",
@@ -695,14 +711,22 @@ const searchRegion = function () {
             cache: false
         });
         request.done(function (response) {
-            regionSearchResult.empty();
+            regionSearchResultArea.empty();
+            $('#region-search-result-area').append(`<div id="region-search-result"></div>`);
             $.each(response, function (key, value) {
                 let line = loadSearchRegionLine(value);
-                regionSearchResult.append(line);
+                $('#region-search-result').append(line);
                 console.log(response);
             })
         })
     }else {
-        regionSearchResult.empty();
+        regionSearchResultArea.empty();
     }
+};
+
+const loadSearchRegionLine = function (response) {
+    return $(`<div class="patient-card-search-result-line">
+                <div class="search-id" hidden>${response.id}</div>
+                <div class="search-text">${response.region_name}</div>
+              </div>`).hide().fadeIn(1000);
 };
