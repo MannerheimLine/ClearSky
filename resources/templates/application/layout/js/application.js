@@ -134,23 +134,6 @@ card_search_input.keyup(function (e) {
     }
 });
 
-patient_card_body.on('keyup', '#region', function () {
-    clearTimeout(typingTimer);
-    typingTimer = setTimeout(searchRegion, 500);
-});
-
-patient_card_body.on('click', '.patient-card-search-result-line', function () {
-    let regionId = $("input[name='region-id']");
-    let selectedValue = $(this).children('.search-id').text();
-    let selectedText = $(this).children('.search-text').text();
-    let regionSearchResultArea = $('#region-search-result-area');
-    let regionInputText = $("input[name='region']");
-    regionId.val(selectedValue);
-    regionSearchResultArea.empty();
-    regionInputText.val(selectedText);
-    updatePatientCardData();
-});
-
 const flipPatientCardStatus = function (name) {
     let input = $(`input[name=${name}]`);
     if (input.val() == 1){
@@ -370,6 +353,103 @@ const loadPatientCardData = function (id) {
     })
 };
 
+/**
+ * Поиск карт
+ */
+
+const loadPatientCardSearchTemplate = function () {
+    return `
+        <div id="cards-data-search-section" class="row" style="padding: 10px;">
+            <table id="cards-data-table" class="table-striped table-mine full-width box-shadow--2dp">
+                 <thead>
+                     <tr>
+                         <th style="width: 20%;">ФИО</th>
+                         <th style="width: 10%;">Номер карты</th>
+                         <th style="width: 15%;">Полис</th>
+                         <th style="width: 15%;">Снилс</th>
+                         <th style="width: 10%;">Статус</th>
+                         <th style="width: 10%;">Прикрепление</th>
+                         <th style="width: 20%;">Действия</th>
+                     </tr>
+                 </thead>
+                 <tbody id="cards-data-table-content"></tbody>
+            </table>
+        </div>`
+};
+
+const loadCardsDataTableContentLine = function(response){
+    let live_status_image;
+    let attached_status_image;
+    switch (response.is_alive) {
+        case 1 :
+            live_status_image = 'fa fa-user';
+            break;
+        case 2 :
+            live_status_image = 'fa fa-skull';
+            break;
+    }
+    switch (response.is_attached) {
+        case 1 :
+            attached_status_image = 'fa fa-plus';
+            break;
+        case 2 :
+            attached_status_image = 'fa fa-minus';
+            break;
+    }
+    return $(`<tr class="tr-table-content">
+                    <td>${response.surname} ${response.firstname} ${response.secondname}</td>
+                    <td>${response.card_number}</td>
+                    <td>${response.policy_number}</td>
+                    <td>${response.insurance}</td>
+                    <td><i class="${live_status_image}" style="font-size: 18px;"></i></td>
+                    <td><i class="${attached_status_image}" style="font-size: 18px;"></i></td>
+                    <td>
+                        <button class="btn btn-outline-success btn-sm" onclick="loadPatientCard(${response.id})">
+                            <i class="fa fa-search"></i> Посмотреть
+                        </button>
+                    </td>
+                </tr>`).hide().fadeIn(1000);
+};
+
+/**
+ * Загрузка карты пациента
+ */
+
+const loadPatientCard = function (id) {
+    patient_card_body.append(loadPatientCardTemplate());
+    let recordBadge = $('#patient-card-found-records');
+    loadPatientCardData(id);
+    $("#patient-card-body :input").not('#region').not('#district').change(function() {updatePatientCardData()});
+    $('#patient-card-alive-section').click(function () {
+        flipPatientCardStatus('is-alive-id');
+        let updatedCardId = updatePatientCardData();
+        /**
+         * Идея в том чтобы заморозить запрос на получение данных у БД хотя бы на немного.
+         * Тем самы запрос на обновление записей всегда пройдет первым, а запрос на получение всегда будет вторым
+         * соответсвенн овозвращая всегда актуальные данные.
+         * -------------------------------------------------------------------------------------------------------
+         * Решит ьпроблему нужно в любом случае через promise или callback, так как вставка данных может длиться и больше
+         * 50 мс, а значит в этом случае, функция по запросу будет отправленна первой!.
+         */
+
+        let freezeToSql = function (){
+            loadPatientCardData(updatedCardId);
+        };
+        setTimeout(freezeToSql, 50);
+    });
+    $('#patient-card-attached-section').click(function () {
+        flipPatientCardStatus('is-attach-id');
+        let updatedCardId = updatePatientCardData();
+        let freezeToSql = function (){
+            loadPatientCardData(updatedCardId);
+        };
+        setTimeout(freezeToSql, 50);
+    });
+    $('#cards-data-search-section').remove();
+    recordBadge.text(0);
+    loadMasksForDynamicInputs();
+};
+
 const loadPatientCardTemplate = function () {
     return `<div class="row">
                     <div id="personal-data-section" class="col-3">
@@ -502,38 +582,41 @@ const loadPatientCardTemplate = function () {
                                 <i class="fa fa-address-book" aria-hidden="true"></i> Адреса
                             </div>
                             <div class='patient-card-information-section-body'>
-                                <input name="region-id" hidden>
                                 <label for="region">Регион:</label>
-                                <div class="input-group mb-2">
+                                <div  class="input-group mb-2">
+                                    <input name="region-id" hidden>
                                     <div class="input-group-prepend">
                                         <div class="input-group-text"><i class="fa fa-address-book"></i> </div>
                                     </div>
                                     <input type="text" class="form-control" id="region" name="region" placeholder="Регион">
-                                    <div id="region-search-result-area"></div>
+                                    <div id="region-search-result-area" class="search-result-area"></div>
                                 </div>
-                                <input name="district-id" hidden>
                                 <label for="district">Район:</label>
                                 <div class="input-group mb-2">
+                                    <input name="district-id" hidden>
                                     <div class="input-group-prepend">
                                         <div class="input-group-text"><i class="fa fa-address-book"></i> </div>
                                     </div>
                                     <input type="text" class="form-control" id="district" name="district" placeholder="Район">
+                                    <div id="district-search-result-area" class="search-result-area"></div>
                                 </div>
-                                <input name="locality-id" hidden>
                                 <label for="locality">Населенный пункт:</label>
                                 <div class="input-group mb-2">
+                                    <input name="locality-id" hidden>
                                     <div class="input-group-prepend">
                                         <div class="input-group-text"><i class="fa fa-address-book"></i> </div>
                                     </div>
                                     <input type="text" class="form-control" id="locality" name="locality" placeholder="Населенный пункт">
+                                    <div id="locality-search-result-area" class="search-result-area"></div>
                                 </div>
-                                <input name="street-id" hidden>
                                 <label for="street">Улица:</label>
                                 <div class="input-group mb-2">
+                                    <input name="street-id" hidden>
                                     <div class="input-group-prepend">
                                         <div class="input-group-text"><i class="fa fa-address-book"></i> </div>
                                     </div>
                                     <input type="text" class="form-control" id="street" name="street" placeholder="Улица">
+                                    <div id="street-search-result-area" class="search-result-area"></div>
                                 </div>
                                 <div class="row">
                                     <div class="col-6">
@@ -592,96 +675,9 @@ const loadPatientCardTemplate = function () {
                 </div>`;
 };
 
-const loadPatientCardSearchTemplate = function () {
-    return `
-        <div id="cards-data-search-section" class="row" style="padding: 10px;">
-            <table id="cards-data-table" class="table-striped table-mine full-width box-shadow--2dp">
-                 <thead>
-                     <tr>
-                         <th style="width: 20%;">ФИО</th>
-                         <th style="width: 10%;">Номер карты</th>
-                         <th style="width: 15%;">Полис</th>
-                         <th style="width: 15%;">Снилс</th>
-                         <th style="width: 10%;">Статус</th>
-                         <th style="width: 10%;">Прикрепление</th>
-                         <th style="width: 20%;">Действия</th>
-                     </tr>
-                 </thead>
-                 <tbody id="cards-data-table-content"></tbody>
-            </table>
-        </div>`
-};
-
-const loadCardsDataTableContentLine = function(response){
-    let live_status_image;
-    let attached_status_image;
-    switch (response.is_alive) {
-        case 1 :
-            live_status_image = 'fa fa-user';
-            break;
-        case 2 :
-            live_status_image = 'fa fa-skull';
-            break;
-    }
-    switch (response.is_attached) {
-        case 1 :
-            attached_status_image = 'fa fa-plus';
-            break;
-        case 2 :
-            attached_status_image = 'fa fa-minus';
-            break;
-    }
-    return $(`<tr class="tr-table-content">
-                    <td>${response.surname} ${response.firstname} ${response.secondname}</td>
-                    <td>${response.card_number}</td>
-                    <td>${response.policy_number}</td>
-                    <td>${response.insurance}</td>
-                    <td><i class="${live_status_image}" style="font-size: 18px;"></i></td>
-                    <td><i class="${attached_status_image}" style="font-size: 18px;"></i></td>
-                    <td>
-                        <button class="btn btn-outline-success btn-sm" onclick="loadPatientCard(${response.id})">
-                            <i class="fa fa-search"></i> Посмотреть
-                        </button>
-                    </td>
-                </tr>`).hide().fadeIn(1000);
-};
-
-
-
-const loadPatientCard = function (id) {
-    patient_card_body.append(loadPatientCardTemplate());
-    let recordBadge = $('#patient-card-found-records');
-    loadPatientCardData(id);
-    $("#patient-card-body :input").not('#region').not('#district').change(function() {updatePatientCardData()});
-    $('#patient-card-alive-section').click(function () {
-        flipPatientCardStatus('is-alive-id');
-        let updatedCardId = updatePatientCardData();
-        /**
-         * Идея в том чтобы заморозить запрос на получение данных у БД хотя бы на немного.
-         * Тем самы запрос на обновление записей всегда пройдет первым, а запрос на получение всегда будет вторым
-         * соответсвенн овозвращая всегда актуальные данные.
-         * -------------------------------------------------------------------------------------------------------
-         * Решит ьпроблему нужно в любом случае через promise или callback, так как вставка данных может длиться и больше
-         * 50 мс, а значит в этом случае, функция по запросу будет отправленна первой!.
-         */
-
-        let freezeToSql = function (){
-            loadPatientCardData(updatedCardId);
-        };
-        setTimeout(freezeToSql, 50);
-    });
-    $('#patient-card-attached-section').click(function () {
-        flipPatientCardStatus('is-attach-id');
-        let updatedCardId = updatePatientCardData();
-        let freezeToSql = function (){
-            loadPatientCardData(updatedCardId);
-        };
-        setTimeout(freezeToSql, 50);
-    });
-    $('#cards-data-search-section').remove();
-    recordBadge.text(0);
-    loadMasksForDynamicInputs();
-};
+/**
+ * Маски для input
+ */
 
 const loadMasksForDynamicInputs = function() {
     let patient_card_body = $("#patient-card-body");
@@ -698,35 +694,89 @@ const loadMasksForStaticInputs = function(){
 };
 
 /**
- * Поиск внутри карты
+ * Поиск в input'ах внутри карты
  */
+
+patient_card_body.on('keyup', '#region', function () {
+    clearTimeout(typingTimer);
+    typingTimer = setTimeout(searchRegion, 500);
+});
+
 const searchRegion = function () {
-    let searchString = $("input[name='region']").val();
-    let regionSearchResultArea = $('#region-search-result-area');
+    searchInSection('region');
+};
+
+patient_card_body.on('keyup', '#district', function () {
+    clearTimeout(typingTimer);
+    typingTimer = setTimeout(searchDistrict, 500);
+});
+
+const searchDistrict = function (val) {
+    /**
+     * Я могу передавать какие угодно именованные параметры, при этом метод searchInSection остается универсальным,
+     * так как он работает что с параметрами, что без них
+     */
+    let params = {
+        regionId: $('input[name="region-id"]').val()
+    };
+    searchInSection('district', params);
+};
+
+/**
+ * Универсальные методы для работы с поиском внтри секций
+ * 1 - выбор результата
+ * 2 - поиск по значению внутри input'а
+ * 3 - подгрузка результатов поиска
+ */
+
+patient_card_body.on('click', '.with-result', function () {
+    let parent = ($(this).parent().parent().parent());   //Ищу родителя, в котором находится выведенный результат
+    let firstInputName = parent.children('input').eq(0).attr("name");   //Получаю имя input 1, где хранится id
+    let secondInputName = parent.children('input').eq(1).attr("name");  //Получаю имя input 2, где хранится текст
+    let Id = $(`input[name=${firstInputName}]`);
+    let selectedValue = $(this).children('.search-id').text();
+    let selectedText = $(this).children('.search-text').text();
+    let SearchResultArea = $(`#${secondInputName}-search-result-area`);
+    let InputText = $(`input[name=${secondInputName}]`);
+    Id.val(selectedValue);  //Установка id для обновления в БД
+    SearchResultArea.empty();   //Очищаю место вывода результатов
+    InputText.val(selectedText);    //Меняю текст, для того что бы было понятно, что выбрано
+    updatePatientCardData();    //Обновляю данные в БД
+});
+
+const searchInSection = function(field, params){
+    let searchString = $(`input[name=${field}]`).val();
+    let SearchResultArea = $(`#${field}-search-result-area`);
     if (searchString.length > 0){
         let request = $.ajax({
             type: "POST",
-            url: "/patient-card/search-region",
-            data: {'searchString' : searchString},
+            url: `/patient-card/search-${field}`,
+            data: {'searchString' : searchString, 'params' : params},
             cache: false
         });
         request.done(function (response) {
-            regionSearchResultArea.empty();
-            $('#region-search-result-area').append(`<div id="region-search-result"></div>`);
-            $.each(response, function (key, value) {
-                let line = loadSearchRegionLine(value);
-                $('#region-search-result').append(line);
-                console.log(response);
-            })
+            SearchResultArea.empty();
+            $(`#${field}-search-result-area`).append(`<div id="${field}-search-result" class="search-result-container"></div>`);
+            if (Array.isArray(response)) {
+                $.each(response, function (key, value) {
+                    let line = loadSearchInSectionLine(value, field);
+                    $(`#${field}-search-result`).append(line);
+                    console.log(response);
+                });
+            }else {
+                let line = `<div class="patient-card-search-result-line">${response}</div>`;
+                $(`#${field}-search-result`).append(line);
+            }
         })
     }else {
-        regionSearchResultArea.empty();
+        SearchResultArea.empty();
     }
 };
 
-const loadSearchRegionLine = function (response) {
-    return $(`<div class="patient-card-search-result-line">
+const loadSearchInSectionLine = function (response, field) {
+    let fieldName = field+'_name'; //На будующее будет понятно как с этим работать
+    return $(`<div class="patient-card-search-result-line with-result">
                 <div class="search-id" hidden>${response.id}</div>
-                <div class="search-text">${response.region_name}</div>
+                <div class="search-text">${response[fieldName]}</div>
               </div>`).hide().fadeIn(1000);
 };

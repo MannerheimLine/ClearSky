@@ -1,23 +1,24 @@
 <?php
 
+declare(strict_types = 1);
 
 namespace Application\EMR\PatientCard\Actions;
 
 
 use Application\Base\AppAction;
 use Application\EMR\PatientCard\Domains\SearchDisposition;
-use Application\EMR\PatientCard\Responders\SearchRegionDepositionResponder;
+use Application\EMR\PatientCard\Responders\SearchRegionDispositionResponder;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 
-class SearchRegionDepositionAction extends AppAction implements RequestHandlerInterface
+class SearchRegionDispositionAction extends AppAction implements RequestHandlerInterface
 {
     private $_searchDisposition;
 
-    public function __construct(SearchDisposition $patientCards, SearchRegionDepositionResponder $responder)
+    public function __construct(SearchDisposition $searchDisposition, SearchRegionDispositionResponder $responder)
     {
-        $this->_searchDisposition = $patientCards;
+        $this->_searchDisposition = $searchDisposition;
         $this->_responder = $responder;
     }
 

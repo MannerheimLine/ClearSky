@@ -155,38 +155,41 @@
                                 <i class="fa fa-address-book" aria-hidden="true"></i> Адреса
                             </div>
                             <div class='patient-card-information-section-body'>
-                                <input name="region-id" hidden>
                                 <label for="region">Регион:</label>
                                 <div  class="input-group mb-2">
+                                    <input name="region-id" hidden>
                                     <div class="input-group-prepend">
                                         <div class="input-group-text"><i class="fa fa-address-book"></i> </div>
                                     </div>
                                     <input type="text" class="form-control" id="region" name="region" placeholder="Регион">
-                                    <div id="region-search-result-area"></div>
+                                    <div id="region-search-result-area" class="search-result-area"></div>
                                 </div>
-                                <input name="district-id" hidden>
                                 <label for="district">Район:</label>
                                 <div class="input-group mb-2">
+                                    <input name="district-id" hidden>
                                     <div class="input-group-prepend">
                                         <div class="input-group-text"><i class="fa fa-address-book"></i> </div>
                                     </div>
                                     <input type="text" class="form-control" id="district" name="district" placeholder="Район">
+                                    <div id="district-search-result-area" class="search-result-area"></div>
                                 </div>
-                                <input name="locality-id" hidden>
                                 <label for="locality">Населенный пункт:</label>
                                 <div class="input-group mb-2">
+                                    <input name="locality-id" hidden>
                                     <div class="input-group-prepend">
                                         <div class="input-group-text"><i class="fa fa-address-book"></i> </div>
                                     </div>
                                     <input type="text" class="form-control" id="locality" name="locality" placeholder="Населенный пункт">
+                                    <div id="locality-search-result-area" class="search-result-area"></div>
                                 </div>
-                                <input name="street-id" hidden>
                                 <label for="street">Улица:</label>
                                 <div class="input-group mb-2">
+                                    <input name="street-id" hidden>
                                     <div class="input-group-prepend">
                                         <div class="input-group-text"><i class="fa fa-address-book"></i> </div>
                                     </div>
                                     <input type="text" class="form-control" id="street" name="street" placeholder="Улица">
+                                    <div id="street-search-result-area" class="search-result-area"></div>
                                 </div>
                                 <div class="row">
                                     <div class="col-6">

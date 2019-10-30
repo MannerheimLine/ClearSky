@@ -1,5 +1,6 @@
 <?php
 
+declare(strict_types = 1);
 
 namespace Application\EMR\PatientCard\Responders;
 
@@ -8,7 +9,7 @@ use Application\Base\AppResponder;
 use Psr\Http\Message\ServerRequestInterface;
 use Zend\Diactoros\Response;
 
-class SearchRegionDepositionResponder extends AppResponder
+class SearchRegionDispositionResponder extends AppResponder
 {
 
     /**

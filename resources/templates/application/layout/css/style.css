@@ -126,14 +126,14 @@ html, body {
     font-weight: bold;
     color: #37474f;
 }
-#region-search-result{
+.search-result-container{
     width: 100%;
     border: solid 1px;
     border-color: #dce1e5;
     border-bottom-left-radius: 5px;
     border-bottom-right-radius: 5px;
 }
-#region-search-result-area{
+.search-result-area{
     width: 100%;
 }
 .patient-card-search-result-line{

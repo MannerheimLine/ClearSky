@@ -32,11 +32,21 @@ class SearchDisposition extends AppDomain
         if ($result->rowCount() > 0){
             return $result->fetchAll();
         }
-        return 'Ничего не найдено';
+        return 'Nothing found';
     }
 
-    public function searchDistrict(string $searchString){
-
+    public function searchDistrict(array $searchData){
+        $searchString = $this->sanitize($searchData['searchString']);
+        $regionId = $searchData['params']['regionId'];
+        $query = ("SELECT * FROM `districts` WHERE `district_name` LIKE '%$searchString%' AND `region` = :regionId LIMIT $this->_limit;");
+        $result = $this->_dbConnection->prepare($query);
+        $result->execute([
+            'regionId' => $regionId
+        ]);
+        if ($result->rowCount() > 0){
+            return $result->fetchAll();
+        }
+        return 'Nothing found';
     }
 
     public function searchStreet(string $searchString){
