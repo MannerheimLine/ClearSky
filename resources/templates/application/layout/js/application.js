@@ -152,7 +152,6 @@ const addPatientCardData = function () {
     });
     request.done(function (response) {
         $("#addPatientCardModal").modal('hide');
-        patient_card_body.empty();
         loadPatientCard(response);
     });
 };
@@ -439,6 +438,7 @@ const loadCardsDataTableContentLine = function(response){
  */
 
 const loadPatientCard = function (id) {
+    patient_card_body.empty();
     patient_card_body.append(loadPatientCardTemplate());
     let recordBadge = $('#patient-card-found-records');
     loadPatientCardData(id);
