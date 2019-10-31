@@ -7,6 +7,13 @@
  */
 
 let typingTimer;
+let specInputs = [
+    '#region',
+    '#district',
+    '#locality',
+    '#street',
+    '#insurance-company'
+];
 
 const patient_card_body = $('#patient-card-body');
 
@@ -18,7 +25,7 @@ $(function () {
     loadMasksForStaticInputs();
 });
 
-$("#patient-card-body :input").not('#region').not('#district').not('#locality').not('#street').change(function() {
+$("#patient-card-body :input").not(specInputs.join(',')).change(function() {
     updatePatientCardData();
 });
 
@@ -48,88 +55,6 @@ $('#patient-card-attached-section').click(function () {
     };
     setTimeout(freezeToSql, 50);
 });
-
-card_search_input.keyup(function (e) {
-    let searchString = card_search_input.val();
-    let selectedPage = 1;
-    if (e.which === 13){
-        if (searchString.length > 0) {
-            searchCards(searchString, selectedPage);
-        }else {
-            alert('Введите данные для поиска');
-            return false;
-        }
-    }
-    if (searchString.length === 0 && e.which === 8){
-        patient_card_body.empty();
-        /**
-         * Легкая задержка чтобы не делать кучу запросов к БД, когда отпускаешь ЗАЖАТУЮ клавишу
-         */
-        setTimeout(function () {
-            loadPatientCard(1)
-        }, 100);
-        loadMasksForDynamicInputs();
-    }
-});
-
-patient_card_body.on('click', '#next-page', function () {
-    let searchString = card_search_input.val();
-    let selectedPage = +$('#current-page').val() + 1;
-    searchCards(searchString, selectedPage);
-});
-patient_card_body.on('click', '#previous-page', function () {
-    let searchString = card_search_input.val();
-    let selectedPage = +$('#current-page').val() - 1 || 1;
-    searchCards(searchString, selectedPage);
-
-});
-
-const searchCards = function (searchString, selectedPage) {
-    let recordBadge = $('#patient-card-found-records');
-    patient_card_body.empty();
-    patient_card_body.append(loadPatientCardSearchTemplate());
-    $('#current-page').val(selectedPage); //Записываю номер текущей страницы в input для быстрого доступа
-    let request = $.ajax({
-        type: "POST",
-        url: "/patient-card/search-cards",
-        data: {'searchString' : searchString, 'selectedPage' : selectedPage},
-        cache: false
-    });
-    request.done(function (response) {
-        let cards = response.cards;
-        let status = response.status;
-        if (cards != null){
-            /**
-             * Необходимо проверить статус для определения, того как отображать кнопки пагинации
-             */
-            console.log(status);
-            switch (status) {
-                case 'first' :
-                    $('#previous-page').parent().addClass('disabled');
-                    break;
-                case 'last' :
-                    $('#next-page').parent().addClass('disabled');
-                    break;
-                case 'middle' :
-                    $('#next-page').parent().removeClass('disabled');
-                    break;
-                default :
-                    $('#previous-page').parent().addClass('disabled');
-                    $('#next-page').parent().addClass('disabled');
-                    break;
-            }
-            let tableContent = $('#cards-data-table-content');
-            let recordCount = cards.length || 0;
-            tableContent.empty();
-            $.each(cards, function (key, value) {
-                let line = loadCardsDataTableContentLine(value);
-                recordBadge.text(recordCount);
-                tableContent.append(line);
-            });
-        }
-
-    });
-};
 
 const flipPatientCardStatus = function (name) {
     let input = $(`input[name=${name}]`);
@@ -350,9 +275,100 @@ const loadPatientCardData = function (id) {
     })
 };
 
+
 /**
  * Поиск карт
  */
+
+card_search_input.keyup(function (e) {
+    let searchString = card_search_input.val();
+    if (e.which === 13){
+        if (searchString.length > 0) {
+            searchCards(searchString, 1);
+        }else {
+            alert('Введите данные для поиска');
+            return false;
+        }
+    }
+    if (searchString.length === 0 && e.which === 8){
+        patient_card_body.empty();
+        /**
+         * Легкая задержка чтобы не делать кучу запросов к БД, когда отпускаешь ЗАЖАТУЮ клавишу
+         */
+        setTimeout(function () {
+            loadPatientCard(1)
+        }, 100);
+        loadMasksForDynamicInputs();
+    }
+});
+
+patient_card_body.on('click', '#next-page', function () {
+    let searchString = card_search_input.val();
+    let selectedPage = +$('#current-page').val() + 1;
+    searchCards(searchString, selectedPage);
+});
+
+patient_card_body.on('click', '#previous-page', function () {
+    let searchString = card_search_input.val();
+    let selectedPage = +$('#current-page').val() - 1 || 1;
+    searchCards(searchString, selectedPage);
+
+});
+
+const searchCards = function (searchString, selectedPage) {
+    let recordBadge = $('#patient-card-found-records');
+    patient_card_body.empty();
+    patient_card_body.append(loadPatientCardSearchTemplate());
+    $('#current-page').val(selectedPage); //Записываю номер текущей страницы в input для быстрого доступа
+    let request = $.ajax({
+        type: "POST",
+        url: "/patient-card/search-cards",
+        data: {'searchString' : searchString, 'selectedPage' : selectedPage},
+        cache: false
+    });
+    request.done(function (response) {
+        if(response != null){
+            let cards = response.cards;
+            let pageOrder = response.pageOrder;
+            if (cards != null){
+                /**
+                 * Необходимо проверить статус для определения, того как отображать кнопки пагинации
+                 */
+                switch (pageOrder) {
+                    case 'first' :
+                        $('#previous-page').parent().addClass('disabled');
+                        break;
+                    case 'last' :
+                        $('#next-page').parent().addClass('disabled');
+                        break;
+                    case 'middle' :
+                        $('#next-page').parent().removeClass('disabled');
+                        break;
+                    default :
+                        $('#previous-page').parent().addClass('disabled');
+                        $('#next-page').parent().addClass('disabled');
+                        break;
+                }
+                let tableContent = $('#cards-data-table-content');
+                let recordCount = cards.length || 0;
+                recordBadge.text(recordCount);
+                tableContent.empty();
+                $.each(cards, function (key, value) {
+                    let line = loadCardsDataTableContentLine(value);
+                    tableContent.append(line);
+                });
+            }
+        }else {
+            let cardsDataSearchSection = $('#cards-data-search-section');
+            let alert = `<div class="alert alert-danger" role="alert" style="width: 100%;">
+                            Не найдено ни одной соответсвующей записи! Проверьте строку запроса и повторите поиск.
+                         </div>`;
+            cardsDataSearchSection.append(alert);
+            $('#previous-page').parent().addClass('disabled');
+            $('#next-page').parent().addClass('disabled');
+        }
+    });
+};
 
 const loadPatientCardSearchTemplate = function () {
     return `
@@ -373,11 +389,13 @@ const loadPatientCardSearchTemplate = function () {
             </table>
         </div>
         <div id="cards-data-search-pagination">
-        <ul class="pagination">
-            <input id="current-page" name="current-page" value="1">
-            <li class="page-item"><a id="previous-page" class="page-link" href="#">Предыдущая</a></li>
-            <li class="page-item"><a id="next-page" class="page-link" href="#">Следующая</a></li>
-        </ul>
+        <div class="text-xs-center">
+            <ul class="pagination pagination-center">
+                <input id="current-page" name="current-page" hidden>
+                <li class="page-item"><a id="previous-page" class="page-link" href="#">Предыдущая</a></li>
+                <li class="page-item"><a id="next-page" class="page-link" href="#">Следующая</a></li>
+            </ul>
+        </div>
     </div>`
 };
 
@@ -415,6 +433,7 @@ const loadCardsDataTableContentLine = function(response){
                 </tr>`).hide().fadeIn(1000);
 };
 
+
 /**
  * Загрузка карты пациента
  */
@@ -423,7 +442,7 @@ const loadPatientCard = function (id) {
     patient_card_body.append(loadPatientCardTemplate());
     let recordBadge = $('#patient-card-found-records');
     loadPatientCardData(id);
-    $("#patient-card-body :input").not('#region').not('#district').not('#locality').not('#street').change(function() {updatePatientCardData()});
+    $("#patient-card-body :input").not(specInputs.join(',')).change(function() {updatePatientCardData()});
     $('#patient-card-alive-section').click(function () {
         flipPatientCardStatus('is-alive-id');
         let updatedCardId = updatePatientCardData();
@@ -546,13 +565,14 @@ const loadPatientCardTemplate = function () {
                                     </div>
                                     <input type="text" class="form-control" id="policy-number" name="policy-number" placeholder="Номер полиса" required>
                                 </div>
-                                <input name="insurance-company-id" hidden>
                                 <label for="insurance-company">Страховая компания:</label>
                                 <div class="input-group mb-2">
+                                    <input name="insurance-company-id" hidden>
                                     <div class="input-group-prepend">
                                         <div class="input-group-text"><i class="fa fa-clipboard"></i> </div>
                                     </div>
                                     <input type="text" class="form-control" id="insurance-company" name="insurance-company" placeholder="Страховая компания">
+                                    <div id="insurance-company-search-result-area" class="search-result-area"></div>
                                 </div>
                                 <hr>
                                 <label for="passport-serial">Серия паспорта:</label>
@@ -679,6 +699,7 @@ const loadPatientCardTemplate = function () {
                 </div>`;
 };
 
+
 /**
  * Маски для input
  */
@@ -696,6 +717,7 @@ const loadMasksForDynamicInputs = function() {
 const loadMasksForStaticInputs = function(){
     $("#add-insurance-certificate").mask("999-999-999 99");
 };
+
 
 /**
  * Работа с поиском в секции АДРЕСА
@@ -741,6 +763,19 @@ patient_card_body.on('keyup', '#locality', function () {
     $("input[name='street']").val('');
 });
 
+
+/**
+ * Работа с поиском в секции ДОКУМЕНТЫ
+ */
+
+patient_card_body.on('keyup', '#insurance-company', function () {
+    clearTimeout(typingTimer);
+    typingTimer = setTimeout(function () {
+        searchInSection('insurance-company');
+    }, 500);
+});
+
+
 /**
  * Универсальные методы для работы с поиском внутри секций
  * 1 - выбор результата
@@ -774,13 +809,13 @@ const searchInSection = function(field, params){
             cache: false
         });
         request.done(function (response) {
+            console.log(response);
             SearchResultArea.empty();
             $(`#${field}-search-result-area`).append(`<div id="${field}-search-result" class="search-result-container"></div>`);
             if (Array.isArray(response)) {
                 $.each(response, function (key, value) {
-                    let line = loadSearchInSectionLine(value, field);
+                    let line = loadSearchInSectionLine(value);
                     $(`#${field}-search-result`).append(line);
-                    console.log(response);
                 });
             }else {
                 let line = `<div class="patient-card-search-result-line">${response}</div>`;
@@ -792,10 +827,9 @@ const searchInSection = function(field, params){
     }
 };
 
-const loadSearchInSectionLine = function (response, field) {
-    let fieldName = field+'_name'; //На будующее будет понятно как с этим работать
+const loadSearchInSectionLine = function (response) {
     return $(`<div class="patient-card-search-result-line with-result">
                 <div class="search-id" hidden>${response.id}</div>
-                <div class="search-text">${response[fieldName]}</div>
+                <div class="search-text">${response.value}</div>
               </div>`).hide().fadeIn(1000);
 };

@@ -115,13 +115,14 @@
                                     </div>
                                     <input type="text" class="form-control" id="policy-number" name="policy-number" placeholder="Номер полиса">
                                 </div>
-                                <input name="insurance-company-id" hidden>
                                 <label for="insurance-company">Страховая компания:</label>
                                 <div class="input-group mb-2">
+                                    <input name="insurance-company-id" hidden>
                                     <div class="input-group-prepend">
                                         <div class="input-group-text"><i class="fa fa-clipboard"></i> </div>
                                     </div>
                                     <input type="text" class="form-control" id="insurance-company" name="insurance-company" placeholder="Страховая компания">
+                                    <div id="insurance-company-search-result-area" class="search-result-area"></div>
                                 </div>
                                 <hr>
                                 <label for="passport-serial">Серия паспорта:</label>

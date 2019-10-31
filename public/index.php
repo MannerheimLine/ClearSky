@@ -6,6 +6,7 @@ use Application\EMR\PatientCard\Actions\PatientCardShowAction;
 use Application\EMR\PatientCard\Actions\PatientCardsSearchAction;
 use Application\EMR\PatientCard\Actions\PatientCardUpdateAction;
 use Application\EMR\PatientCard\Actions\SearchDistrictDispositionAction;
+use Application\EMR\PatientCard\Actions\SearchInsuranceCompanyAction;
 use Application\EMR\PatientCard\Actions\SearchLocalityDispositionAction;
 use Application\EMR\PatientCard\Actions\SearchRegionDispositionAction;
 use Aura\Router\RouterContainer;
@@ -42,6 +43,7 @@ $map->post('patient-card/search-cards', '/patient-card/search-cards', PatientCar
 $map->post('patient-card/search-region', '/patient-card/search-region', SearchRegionDispositionAction::class)->tokens(['searchString' => '\w+']);
 $map->post('patient-card/search-district', '/patient-card/search-district', SearchDistrictDispositionAction::class)->tokens(['searchString' => '\w+']);
 $map->post('patient-card/search-locality', '/patient-card/search-locality', SearchLocalityDispositionAction::class)->tokens(['searchString' => '\w+']);
+$map->post('patient-card/search-insurance-company', '/patient-card/search-insurance-company', SearchInsuranceCompanyAction::class)->tokens(['searchString' => '\w+']);
 //$map->get('catalog/detail', '/blog/{id}/view/{number}-{detail}', Application\Blog\Action\DetailsIndexAction::class)->tokens(['id' => '\d+', 'number' => '\d+', 'detail' => '\d+']);
 
 #DI Container

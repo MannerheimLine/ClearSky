@@ -18,37 +18,47 @@ class PatientCards extends AppDomain
         $this->_dbConnection = $dbConnector->getConnection();
     }
 
-    public function getCardsData(string $searchString, int $page){
+    /**
+     * @param string $searchString
+     * @param int $selectedPage
+     * @return array|null
+     */
+    public function getCardsData(string $searchString, int $selectedPage){
         $searchString = $this->sanitize($searchString);
-        $start = ($this->_limit*$page) - $this->_limit;
+        $start = ($this->_limit*$selectedPage) - $this->_limit;
         $query = ("SELECT `id`, `card_number`, `is_alive`, `is_attached`, `surname`, `firstname`, `secondname`, `policy_number`, `insurance`
         FROM `patient_cards`
         WHERE `policy_number` LIKE '%$searchString%' OR CONCAT(`surname`, ' ', `firstname`, ' ', `secondname`) LIKE '%$searchString%' LIMIT :start, :offset");
         $result = $this->_dbConnection->prepare($query);
         $result->execute([
             'start' => $start,
-            'offset' => $this->_limit + 1
+            'offset' => $this->_limit + 1   //Такой сдвиг нужен для сортировки специально, дабы определить порядок страницы
         ]);
         if ($result->rowCount() > 0){
             $cards = $result->fetchAll();
             $cardsCount = count($cards);
-            if($page === 1){
+            /**
+             * Банальное определение порядка страницы: первая, средняя, последняя либо единственная
+             * Заолнение данными массива: карты, статус
+             */
+            if($selectedPage === 1){
                 if ($cardsCount > $this->_limit){
-                    $data['status'] = 'first';
+                    $data['pageOrder'] = 'first';
                     array_pop($cards);
                 }elseif($cardsCount === $this->_limit){
-                    $data['status'] = 'single';
+                    $data['pageOrder'] = 'single';
                 }
                 $data['cards'] = $cards;
             }elseif ($cardsCount <= $this->_limit){
-                $data['status'] = 'last';
+                $data['pageOrder'] = 'last';
                 $data['cards'] = $cards;
             }else{
                 array_pop($cards);
-                $data['status'] = 'middle';
+                $data['pageOrder'] = 'middle';
                 $data['cards'] = $cards;
             }
             return $data;
         }
+        return null;
     }
 }

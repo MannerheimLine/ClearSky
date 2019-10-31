@@ -146,7 +146,7 @@ class PatientCard extends AppDomain implements \JsonSerializable
         `patient_cards`.`insurance` as `insurance`,
         `patient_cards`.`policy_number` as `policy_number`,
         `patient_cards`.`insurance_company` as `insurance_company_id`,
-        `insurance_companies`.`insurance_name` as `insurance_company`,
+        `insurance_companies`.`insurance_company_name` as `insurance_company`,
         `patient_cards`.`passport_serial` as `passport_serial`,
         `patient_cards`.`passport_number` as `passport_number`,
         `patient_cards`.`fms_department` as `fms_department_id`,

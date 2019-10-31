@@ -30,7 +30,13 @@ class SearchDisposition extends AppDomain
         $result = $this->_dbConnection->prepare($query);
         $result->execute();
         if ($result->rowCount() > 0){
-            return $result->fetchAll();
+            $i = 0;
+            while ($row = $result->fetch()){
+                $data[$i]['id'] = $row['id'];
+                $data[$i]['value'] = $row['region_name'];
+                $i ++;
+            }
+            return $data;
         }
         return 'Nothing found';
     }
@@ -44,7 +50,13 @@ class SearchDisposition extends AppDomain
             'searchId' => $searchId
         ]);
         if ($result->rowCount() > 0){
-            return $result->fetchAll();
+            $i = 0;
+            while ($row = $result->fetch()){
+                $data[$i]['id'] = $row['id'];
+                $data[$i]['value'] = $row['district_name'];
+                $i ++;
+            }
+            return $data;
         }
         return 'Nothing found';
     }
@@ -58,7 +70,13 @@ class SearchDisposition extends AppDomain
             'searchId' => $searchId
         ]);
         if ($result->rowCount() > 0){
-            return $result->fetchAll();
+            $i = 0;
+            while ($row = $result->fetch()){
+                $data[$i]['id'] = $row['id'];
+                $data[$i]['value'] = $row['locality_name'];
+                $i ++;
+            }
+            return $data;
         }
         return 'Nothing found';
     }

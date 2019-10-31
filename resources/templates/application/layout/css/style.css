@@ -146,3 +146,6 @@ html, body {
     color: white;
     cursor: pointer;
 }
+.pagination-center{
+    justify-content: center;
+}
