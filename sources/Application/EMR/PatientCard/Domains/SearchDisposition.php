@@ -37,11 +37,25 @@ class SearchDisposition extends AppDomain
 
     public function searchDistrict(array $searchData){
         $searchString = $this->sanitize($searchData['searchString']);
-        $regionId = $searchData['params']['regionId'];
-        $query = ("SELECT * FROM `districts` WHERE `district_name` LIKE '%$searchString%' AND `region` = :regionId LIMIT $this->_limit;");
+        $searchId = $searchData['params']['searchId'];
+        $query = ("SELECT * FROM `districts` WHERE `district_name` LIKE '%$searchString%' AND `region` = :searchId LIMIT $this->_limit;");
         $result = $this->_dbConnection->prepare($query);
         $result->execute([
-            'regionId' => $regionId
+            'searchId' => $searchId
+        ]);
+        if ($result->rowCount() > 0){
+            return $result->fetchAll();
+        }
+        return 'Nothing found';
+    }
+
+    public function searchLocality(array $searchData){
+        $searchString = $this->sanitize($searchData['searchString']);
+        $searchId = $searchData['params']['searchId'];
+        $query = ("SELECT * FROM `localities` WHERE `locality_name` LIKE '%$searchString%' AND `district` = :searchId LIMIT $this->_limit;");
+        $result = $this->_dbConnection->prepare($query);
+        $result->execute([
+            'searchId' => $searchId
         ]);
         if ($result->rowCount() > 0){
             return $result->fetchAll();

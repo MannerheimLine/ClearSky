@@ -30,7 +30,9 @@ class PatientCardsSearchAction extends AppAction implements RequestHandlerInterf
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
         $searchString = $request->getParsedBody()['searchString'];
-        $payload = $this->_patientCards->getCardsData($searchString);
+        $page = $request->getParsedBody()['selectedPage'];
+       // $payload = $this->_patientCards->getCardsData($searchString);
+        $payload = $this->_patientCards->getRecordsPage($searchString, (int)$page);
         $response = $this->_responder->respond($request, $payload);
 
         return $response;

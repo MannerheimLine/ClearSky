@@ -10,6 +10,7 @@ use Engine\Database\Connectors\ConnectorInterface;
 
 class PatientCards extends AppDomain
 {
+    private $_limit = 5;
     private $_dbConnection;
 
     public function __construct(ConnectorInterface $dbConnector)
@@ -17,7 +18,21 @@ class PatientCards extends AppDomain
         $this->_dbConnection = $dbConnector->getConnection();
     }
 
-    public function getCardsData(string $searchString){
+    /**
+     * Расчитывает количество страниц
+     *
+     * @return int
+     */
+    private function countPages(array $records) : int {
+        $pagesCount = ceil( count($records) / $this->_limit);
+        return (int) $pagesCount;
+    }
+
+    private function getCardsData(string $searchString){
+        /**
+         * 1) Метод ищет все совпадающие записи
+         * 2) Метод возвращает записи для текущей страницы
+         */
         $searchString = $this->sanitize($searchString);
         $query = ("SELECT `id`, `card_number`, `is_alive`, `is_attached`, `surname`, `firstname`, `secondname`, `policy_number`, `insurance`
         FROM `patient_cards`
@@ -28,6 +43,24 @@ class PatientCards extends AppDomain
             $cards = $result->fetchAll();
             return $cards;
         }
+    }
+
+    public function getRecordsPage(string $searchString, int $page = 1) : array {
+        $records = $this->getCardsData($searchString);
+        $pagesCount = $this->countPages($records);
+        $chunkedPages = array_chunk($records, $this->_limit);
+        $keys = range(1, $pagesCount);
+        $pages = array_combine($keys, $chunkedPages);
+        $pageRecords = $pages[$page];
+        /**
+         * Теперь нужн овернуть все необходимые для отображения данные:
+         * 1) Количество страниц для пагинации
+         * 2) Записи с выбранной страницы
+         */
+        $data['pagesCount'] = $pagesCount;
+        $data['pageRecords'] = $pageRecords;
+        return $data;
+
     }
 
 }

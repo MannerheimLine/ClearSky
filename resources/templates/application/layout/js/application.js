@@ -62,7 +62,7 @@ $(function () {
     loadMasksForStaticInputs();
 });
 
-$("#patient-card-body :input").not('#region').not('#district').change(function() {
+$("#patient-card-body :input").not('#region').not('#district').not('#locality').not('#street').change(function() {
     updatePatientCardData();
 });
 
@@ -95,6 +95,7 @@ $('#patient-card-attached-section').click(function () {
 
 card_search_input.keyup(function (e) {
     let searchString = card_search_input.val();
+    //let selectedPage = 1;
     if (e.which === 13){
         let recordBadge = $('#patient-card-found-records');
         if (searchString.length > 0){
@@ -103,14 +104,16 @@ card_search_input.keyup(function (e) {
             let request = $.ajax({
                 type: "POST",
                 url: "/patient-card/search-cards",
-                data: {'searchString' : searchString},
+                data: {'searchString' : searchString, 'selectedPage' : selectedPage},
                 cache: false
             });
             request.done(function (response) {
+                let pagesCount = response.pagesCount;
+                let pageRecords = response.pageRecords;
                 let tableContent = $('#cards-data-table-content');
-                let recordCount = response.length || 0;
+                let recordCount = pageRecords.length || 0;
                 tableContent.empty();
-                $.each(response, function (key, value) {
+                $.each(pageRecords, function (key, value) {
                     let line = loadCardsDataTableContentLine(value);
                     recordBadge.text(recordCount);
                     tableContent.append(line);
@@ -419,7 +422,7 @@ const loadPatientCard = function (id) {
     patient_card_body.append(loadPatientCardTemplate());
     let recordBadge = $('#patient-card-found-records');
     loadPatientCardData(id);
-    $("#patient-card-body :input").not('#region').not('#district').change(function() {updatePatientCardData()});
+    $("#patient-card-body :input").not('#region').not('#district').not('#locality').not('#street').change(function() {updatePatientCardData()});
     $('#patient-card-alive-section').click(function () {
         flipPatientCardStatus('is-alive-id');
         let updatedCardId = updatePatientCardData();
@@ -694,33 +697,48 @@ const loadMasksForStaticInputs = function(){
 };
 
 /**
- * Поиск в input'ах внутри карты
+ * Работа с поиском в секции АДРЕСА
  */
 
 patient_card_body.on('keyup', '#region', function () {
     clearTimeout(typingTimer);
-    typingTimer = setTimeout(searchRegion, 500);
+    typingTimer = setTimeout(function () {
+        searchInSection('region');
+    }, 500);
+    //Очистка полей
+    $("input[name='district-id']").val('');
+    $("input[name='district']").val('');
+    $("input[name='locality-id']").val('');
+    $("input[name='locality']").val('');
+    $("input[name='street-id']").val('');
+    $("input[name='street']").val('');
 });
-
-const searchRegion = function () {
-    searchInSection('region');
-};
 
 patient_card_body.on('keyup', '#district', function () {
     clearTimeout(typingTimer);
-    typingTimer = setTimeout(searchDistrict, 500);
+    typingTimer = setTimeout(function () {
+        let params = {
+            searchId: $('input[name="region-id"]').val()
+        };
+        searchInSection('district', params);
+    }, 500);
+    $("input[name='locality-id']").val('');
+    $("input[name='locality']").val('');
+    $("input[name='street-id']").val('');
+    $("input[name='street']").val('');
 });
 
-const searchDistrict = function (val) {
-    /**
-     * Я могу передавать какие угодно именованные параметры, при этом метод searchInSection остается универсальным,
-     * так как он работает что с параметрами, что без них
-     */
-    let params = {
-        regionId: $('input[name="region-id"]').val()
-    };
-    searchInSection('district', params);
-};
+patient_card_body.on('keyup', '#locality', function () {
+    clearTimeout(typingTimer);
+    typingTimer = setTimeout(function () {
+        let params = {
+            searchId: $('input[name="district-id"]').val()
+        };
+        searchInSection('locality', params);
+    }, 500);
+    $("input[name='street-id']").val('');
+    $("input[name='street']").val('');
+});
 
 /**
  * Универсальные методы для работы с поиском внтри секций

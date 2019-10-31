@@ -84,9 +84,9 @@ class PatientCard extends AppDomain implements \JsonSerializable
         $castedData['passportSerial'] = $updatingData['passportSerial'];
         $castedData['passportNumber'] = $updatingData['passportNumber'] ?: null;
         $castedData['fmsDepartment'] = (int)$updatingData['fmsDepartment'] ?: null;
-        $castedData['region'] = (int)$updatingData['region'];
-        $castedData['district'] = (int)$updatingData['district'];
-        $castedData['locality'] = (int)$updatingData['locality'];
+        $castedData['region'] = (int)$updatingData['region'] ?: null;
+        $castedData['district'] = (int)$updatingData['district'] ?: null;
+        $castedData['locality'] = (int)$updatingData['locality'] ?: null;
         $castedData['street'] = (int)$updatingData['street'] ?: null;
         $castedData['houseNumber'] = $updatingData['houseNumber'];
         $castedData['apartment'] = $updatingData['apartment'];
