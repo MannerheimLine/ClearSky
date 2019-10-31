@@ -8,53 +8,9 @@
 
 let typingTimer;
 
-const module_wrapper = $('.module-wrapper');
-const patient_card_menu = $('.patient-card-menu');
 const patient_card_body = $('#patient-card-body');
-const personal_data_section = $('#personal-data-section');
-const document_section = $('#document-section');
-const addresses_section = $('#addresses-section');
-const additionally_section = $('#additionally-section');
 
 const card_search_input =  $("input[name='card-search']");
-
-/*const id_input = $("input[name='id']");
-const card_number_input = $("input[name='card-number']");
-const is_alive_id_input = $("input[name='is-alive-id']");
-const is_alive_input = $("#patient-alive-status");
-const is_attached_id_input = $("input[name='is-attach-id']");
-const is_attached_input = $("#patient-attach-status");
-const full_name_input = $("input[name='full-name']");
-const gender_input = $("select[name='gender']");
-const date_birth_input = $("input[name='date-birth']");
-const telephone_input = $("input[name='telephone']");
-const email_input = $("input[name='email']");
-const insurance_certificate_input = $("input[name='insurance-certificate']");
-const policy_number_input = $("input[name='policy-number']");
-const insurance_company_id_input = $("input[name='insurance-company-id']");
-const insurance_company_input = $("input[name='insurance-company']");
-const passport_serial_input = $("input[name='passport-serial']");
-const passport_number_input = $("input[name='passport-number']");
-const fms_department_id_input = $("input[name='fms-department-id']");
-const fms_department_input = $("textarea[name='fms-department']");
-const region_id_input = $("input[name='region-id']");
-const region_input = $("input[name='region']");
-const district_id_input = $("input[name='district-id']");
-const district_input = $("input[name='district']");
-const locality_id_input = $("input[name='locality-id']");
-const locality_input = $("input[name='locality']");
-const street_id_input = $("input[name='street-id']");
-const street_input = $("input[name='street']");
-const house_number_input = $("input[name='house-number']");
-const apartment_input = $("input[name='apartment']");
-const workplace_input = $("input[name='workplace']");
-const profession_input = $("input[name='profession']");
-const notation_input = $("textarea[name='notation']");*/
-
-/*const patient_card_alive_section = $('#patient-card-alive-section');
-const patient_card_attached_section = $('#patient-card-attached-section');
-const is_alive_image = $("#patient-alive-image");
-const is_attached_image = $("#patient-attached-image");*/
 
 $(function () {
     loadPatientCardData(1);
@@ -95,31 +51,10 @@ $('#patient-card-attached-section').click(function () {
 
 card_search_input.keyup(function (e) {
     let searchString = card_search_input.val();
-    //let selectedPage = 1;
+    let selectedPage = 1;
     if (e.which === 13){
-        let recordBadge = $('#patient-card-found-records');
-        if (searchString.length > 0){
-            patient_card_body.empty();
-            patient_card_body.append(loadPatientCardSearchTemplate());
-            let request = $.ajax({
-                type: "POST",
-                url: "/patient-card/search-cards",
-                data: {'searchString' : searchString, 'selectedPage' : selectedPage},
-                cache: false
-            });
-            request.done(function (response) {
-                let pagesCount = response.pagesCount;
-                let pageRecords = response.pageRecords;
-                let tableContent = $('#cards-data-table-content');
-                let recordCount = pageRecords.length || 0;
-                tableContent.empty();
-                $.each(pageRecords, function (key, value) {
-                    let line = loadCardsDataTableContentLine(value);
-                    recordBadge.text(recordCount);
-                    tableContent.append(line);
-                    console.log(response);
-                });
-            });
+        if (searchString.length > 0) {
+            searchCards(searchString, selectedPage);
         }else {
             alert('Введите данные для поиска');
             return false;
@@ -136,6 +71,65 @@ card_search_input.keyup(function (e) {
         loadMasksForDynamicInputs();
     }
 });
+
+patient_card_body.on('click', '#next-page', function () {
+    let searchString = card_search_input.val();
+    let selectedPage = +$('#current-page').val() + 1;
+    searchCards(searchString, selectedPage);
+});
+patient_card_body.on('click', '#previous-page', function () {
+    let searchString = card_search_input.val();
+    let selectedPage = +$('#current-page').val() - 1 || 1;
+    searchCards(searchString, selectedPage);
+
+});
+
+const searchCards = function (searchString, selectedPage) {
+    let recordBadge = $('#patient-card-found-records');
+    patient_card_body.empty();
+    patient_card_body.append(loadPatientCardSearchTemplate());
+    $('#current-page').val(selectedPage); //Записываю номер текущей страницы в input для быстрого доступа
+    let request = $.ajax({
+        type: "POST",
+        url: "/patient-card/search-cards",
+        data: {'searchString' : searchString, 'selectedPage' : selectedPage},
+        cache: false
+    });
+    request.done(function (response) {
+        let cards = response.cards;
+        let status = response.status;
+        if (cards != null){
+            /**
+             * Необходимо проверить статус для определения, того как отображать кнопки пагинации
+             */
+            console.log(status);
+            switch (status) {
+                case 'first' :
+                    $('#previous-page').parent().addClass('disabled');
+                    break;
+                case 'last' :
+                    $('#next-page').parent().addClass('disabled');
+                    break;
+                case 'middle' :
+                    $('#next-page').parent().removeClass('disabled');
+                    break;
+                default :
+                    $('#previous-page').parent().addClass('disabled');
+                    $('#next-page').parent().addClass('disabled');
+                    break;
+            }
+            let tableContent = $('#cards-data-table-content');
+            let recordCount = cards.length || 0;
+            tableContent.empty();
+            $.each(cards, function (key, value) {
+                let line = loadCardsDataTableContentLine(value);
+                recordBadge.text(recordCount);
+                tableContent.append(line);
+            });
+        }
+
+    });
+};
 
 const flipPatientCardStatus = function (name) {
     let input = $(`input[name=${name}]`);
@@ -377,7 +371,14 @@ const loadPatientCardSearchTemplate = function () {
                  </thead>
                  <tbody id="cards-data-table-content"></tbody>
             </table>
-        </div>`
+        </div>
+        <div id="cards-data-search-pagination">
+        <ul class="pagination">
+            <input id="current-page" name="current-page" value="1">
+            <li class="page-item"><a id="previous-page" class="page-link" href="#">Предыдущая</a></li>
+            <li class="page-item"><a id="next-page" class="page-link" href="#">Следующая</a></li>
+        </ul>
+    </div>`
 };
 
 const loadCardsDataTableContentLine = function(response){
@@ -741,7 +742,7 @@ patient_card_body.on('keyup', '#locality', function () {
 });
 
 /**
- * Универсальные методы для работы с поиском внтри секций
+ * Универсальные методы для работы с поиском внутри секций
  * 1 - выбор результата
  * 2 - поиск по значению внутри input'а
  * 3 - подгрузка результатов поиска

@@ -31,8 +31,7 @@ class PatientCardsSearchAction extends AppAction implements RequestHandlerInterf
     {
         $searchString = $request->getParsedBody()['searchString'];
         $page = $request->getParsedBody()['selectedPage'];
-       // $payload = $this->_patientCards->getCardsData($searchString);
-        $payload = $this->_patientCards->getRecordsPage($searchString, (int)$page);
+        $payload = $this->_patientCards->getCardsData($searchString, (int)$page);
         $response = $this->_responder->respond($request, $payload);
 
         return $response;
