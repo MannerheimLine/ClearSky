@@ -12,7 +12,8 @@ let specInputs = [
     '#district',
     '#locality',
     '#street',
-    '#insurance-company'
+    '#insurance-company',
+    '#fms-department'
 ];
 
 const patient_card_body = $('#patient-card-body');
@@ -589,13 +590,14 @@ const loadPatientCardTemplate = function () {
                                     </div>
                                     <input type="text" class="form-control" id="passport-number" name="passport-number" placeholder="Номер паспорта">
                                 </div>
-                                <input name="fms-department-id" hidden>
                                 <label for="fms-department">Отдел ФМС выдавший папорт:</label>
                                 <div class="input-group mb-2">
+                                    <input name="fms-department-id" hidden>
                                     <div class="input-group-prepend">
                                         <div class="input-group-text"><i class="fa fa-id-card"></i> </div>
                                     </div>
                                     <textarea class="form-control" id="fms-department" name="fms-department"></textarea>
+                                    <div id="fms-department-search-result-area" class="search-result-area"></div>
                                 </div>
                             </div>
                         </div>
@@ -775,6 +777,13 @@ patient_card_body.on('keyup', '#insurance-company', function () {
     }, 500);
 });
 
+patient_card_body.on('keyup', '#fms-department', function () {
+    clearTimeout(typingTimer);
+    typingTimer = setTimeout(function () {
+        searchInSection('fms-department');
+    }, 500);
+});
+
 
 /**
  * Универсальные методы для работы с поиском внутри секций
@@ -799,7 +808,7 @@ patient_card_body.on('click', '.with-result', function () {
 });
 
 const searchInSection = function(field, params){
-    let searchString = $(`input[name=${field}]`).val();
+    let searchString = $(`#${field}`).val();//$(`input[name=${field}]`).val();
     let SearchResultArea = $(`#${field}-search-result-area`);
     if (searchString.length > 0){
         let request = $.ajax({

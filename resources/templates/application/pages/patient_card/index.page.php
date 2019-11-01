@@ -139,13 +139,14 @@
                                     </div>
                                     <input type="text" class="form-control" id="passport-number" name="passport-number" placeholder="Номер паспорта">
                                 </div>
-                                <input name="fms-department-id" hidden>
                                 <label for="fms-department">Отдел ФМС выдавший папорт:</label>
                                 <div class="input-group mb-2">
+                                    <input name="fms-department-id" hidden>
                                     <div class="input-group-prepend">
                                         <div class="input-group-text"><i class="fa fa-id-card"></i> </div>
                                     </div>
                                     <textarea class="form-control" id="fms-department" name="fms-department"></textarea>
+                                    <div id="fms-department-search-result-area" class="search-result-area"></div>
                                 </div>
                             </div>
                         </div>

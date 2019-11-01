@@ -1,14 +1,15 @@
 <?php
 
-use Application\EMR\PatientCard\Actions\PatientCardAddAction;
-use Application\EMR\PatientCard\Actions\PatientCardIndexAction;
-use Application\EMR\PatientCard\Actions\PatientCardShowAction;
-use Application\EMR\PatientCard\Actions\PatientCardsSearchAction;
-use Application\EMR\PatientCard\Actions\PatientCardUpdateAction;
-use Application\EMR\PatientCard\Actions\SearchDistrictDispositionAction;
-use Application\EMR\PatientCard\Actions\SearchInsuranceCompanyAction;
-use Application\EMR\PatientCard\Actions\SearchLocalityDispositionAction;
-use Application\EMR\PatientCard\Actions\SearchRegionDispositionAction;
+use Application\EMR\PatientCard\Card\Actions\PatientCardAddAction;
+use Application\EMR\PatientCard\Card\Actions\PatientCardIndexAction;
+use Application\EMR\PatientCard\Card\Actions\PatientCardShowAction;
+use Application\EMR\PatientCard\Card\Actions\PatientCardUpdateAction;
+use Application\EMR\PatientCard\Search\CardsSearch\Actions\PatientCardsSearchAction;
+use Application\EMR\PatientCard\Search\DispositionSearch\Actions\DistrictSearchAction;
+use Application\EMR\PatientCard\Search\OrganisationsSearch\Actions\FmsDepartmentSearchAction;
+use Application\EMR\PatientCard\Search\OrganisationsSearch\Actions\InsuranceCompanySearchAction;
+use Application\EMR\PatientCard\Search\DispositionSearch\Actions\LocalitySearchAction;
+use Application\EMR\PatientCard\Search\DispositionSearch\Actions\RegionSearchAction;
 use Aura\Router\RouterContainer;
 use DI\ContainerBuilder;
 use Engine\Database\Connectors\ConnectorInterface;
@@ -40,10 +41,11 @@ $map->post('patient-card/update', '/patient-card/update', PatientCardUpdateActio
 $map->post('patient-card/add', '/patient-card/add', PatientCardAddAction::class);
 $map->get('patient-card/show', '/patient-card/show/{id}', PatientCardShowAction::class)->tokens(['id' => '\d+']);
 $map->post('patient-card/search-cards', '/patient-card/search-cards', PatientCardsSearchAction::class)->tokens(['searchString' => '\w+']);
-$map->post('patient-card/search-region', '/patient-card/search-region', SearchRegionDispositionAction::class)->tokens(['searchString' => '\w+']);
-$map->post('patient-card/search-district', '/patient-card/search-district', SearchDistrictDispositionAction::class)->tokens(['searchString' => '\w+']);
-$map->post('patient-card/search-locality', '/patient-card/search-locality', SearchLocalityDispositionAction::class)->tokens(['searchString' => '\w+']);
-$map->post('patient-card/search-insurance-company', '/patient-card/search-insurance-company', SearchInsuranceCompanyAction::class)->tokens(['searchString' => '\w+']);
+$map->post('patient-card/search-region', '/patient-card/search-region', RegionSearchAction::class)->tokens(['searchString' => '\w+']);
+$map->post('patient-card/search-district', '/patient-card/search-district', DistrictSearchAction::class)->tokens(['searchString' => '\w+']);
+$map->post('patient-card/search-locality', '/patient-card/search-locality', LocalitySearchAction::class)->tokens(['searchString' => '\w+']);
+$map->post('patient-card/search-insurance-company', '/patient-card/search-insurance-company', InsuranceCompanySearchAction::class)->tokens(['searchString' => '\w+']);
+$map->post('patient-card/search-fms-department', '/patient-card/search-fms-department', FmsDepartmentSearchAction::class)->tokens(['searchString' => '\w+']);
 //$map->get('catalog/detail', '/blog/{id}/view/{number}-{detail}', Application\Blog\Action\DetailsIndexAction::class)->tokens(['id' => '\d+', 'number' => '\d+', 'detail' => '\d+']);
 
 #DI Container
