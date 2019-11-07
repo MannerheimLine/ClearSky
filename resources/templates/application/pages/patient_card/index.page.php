@@ -125,28 +125,48 @@
                                     <div id="insurance-company-search-result-area" class="search-result-area"></div>
                                 </div>
                                 <hr>
-                                <label for="passport-serial">Серия паспорта:</label>
-                                <div class="input-group mb-2">
-                                    <div class="input-group-prepend">
-                                        <div class="input-group-text"><i class="fa fa-id-card"></i> </div>
+                                <ul class="nav nav-tabs nav-fill" id="person-documents-navs" role="tablist">
+                                    <li class="nav-item">
+                                        <a class="nav-link active text-warning" id="passport-tab" data-toggle="tab" href="#passport-panel" role="tab" aria-controls="home" aria-selected="true">Паспорт</a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link text-danger" id="birth-certificate-tab" data-toggle="tab" href="#birth-certificate-panel" role="tab" aria-controls="profile" aria-selected="false">Свидетельство</a>
+                                    </li>
+                                </ul>
+                                <div class="tab-content" id="person-documents-content">
+                                    <div class="tab-pane fade show active" id="passport-panel" role="tabpanel">
+                                        <label for="passport">Серия, номер паспорта:</label>
+                                        <div class="input-group mb-2">
+                                            <div class="input-group-prepend">
+                                                <div class="input-group-text"><i class="fa fa-id-card"></i> </div>
+                                            </div>
+                                            <input type="text" class="form-control" id="passport" name="passport" placeholder="Серия, номер паспорта">
+                                        </div>
+                                        <label for="fms-department">Отдел ФМС выдавший паспорт:</label>
+                                        <div class="input-group mb-2">
+                                            <div class="input-group-prepend">
+                                                <div class="input-group-text"><i class="fa fa-id-card"></i> </div>
+                                            </div>
+                                            <textarea class="form-control" id="fms-department" name="fms-department"></textarea>
+                                        </div>
                                     </div>
-                                    <input type="text" class="form-control" id="passport-serial" name="passport-serial" placeholder="Серия паспорта">
-                                </div>
-                                <label for="passport-number">Номер паспорта:</label>
-                                <div class="input-group mb-2">
-                                    <div class="input-group-prepend">
-                                        <div class="input-group-text"><i class="fa fa-id-card"></i> </div>
+                                    <div class="tab-pane fade" id="birth-certificate-panel" role="tabpanel">
+                                        <label for="birth-certificate">Серия, номер свидетельства:</label>
+                                        <div class="input-group mb-2">
+                                            <div class="input-group-prepend">
+                                                <div class="input-group-text"><i class="fa fa-id-card"></i> </div>
+                                            </div>
+                                            <input type="text" class="form-control" id="birth-certificate" name="birth-certificate" placeholder="Серия, номер свидетельства">
+                                        </div>
+                                        <label for="registry-office">Отдел ЗАГС выдавший свидетельство:</label>
+                                        <div class="input-group mb-2">
+                                            <div class="input-group-prepend">
+                                                <div class="input-group-text"><i class="fa fa-id-card"></i> </div>
+                                            </div>
+                                            <textarea class="form-control" id="registry-office" name="registry-office"></textarea>
+                                            <div id="fms-department-search-result-area" class="search-result-area"></div>
+                                        </div>
                                     </div>
-                                    <input type="text" class="form-control" id="passport-number" name="passport-number" placeholder="Номер паспорта">
-                                </div>
-                                <label for="fms-department">Отдел ФМС выдавший папорт:</label>
-                                <div class="input-group mb-2">
-                                    <input name="fms-department-id" hidden>
-                                    <div class="input-group-prepend">
-                                        <div class="input-group-text"><i class="fa fa-id-card"></i> </div>
-                                    </div>
-                                    <textarea class="form-control" id="fms-department" name="fms-department"></textarea>
-                                    <div id="fms-department-search-result-area" class="search-result-area"></div>
                                 </div>
                             </div>
                         </div>

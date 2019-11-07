@@ -12,8 +12,7 @@ let specInputs = [
     '#district',
     '#locality',
     '#street',
-    '#insurance-company',
-    '#fms-department'
+    '#insurance-company'
 ];
 
 const patient_card_body = $('#patient-card-body');
@@ -67,66 +66,68 @@ const flipPatientCardStatus = function (name) {
 };
 
 const updatePatientCardData = function () {
-    let id_value = $("input[name='id']").val();
-    let card_number_value = $("input[name='card-number']").val();
-    let is_alive_id_value = $("input[name='is-alive-id']").val();
-    let is_attach_id_value = $("input[name='is-attach-id']").val();
-    let full_name_value = $("input[name='full-name']").val();
-    let gender_value = $("select[name='gender']").val();
-    let date_birth_value = $("input[name='date-birth']").val();
-    let telephone_value = $("input[name='telephone']").val();
-    let email_value = $("input[name='email']").val();
-    let insurance_certificate_value = $("input[name='insurance-certificate']").val();
-    let policy_number_value = $("input[name='policy-number']").val();
-    let insurance_company_value = $("input[name='insurance-company-id']").val();
-    let passport_serial_value = $("input[name='passport-serial']").val();
-    let passport_number_value = $("input[name='passport-number']").val();
-    let fms_department_value = $("input[name='fms-department-id']").val();
-    let region_value = $("input[name='region-id']").val();
-    let district_value = $("input[name='district-id']").val();
-    let locality_value = $("input[name='locality-id']").val();
-    let street_value = $("input[name='street-id']").val();
-    let house_number_value = $("input[name='house-number']").val();
-    let apartment_value = $("input[name='apartment']").val();
-    let workplace_value = $("input[name='workplace']").val();
-    let profession_value = $("input[name='profession']").val();
-    let notation_value = $("textarea[name='notation']").val();
+    let id = $("input[name='id']").val();
+    let cardNumber = $("input[name='card-number']").val();
+    let isAliveId = $("input[name='is-alive-id']").val();
+    let isAttachId = $("input[name='is-attach-id']").val();
+    let fullName = $("input[name='full-name']").val();
+    let gender = $("select[name='gender']").val();
+    let dateBirth = $("input[name='date-birth']").val();
+    let telephone = $("input[name='telephone']").val();
+    let email = $("input[name='email']").val();
+    let insuranceCertificate = $("input[name='insurance-certificate']").val();
+    let policyNumber = $("input[name='policy-number']").val();
+    let insuranceCompany = $("input[name='insurance-company-id']").val();
+    let passport = $("input[name='passport']").val();
+    let fmsDepartment = $("textarea[name='fms-department']").val();
+    let birthCertificate = $("input[name='birth-certificate']").val();
+    let registryOffice = $("textarea[name='registry-office']").val();
+    let region = $("input[name='region-id']").val();
+    let district = $("input[name='district-id']").val();
+    let locality = $("input[name='locality-id']").val();
+    let street = $("input[name='street-id']").val();
+    let houseNumber = $("input[name='house-number']").val();
+    let apartment = $("input[name='apartment']").val();
+    let workplace = $("input[name='workplace']").val();
+    let profession = $("input[name='profession']").val();
+    let notation = $("textarea[name='notation']").val();
     let request = $.ajax({
         type: "POST",
         url: "/patient-card/update",
         data: {
-            'id' : id_value,
-            'cardNumber' : card_number_value,
-            'isAlive' : is_alive_id_value,
-            'isAttach' : is_attach_id_value,
-            'fullName' : full_name_value,
-            'gender' : gender_value,
-            'dateBirth' : date_birth_value,
-            'telephone' : telephone_value,
-            'email' : email_value,
-            'insuranceCertificate' : insurance_certificate_value,
-            'policyNumber' : policy_number_value,
-            'insuranceCompany' : insurance_company_value,
-            'passportSerial' : passport_serial_value,
-            'passportNumber' : passport_number_value,
-            'fmsDepartment' : fms_department_value,
-            'region' : region_value,
-            'district' : district_value,
-            'locality' : locality_value,
-            'street' : street_value,
-            'houseNumber' : house_number_value,
-            'apartment' : apartment_value,
-            'workplace' : workplace_value,
-            'profession' : profession_value,
-            'notation' : notation_value
+            'id' : id,
+            'cardNumber' : cardNumber,
+            'isAlive' : isAliveId,
+            'isAttach' : isAttachId,
+            'fullName' : fullName,
+            'gender' : gender,
+            'dateBirth' : dateBirth,
+            'telephone' : telephone,
+            'email' : email,
+            'insuranceCertificate' : insuranceCertificate,
+            'policyNumber' : policyNumber,
+            'insuranceCompany' : insuranceCompany,
+            'passport' : passport,
+            'fmsDepartment' : fmsDepartment,
+            'birthCertificate' : birthCertificate,
+            'registryOffice' : registryOffice,
+            'region' : region,
+            'district' : district,
+            'locality' : locality,
+            'street' : street,
+            'houseNumber' : houseNumber,
+            'apartment' : apartment,
+            'workplace' : workplace,
+            'profession' : profession,
+            'notation' : notation
         },
         cache: false
     });
     request.done(function () {
-        console.log('Patient card '+ card_number_value + ' updated');
-        console.log('Id '+ id_value + ' updated');
+        console.log('Patient card '+ cardNumber + ' updated');
+        console.log('Id '+ id + ' updated');
     });
-    return id_value;
+    return id;
 };
 
 const addPatientCardData = function () {
@@ -156,125 +157,6 @@ const addPatientCardData = function () {
         loadPatientCard(response);
     });
 };
-
-const loadPatientCardData = function (id) {
-    let id_input = $("input[name='id']");
-    let card_number_input = $("input[name='card-number']");
-    let is_alive_id_input = $("input[name='is-alive-id']");
-    let is_alive_input = $("#patient-alive-status");
-    let is_attached_id_input = $("input[name='is-attach-id']");
-    let is_attached_input = $("#patient-attach-status");
-    let full_name_input = $("input[name='full-name']");
-    let gender_input = $("select[name='gender']");
-    let date_birth_input = $("input[name='date-birth']");
-    let telephone_input = $("input[name='telephone']");
-    let email_input = $("input[name='email']");
-    let insurance_certificate_input = $("input[name='insurance-certificate']");
-    let policy_number_input = $("input[name='policy-number']");
-    let insurance_company_id_input = $("input[name='insurance-company-id']");
-    let insurance_company_input = $("input[name='insurance-company']");
-    let passport_serial_input = $("input[name='passport-serial']");
-    let passport_number_input = $("input[name='passport-number']");
-    let fms_department_id_input = $("input[name='fms-department-id']");
-    let fms_department_input = $("textarea[name='fms-department']");
-    let region_id_input = $("input[name='region-id']");
-    let region_input = $("input[name='region']");
-    let district_id_input = $("input[name='district-id']");
-    let district_input = $("input[name='district']");
-    let locality_id_input = $("input[name='locality-id']");
-    let locality_input = $("input[name='locality']");
-    let street_id_input = $("input[name='street-id']");
-    let street_input = $("input[name='street']");
-    let house_number_input = $("input[name='house-number']");
-    let apartment_input = $("input[name='apartment']");
-    let workplace_input = $("input[name='workplace']");
-    let profession_input = $("input[name='profession']");
-    let notation_input = $("textarea[name='notation']");
-    let request = $.ajax({
-        type: "GET",
-        url: "/patient-card/show/" + id,
-        cache: false
-    });
-    request.done(function (response) {
-        let card_data = response.card_data;
-        id_input.val(card_data.id);
-        card_number_input.val(card_data.cardNumber);
-        is_alive_id_input.val(card_data.isAliveId);
-        is_alive_input.text(card_data.isAlive);
-        is_attached_id_input.val(card_data.isAttachId);
-        is_attached_input.text(card_data.isAttached);
-        full_name_input.val(card_data.surname + ' ' + card_data.firstName + ' ' + card_data.secondName);
-        $.each(response.genders, function (key, value) {
-            gender_input.append(`<option value="${value.id}" ${card_data.genderId == value.id ?' selected':''}>${value.description}</option>`)
-        });
-        date_birth_input.val(card_data.dateBirth);
-        telephone_input.val(card_data.telephone);
-        email_input.val(card_data.email);
-        insurance_certificate_input.val(card_data.insuranceCertificate);
-        policy_number_input.val(card_data.policyNumber);
-        insurance_company_id_input.val(card_data.insuranceCompanyId);
-        insurance_company_input.val(card_data.insuranceCompany);
-        passport_serial_input.val(card_data.passportSerial);
-        passport_number_input.val(card_data.passportNumber);
-        fms_department_id_input.val(card_data.fmsDepartmentId);
-        fms_department_input.val(card_data.fmsDepartment);
-        region_id_input .val(card_data.regionId);
-        region_input .val(card_data.region);
-        district_id_input.val(card_data.districtId);
-        district_input.val(card_data.district);
-        locality_id_input.val(card_data.localityId);
-        locality_input.val(card_data.locality);
-        street_id_input.val(card_data.streetId);
-        street_input.val(card_data.street);
-        house_number_input.val(card_data.houseNumber);
-        apartment_input.val(card_data.apartment);
-        workplace_input.val(card_data.workPlace);
-        profession_input.val(card_data.profession);
-        notation_input.val(card_data.notation);
-
-        /*
-        * Значки fontawesome для статусов
-        */
-        let patient_card_alive_section = $('#patient-card-alive-section');
-        let patient_card_attached_section = $('#patient-card-attached-section');
-        let is_alive_image = $("#patient-alive-image");
-        let is_attached_image = $("#patient-attached-image");
-        /*
-         * Статус по карте: жив/мертв, прикреплен/откреплен
-         */
-        $('#patient-alive-status').text(card_data.isAlive);
-        $('#patient-attached-status').text(card_data.isAttached);
-
-        switch (card_data.isAliveId) {
-            //Если пациент жив.
-            case 1 :
-                patient_card_alive_section.css({'color' : '#28a745'});
-                switch (card_data.humanType) {
-                    case 1 : is_alive_image.attr('class', 'fa fa-male'); break;
-                    case 2 : is_alive_image.attr('class', 'fa fa-female'); break;
-                    case 3 : is_alive_image.attr('class', 'fa fa-child'); break;
-                    default : is_alive_image.attr('class', 'fa fa-male');
-                }
-                break;
-            case 2 :
-                patient_card_alive_section.css({'color' : '#d80e1b'});
-                is_alive_image.attr('class', 'fa fa-skull');
-                break;
-        }
-        switch (card_data.isAttachId) {
-            case 1 :
-                patient_card_attached_section.css({'color' : '#28a745'});
-                is_attached_image.attr('class', 'fa fa-user-plus');
-                break;
-            case 2 :
-                patient_card_attached_section.css({'color' : '#d80e1b'});
-                is_attached_image.attr('class', 'fa fa-user-times');
-                break;
-
-        }
-    })
-};
-
 
 /**
  * Поиск карт
@@ -474,6 +356,124 @@ const loadPatientCard = function (id) {
     loadMasksForDynamicInputs();
 };
 
+const loadPatientCardData = function (requestedId) {
+    let id = $("input[name='id']");
+    let cardNumber = $("input[name='card-number']");
+    let isAliveId = $("input[name='is-alive-id']");
+    let isAlive = $("#patient-alive-status");
+    let isAttachedId = $("input[name='is-attach-id']");
+    let isAttached = $("#patient-attach-status");
+    let fullName = $("input[name='full-name']");
+    let gender = $("select[name='gender']");
+    let dateBirth = $("input[name='date-birth']");
+    let telephone = $("input[name='telephone']");
+    let email = $("input[name='email']");
+    let insuranceCertificate = $("input[name='insurance-certificate']");
+    let policyNumber = $("input[name='policy-number']");
+    let insuranceCompanyId = $("input[name='insurance-company-id']");
+    let insuranceCompany = $("input[name='insurance-company']");
+    let passport = $("input[name='passport']");
+    let fmsDepartment = $("textarea[name='fms-department']");
+    let birthCertificate = $("input[name='birth-certificate']");
+    let registryOffice = $("textarea[name='registry-office']");
+    let regionId = $("input[name='region-id']");
+    let region = $("input[name='region']");
+    let districtId = $("input[name='district-id']");
+    let district = $("input[name='district']");
+    let localityId = $("input[name='locality-id']");
+    let locality = $("input[name='locality']");
+    let streetId = $("input[name='street-id']");
+    let street = $("input[name='street']");
+    let houseNumber = $("input[name='house-number']");
+    let apartment = $("input[name='apartment']");
+    let workplace = $("input[name='workplace']");
+    let profession = $("input[name='profession']");
+    let notation = $("textarea[name='notation']");
+    let request = $.ajax({
+        type: "GET",
+        url: "/patient-card/show/" + requestedId,
+        cache: false
+    });
+    request.done(function (response) {
+        let card_data = response.card_data;
+        id.val(card_data.id);
+        cardNumber.val(card_data.cardNumber);
+        isAliveId.val(card_data.isAliveId);
+        isAlive.text(card_data.isAlive);
+        isAttachedId.val(card_data.isAttachId);
+        isAttached.text(card_data.isAttached);
+        fullName.val(card_data.surname + ' ' + card_data.firstName + ' ' + card_data.secondName);
+        $.each(response.genders, function (key, value) {
+            gender.append(`<option value="${value.id}" ${card_data.genderId == value.id ?' selected':''}>${value.description}</option>`)
+        });
+        dateBirth.val(card_data.dateBirth);
+        telephone.val(card_data.telephone);
+        email.val(card_data.email);
+        insuranceCertificate.val(card_data.insuranceCertificate);
+        policyNumber.val(card_data.policyNumber);
+        insuranceCompanyId.val(card_data.insuranceCompanyId);
+        insuranceCompany.val(card_data.insuranceCompany);
+        passport.val(card_data.passportSerial + ' ' + card_data.passportNumber);
+        fmsDepartment.val(card_data.fmsDepartment);
+        birthCertificate.val(card_data.birthCertificateSerial + ' ' + card_data.birthCertificateNumber);
+        registryOffice.val(card_data.registryOffice);
+        regionId .val(card_data.regionId);
+        region .val(card_data.region);
+        districtId.val(card_data.districtId);
+        district.val(card_data.district);
+        localityId.val(card_data.localityId);
+        locality.val(card_data.locality);
+        streetId.val(card_data.streetId);
+        street.val(card_data.street);
+        houseNumber.val(card_data.houseNumber);
+        apartment.val(card_data.apartment);
+        workplace.val(card_data.workPlace);
+        profession.val(card_data.profession);
+        notation.val(card_data.notation);
+
+        /*
+        * Значки fontawesome для статусов
+        */
+        let patient_card_alive_section = $('#patient-card-alive-section');
+        let patient_card_attached_section = $('#patient-card-attached-section');
+        let is_alive_image = $("#patient-alive-image");
+        let is_attached_image = $("#patient-attached-image");
+        /*
+         * Статус по карте: жив/мертв, прикреплен/откреплен
+         */
+        $('#patient-alive-status').text(card_data.isAlive);
+        $('#patient-attached-status').text(card_data.isAttached);
+
+        switch (card_data.isAliveId) {
+            //Если пациент жив.
+            case 1 :
+                patient_card_alive_section.css({'color' : '#28a745'});
+                switch (card_data.humanType) {
+                    case 1 : is_alive_image.attr('class', 'fa fa-male'); break;
+                    case 2 : is_alive_image.attr('class', 'fa fa-female'); break;
+                    case 3 : is_alive_image.attr('class', 'fa fa-child'); break;
+                    default : is_alive_image.attr('class', 'fa fa-male');
+                }
+                break;
+            case 2 :
+                patient_card_alive_section.css({'color' : '#d80e1b'});
+                is_alive_image.attr('class', 'fa fa-skull');
+                break;
+        }
+        switch (card_data.isAttachId) {
+            case 1 :
+                patient_card_attached_section.css({'color' : '#28a745'});
+                is_attached_image.attr('class', 'fa fa-user-plus');
+                break;
+            case 2 :
+                patient_card_attached_section.css({'color' : '#d80e1b'});
+                is_attached_image.attr('class', 'fa fa-user-times');
+                break;
+
+        }
+    })
+};
+
 const loadPatientCardTemplate = function () {
     return `<div class="row">
                     <div id="personal-data-section" class="col-3">
@@ -556,7 +556,7 @@ const loadPatientCardTemplate = function () {
                                     <div class="input-group-prepend">
                                         <div class="input-group-text"><i class="fa fa-id-card"></i> </div>
                                     </div>
-                                    <input type="text" class="form-control" id="insurance-certificate" name="insurance-certificate" placeholder="СНИЛС" required>
+                                    <input type="text" class="form-control" id="insurance-certificate" name="insurance-certificate" placeholder="СНИЛС">
                                 </div>
                                 <hr>
                                 <label for="policy-number">Единый номер полиса<span class="red-asterisk">*</span>:</label>
@@ -564,7 +564,7 @@ const loadPatientCardTemplate = function () {
                                     <div class="input-group-prepend">
                                         <div class="input-group-text"><i class="fa fa-clipboard"></i> </div>
                                     </div>
-                                    <input type="text" class="form-control" id="policy-number" name="policy-number" placeholder="Номер полиса" required>
+                                    <input type="text" class="form-control" id="policy-number" name="policy-number" placeholder="Номер полиса">
                                 </div>
                                 <label for="insurance-company">Страховая компания:</label>
                                 <div class="input-group mb-2">
@@ -576,28 +576,48 @@ const loadPatientCardTemplate = function () {
                                     <div id="insurance-company-search-result-area" class="search-result-area"></div>
                                 </div>
                                 <hr>
-                                <label for="passport-serial">Серия паспорта:</label>
-                                <div class="input-group mb-2">
-                                    <div class="input-group-prepend">
-                                        <div class="input-group-text"><i class="fa fa-id-card"></i> </div>
+                                <ul class="nav nav-tabs nav-fill" id="person-documents-navs" role="tablist">
+                                    <li class="nav-item">
+                                        <a class="nav-link active text-warning" id="passport-tab" data-toggle="tab" href="#passport-panel" role="tab" aria-controls="home" aria-selected="true">Паспорт</a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link text-danger" id="birth-certificate-tab" data-toggle="tab" href="#birth-certificate-panel" role="tab" aria-controls="profile" aria-selected="false">Свидетельство</a>
+                                    </li>
+                                </ul>
+                                <div class="tab-content" id="person-documents-content">
+                                    <div class="tab-pane fade show active" id="passport-panel" role="tabpanel">
+                                        <label for="passport">Серия, номер паспорта:</label>
+                                        <div class="input-group mb-2">
+                                            <div class="input-group-prepend">
+                                                <div class="input-group-text"><i class="fa fa-id-card"></i> </div>
+                                            </div>
+                                            <input type="text" class="form-control" id="passport" name="passport" placeholder="Серия, номер паспорта">
+                                        </div>
+                                        <label for="fms-department">Отдел ФМС выдавший паспорт:</label>
+                                        <div class="input-group mb-2">
+                                            <div class="input-group-prepend">
+                                                <div class="input-group-text"><i class="fa fa-id-card"></i> </div>
+                                            </div>
+                                            <textarea class="form-control" id="fms-department" name="fms-department"></textarea>
+                                        </div>
                                     </div>
-                                    <input type="text" class="form-control" id="passport-serial" name="passport-serial" placeholder="Серия паспорта">
-                                </div>
-                                <label for="passport-number">Номер паспорта:</label>
-                                <div class="input-group mb-2">
-                                    <div class="input-group-prepend">
-                                        <div class="input-group-text"><i class="fa fa-id-card"></i> </div>
+                                    <div class="tab-pane fade" id="birth-certificate-panel" role="tabpanel">
+                                        <label for="birth-certificate">Серия, номер свидетельства:</label>
+                                        <div class="input-group mb-2">
+                                            <div class="input-group-prepend">
+                                                <div class="input-group-text"><i class="fa fa-id-card"></i> </div>
+                                            </div>
+                                            <input type="text" class="form-control" id="birth-certificate" name="birth-certificate" placeholder="Серия, номер свидетельства">
+                                        </div>
+                                        <label for="registry-office">Отдел ЗАГС выдавший свидетельство:</label>
+                                        <div class="input-group mb-2">
+                                            <div class="input-group-prepend">
+                                                <div class="input-group-text"><i class="fa fa-id-card"></i> </div>
+                                            </div>
+                                            <textarea class="form-control" id="registry-office" name="registry-office"></textarea>
+                                            <div id="fms-department-search-result-area" class="search-result-area"></div>
+                                        </div>
                                     </div>
-                                    <input type="text" class="form-control" id="passport-number" name="passport-number" placeholder="Номер паспорта">
-                                </div>
-                                <label for="fms-department">Отдел ФМС выдавший папорт:</label>
-                                <div class="input-group mb-2">
-                                    <input name="fms-department-id" hidden>
-                                    <div class="input-group-prepend">
-                                        <div class="input-group-text"><i class="fa fa-id-card"></i> </div>
-                                    </div>
-                                    <textarea class="form-control" id="fms-department" name="fms-department"></textarea>
-                                    <div id="fms-department-search-result-area" class="search-result-area"></div>
                                 </div>
                             </div>
                         </div>
@@ -711,8 +731,12 @@ const loadMasksForDynamicInputs = function() {
     setTimeout(function () {
         let insurance_certificate = patient_card_body.find($("#insurance-certificate"));
         let telephone = patient_card_body.find($("#telephone"));
+        let passport = patient_card_body.find($("#passport"));
+        let birthCertificate = patient_card_body.find($("#birth-certificate"));
         insurance_certificate.mask("999-999-999 99");
         telephone.mask("9(999)999-99-99");
+        passport.mask("9999 999999");
+        birthCertificate.mask("99-99 999999");
     }, 100);
 };
 
@@ -774,13 +798,6 @@ patient_card_body.on('keyup', '#insurance-company', function () {
     clearTimeout(typingTimer);
     typingTimer = setTimeout(function () {
         searchInSection('insurance-company');
-    }, 500);
-});
-
-patient_card_body.on('keyup', '#fms-department', function () {
-    clearTimeout(typingTimer);
-    typingTimer = setTimeout(function () {
-        searchInSection('fms-department');
     }, 500);
 });
 

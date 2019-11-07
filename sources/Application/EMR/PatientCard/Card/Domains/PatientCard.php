@@ -36,8 +36,10 @@ class PatientCard extends AppDomain implements \JsonSerializable
     private $_insuranceCertificate;
     private $_passportSerial;
     private $_passportNumber;
-    private $_fmsDepartmentId;
     private $_fmsDepartment;
+    private $_birthCertificateSerial;
+    private $_birthCertificateNumber;
+    private $_registryOffice;
     private $_regionId;
     private $_region;
     private $_districtId;
@@ -81,9 +83,14 @@ class PatientCard extends AppDomain implements \JsonSerializable
         $castedData['insuranceCertificate'] = $updatingData['insuranceCertificate'] ?: null;
         $castedData['policyNumber'] = $updatingData['policyNumber'];
         $castedData['insuranceCompany'] = (int)$updatingData['insuranceCompany'];
-        $castedData['passportSerial'] = $updatingData['passportSerial'];
-        $castedData['passportNumber'] = $updatingData['passportNumber'] ?: null;
-        $castedData['fmsDepartment'] = (int)$updatingData['fmsDepartment'] ?: null;
+        $passport = explode(' ',$updatingData['passport']);
+        $castedData['passportSerial'] = $passport[0];
+        $castedData['passportNumber'] = $passport[1];
+        $castedData['fmsDepartment'] = $updatingData['fmsDepartment'];
+        $birthCertificate = explode(' ', $updatingData['birthCertificate']);
+        $castedData['birthCertificateSerial'] = $birthCertificate[0];
+        $castedData['birthCertificateNumber'] = $birthCertificate[1];
+        $castedData['registryOffice'] = $updatingData['registryOffice'];
         $castedData['region'] = (int)$updatingData['region'] ?: null;
         $castedData['district'] = (int)$updatingData['district'] ?: null;
         $castedData['locality'] = (int)$updatingData['locality'] ?: null;
@@ -149,8 +156,10 @@ class PatientCard extends AppDomain implements \JsonSerializable
         `insurance_companies`.`insurance_company_name` as `insurance_company`,
         `patient_cards`.`passport_serial` as `passport_serial`,
         `patient_cards`.`passport_number` as `passport_number`,
-        `patient_cards`.`fms_department` as `fms_department_id`,
-        `fms_departments`.`fms_department_name` as `fms_department`,
+        `patient_cards`.`fms_department` as `fms_department`,
+        `patient_cards`.`birth_certificate_serial` as `birth_certificate_serial`,
+        `patient_cards`.`birth_certificate_number` as `birth_certificate_number`,
+        `patient_cards`.`registry_office` as `registry_office`,
         `patient_cards`.`region` as `region_id`,
         `regions`.`region_name` as `region`,
         `patient_cards`.`district` as `district_id`,
@@ -171,7 +180,6 @@ class PatientCard extends AppDomain implements \JsonSerializable
         LEFT JOIN `localities` ON `patient_cards`.`locality` = `localities`.`id` 
         LEFT JOIN `insurance_companies` ON `patient_cards`.`insurance_company` = `insurance_companies`.`id` 
         LEFT JOIN `streets` ON `patient_cards`.`street` = `streets`.`id` 
-        LEFT JOIN `fms_departments` ON `patient_cards`.`fms_department` = `fms_departments`.`id` 
         LEFT JOIN `alive_status` ON `patient_cards`.`is_alive` = `alive_status`.`id` 
         LEFT JOIN `attach_status` ON `patient_cards`.`is_attached` = `attach_status`.`id` 
         WHERE `patient_cards`.`id` = :id");
@@ -201,8 +209,10 @@ class PatientCard extends AppDomain implements \JsonSerializable
                 $this->_insuranceCompany = $row['insurance_company'];
                 $this->_passportSerial = $row['passport_serial'];
                 $this->_passportNumber = $row['passport_number'];
-                $this->_fmsDepartmentId = $row['fms_department_id'];
                 $this->_fmsDepartment = $row['fms_department'];
+                $this->_birthCertificateSerial = $row['birth_certificate_serial'];
+                $this->_birthCertificateNumber = $row['birth_certificate_number'];
+                $this->_registryOffice = $row['registry_office'];
                 $this->_regionId = $row['region_id'];
                 $this->_region = $row['region'];
                 $this->_districtId = $row['district_id'];
@@ -242,6 +252,9 @@ class PatientCard extends AppDomain implements \JsonSerializable
             `passport_serial` = :passportSerial,
             `passport_number` = :passportNumber,
             `fms_department` = :fmsDepartment,
+            `birth_certificate_serial` = :birthCertificateSerial,
+            `birth_certificate_number` = :birthCertificateNumber,
+            `registry_office` = :registryOffice,
             `region` = :region,
             `district` = :district,
             `locality` = :locality,
@@ -271,6 +284,9 @@ class PatientCard extends AppDomain implements \JsonSerializable
             'passportSerial' => $castedData['passportSerial'],
             'passportNumber' => $castedData['passportNumber'],
             'fmsDepartment' => $castedData['fmsDepartment'],
+            'birthCertificateSerial' => $castedData['birthCertificateSerial'],
+            'birthCertificateNumber' => $castedData['birthCertificateNumber'],
+            'registryOffice' => $castedData['registryOffice'],
             'region' => $castedData['region'],
             'district' => $castedData['district'],
             'locality' => $castedData['locality'],
@@ -365,8 +381,10 @@ class PatientCard extends AppDomain implements \JsonSerializable
             'insuranceCertificate' => $this->_insuranceCertificate,
             'passportSerial' => $this->_passportSerial,
             'passportNumber' => $this->_passportNumber,
-            'fmsDepartmentId' => $this->_fmsDepartmentId,
             'fmsDepartment' => $this->_fmsDepartment,
+            'birthCertificateSerial' => $this->_birthCertificateSerial,
+            'birthCertificateNumber' => $this->_birthCertificateNumber,
+            'registryOffice' => $this->_registryOffice,
             'regionId' => $this->_regionId,
             'region' => $this->_region,
             'districtId' => $this->_districtId,
