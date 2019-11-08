@@ -4,6 +4,7 @@ use Application\EMR\PatientCard\Card\Actions\PatientCardAddAction;
 use Application\EMR\PatientCard\Card\Actions\PatientCardIndexAction;
 use Application\EMR\PatientCard\Card\Actions\PatientCardShowAction;
 use Application\EMR\PatientCard\Card\Actions\PatientCardUpdateAction;
+use Application\EMR\PatientCard\Card\Middleware\CardValidatorMiddleware;
 use Application\EMR\PatientCard\Search\CardsSearch\Actions\PatientCardsSearchAction;
 use Application\EMR\PatientCard\Search\DispositionSearch\Actions\DistrictSearchAction;
 use Application\EMR\PatientCard\Search\DispositionSearch\Actions\StreetSearchAction;
@@ -78,11 +79,11 @@ if ($route){
     //$db = $container->get(\Engine\Database\Creators\DbCreator::class);
     //$db->createDataBase('db');
     //$db->createTable('table');
-    $collection = new SchemeCollection('sources/Engine/Database/Creators/Schemes');
-    $tableCreator = $container->get(TableCreator::class);
-    foreach ($collection->getSchemes() as $scheme){
-        $tableCreator->create($scheme);
-    }
+    //$collection = new SchemeCollection('sources/Engine/Database/Creators/Schemes');
+    //$tableCreator = $container->get(TableCreator::class);
+    //foreach ($collection->getSchemes() as $scheme){
+    //    $tableCreator->create($scheme);
+    //}
 
 
 
@@ -94,7 +95,9 @@ if ($route){
     $pipeline->pipe(path('/', new ProfilerMiddleware()));
     $pipeline->pipe(path('/', new ClientIpMiddleware()));
     $pipeline->pipe(path('/', new MemoryUsageMiddleware()));
-    $pipeline->pipe(path('patient_card', new BasicAuthMiddleware()));
+    $pipeline->pipe(path('patient-card', new BasicAuthMiddleware()));
+    $pipeline->pipe(path('patient-card/update', new CardValidatorMiddleware()));
+    $pipeline->pipe(path('patient-card/add', new CardValidatorMiddleware()));
     $pipeline->pipe(new PathMiddlewareDecorator('patient_card', new ModifyMiddleware()));
 #Запуск трубопровода
     $response = $pipeline->process($request, $action);

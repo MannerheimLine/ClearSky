@@ -331,14 +331,6 @@
                                     </div>
                                     <input type="text" class="form-control" id="add-policy-number" name="add-policy-number" placeholder="Номер полиса" required>
                                 </div>
-                                <input name="add-insurance-company-id" value="1" hidden>
-                                <label for="add-insurance-company">Страховая компания:</label>
-                                <div class="input-group mb-2">
-                                    <div class="input-group-prepend">
-                                        <div class="input-group-text"><i class="fa fa-clipboard"></i> </div>
-                                    </div>
-                                    <input type="text" class="form-control" id="add-insurance-company" name="add-insurance-company" placeholder="Страховая компания">
-                                </div>
                             </div>
                             <div class="modal-footer">
                                 <button type="button" class="btn btn-primary btn-sm" onclick="addPatientCardData();">Сохранить</button>
