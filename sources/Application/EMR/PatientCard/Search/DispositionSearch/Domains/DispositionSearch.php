@@ -81,8 +81,26 @@ class DispositionSearch extends AppDomain
         return 'Nothing found';
     }
 
-    public function searchStreet(string $searchString){
-
+    public function searchStreet(array $searchData){
+        $searchString = $this->sanitize($searchData['searchString']);
+        $searchId = $searchData['params']['searchId'];
+        $query = ("SELECT `streets`.`id`, `streets`.`street_name` FROM `streets_localities`
+                  INNER JOIN `streets` ON streets_localities.street_id = streets.id
+                  WHERE `street_name` LIKE '%$searchString%' AND `locality_id` = :searchId");
+        $result = $this->_dbConnection->prepare($query);
+        $result->execute([
+            'searchId' => $searchId
+        ]);
+        if ($result->rowCount() > 0){
+            $i = 0;
+            while ($row = $result->fetch()){
+                $data[$i]['id'] = $row['id'];
+                $data[$i]['value'] = $row['street_name'];
+                $i ++;
+            }
+            return $data;
+        }
+        return 'Nothing found';
     }
 
 }

@@ -6,6 +6,7 @@ use Application\EMR\PatientCard\Card\Actions\PatientCardShowAction;
 use Application\EMR\PatientCard\Card\Actions\PatientCardUpdateAction;
 use Application\EMR\PatientCard\Search\CardsSearch\Actions\PatientCardsSearchAction;
 use Application\EMR\PatientCard\Search\DispositionSearch\Actions\DistrictSearchAction;
+use Application\EMR\PatientCard\Search\DispositionSearch\Actions\StreetSearchAction;
 use Application\EMR\PatientCard\Search\OrganisationsSearch\Actions\FmsDepartmentSearchAction;
 use Application\EMR\PatientCard\Search\OrganisationsSearch\Actions\InsuranceCompanySearchAction;
 use Application\EMR\PatientCard\Search\DispositionSearch\Actions\LocalitySearchAction;
@@ -44,8 +45,8 @@ $map->post('patient-card/search-cards', '/patient-card/search-cards', PatientCar
 $map->post('patient-card/search-region', '/patient-card/search-region', RegionSearchAction::class)->tokens(['searchString' => '\w+']);
 $map->post('patient-card/search-district', '/patient-card/search-district', DistrictSearchAction::class)->tokens(['searchString' => '\w+']);
 $map->post('patient-card/search-locality', '/patient-card/search-locality', LocalitySearchAction::class)->tokens(['searchString' => '\w+']);
+$map->post('patient-card/search-street', '/patient-card/search-street', StreetSearchAction::class)->tokens(['searchString' => '\w+']);
 $map->post('patient-card/search-insurance-company', '/patient-card/search-insurance-company', InsuranceCompanySearchAction::class)->tokens(['searchString' => '\w+']);
-$map->post('patient-card/search-fms-department', '/patient-card/search-fms-department', FmsDepartmentSearchAction::class)->tokens(['searchString' => '\w+']);
 //$map->get('catalog/detail', '/blog/{id}/view/{number}-{detail}', Application\Blog\Action\DetailsIndexAction::class)->tokens(['id' => '\d+', 'number' => '\d+', 'detail' => '\d+']);
 
 #DI Container

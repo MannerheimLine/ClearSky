@@ -72,7 +72,7 @@ class PatientCard extends AppDomain implements \JsonSerializable
         $castedData['cardNumber'] = $updatingData['cardNumber'];
         $castedData['isAlive'] = (int)$updatingData['isAlive'];
         $castedData['isAttach'] = (int)$updatingData['isAttach'];
-        $fullName = explode(' ',$updatingData['fullName']);
+        $fullName = explode(' ', rtrim($updatingData['fullName']));
         $castedData['surname'] = $fullName[0];
         $castedData['firstName'] = $fullName[1];
         $castedData['secondName'] = $fullName[2];
@@ -84,12 +84,12 @@ class PatientCard extends AppDomain implements \JsonSerializable
         $castedData['policyNumber'] = $updatingData['policyNumber'];
         $castedData['insuranceCompany'] = (int)$updatingData['insuranceCompany'];
         $passport = explode(' ',$updatingData['passport']);
-        $castedData['passportSerial'] = $passport[0];
-        $castedData['passportNumber'] = $passport[1];
+        $castedData['passportSerial'] = $passport[0] ?: null;
+        $castedData['passportNumber'] = $passport[1] ?: null;
         $castedData['fmsDepartment'] = $updatingData['fmsDepartment'];
         $birthCertificate = explode(' ', $updatingData['birthCertificate']);
-        $castedData['birthCertificateSerial'] = $birthCertificate[0];
-        $castedData['birthCertificateNumber'] = $birthCertificate[1];
+        $castedData['birthCertificateSerial'] = $birthCertificate[0] ?: null;
+        $castedData['birthCertificateNumber'] = $birthCertificate[1] ?: null;
         $castedData['registryOffice'] = $updatingData['registryOffice'];
         $castedData['region'] = (int)$updatingData['region'] ?: null;
         $castedData['district'] = (int)$updatingData['district'] ?: null;

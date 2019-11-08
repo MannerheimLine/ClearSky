@@ -1,14 +1,15 @@
 <?php
 
+declare(strict_types = 1);
 
-namespace Application\EMR\PatientCard\Search\OrganisationsSearch\Responders;
+namespace Application\EMR\PatientCard\Search\DispositionSearch\Responders;
 
 
 use Application\Base\AppResponder;
 use Psr\Http\Message\ServerRequestInterface;
 use Zend\Diactoros\Response;
 
-class FmsDepartmentSearchResponder extends AppResponder
+class StreetSearchResponder extends AppResponder
 {
 
     /**

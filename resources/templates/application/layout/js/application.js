@@ -402,7 +402,7 @@ const loadPatientCardData = function (requestedId) {
         isAlive.text(card_data.isAlive);
         isAttachedId.val(card_data.isAttachId);
         isAttached.text(card_data.isAttached);
-        fullName.val(card_data.surname + ' ' + card_data.firstName + ' ' + card_data.secondName);
+        fullName.val(card_data.surname + ' ' + card_data.firstName + ' ' + (card_data.secondName || ''));
         $.each(response.genders, function (key, value) {
             gender.append(`<option value="${value.id}" ${card_data.genderId == value.id ?' selected':''}>${value.description}</option>`)
         });
@@ -413,9 +413,17 @@ const loadPatientCardData = function (requestedId) {
         policyNumber.val(card_data.policyNumber);
         insuranceCompanyId.val(card_data.insuranceCompanyId);
         insuranceCompany.val(card_data.insuranceCompany);
-        passport.val(card_data.passportSerial + ' ' + card_data.passportNumber);
+        if((card_data.passportSerial && card_data.passportNumber) != null){
+            passport.val(card_data.passportSerial + ' ' + card_data.passportNumber);
+        }else{
+            passport.val('');
+        }
         fmsDepartment.val(card_data.fmsDepartment);
-        birthCertificate.val(card_data.birthCertificateSerial + ' ' + card_data.birthCertificateNumber);
+        if ((card_data.birthCertificateSerial && card_data.birthCertificateNumber) != null){
+            birthCertificate.val(card_data.birthCertificateSerial + ' ' + card_data.birthCertificateNumber);
+        }else {
+            birthCertificate.val('');
+        }
         registryOffice.val(card_data.registryOffice);
         regionId .val(card_data.regionId);
         region .val(card_data.region);
@@ -787,6 +795,16 @@ patient_card_body.on('keyup', '#locality', function () {
     }, 500);
     $("input[name='street-id']").val('');
     $("input[name='street']").val('');
+});
+
+patient_card_body.on('keyup', '#street', function () {
+    clearTimeout(typingTimer);
+    typingTimer = setTimeout(function () {
+        let params = {
+            searchId: $('input[name="locality-id"]').val()
+        };
+        searchInSection('street', params);
+    }, 500);
 });
 
 
