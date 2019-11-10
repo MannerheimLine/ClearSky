@@ -50,18 +50,20 @@
                                 <hr>
                                 <input name="id" hidden>
                                 <label for="card-number">Номер карты<span class="red-asterisk">*</span>:</label>
+                                <div class="incorrect-input-message"><i>Поле не заполнено</i></div>
                                 <div class="input-group mb-2">
                                     <div class="input-group-prepend">
-                                        <div class="input-group-text"><i class="fa fa-id-card"></i> </div>
+                                        <div class="input-group-text incorrect-input-group"><i class="fa fa-id-card"></i> </div>
                                     </div>
-                                    <input type="text" class="form-control" id="card-number" name="card-number" placeholder="Номер карты">
+                                    <input type="text" class="form-control incorrect-input-border" id="card-number" name="card-number" placeholder="Номер карты">
                                 </div>
                                 <label  for="full-name">ФИО<span class="red-asterisk">*</span>:</label>
+                                <div class="incorrect-input-message"><i>Фамилия и Имя обязательны для заполнения</i></div>
                                 <div class="input-group mb-2">
                                     <div class="input-group-prepend">
-                                        <div class="input-group-text"><i class="fa fa-user-circle"></i> </div>
+                                        <div class="input-group-text incorrect-input-group"><i class="fa fa-user-circle"></i> </div>
                                     </div>
-                                    <input type="text" class="form-control" id="full-name" name="full-name" placeholder="ФИО">
+                                    <input type="text" class="form-control incorrect-input-border" id="full-name" name="full-name" placeholder="ФИО">
                                 </div>
                                 <label  for="gender">Пол:</label>
                                 <div class="input-group mb-2">

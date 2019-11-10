@@ -149,3 +149,18 @@ html, body {
 .pagination-center{
     justify-content: center;
 }
+.incorrect-input-group{
+    background-color: #ff0000; !important;
+    border: 1px solid #ff0000; !important;
+    color: white; !important;
+}
+.incorrect-input-border{
+    border: 1px solid #ff0000; !important;
+}
+.incorrect-input-message{
+    color: #ff0000;
+    font-size: 14px;
+    margin-left: 10px;
+    margin-bottom: 5px;
+    margin-top: -10px;
+}

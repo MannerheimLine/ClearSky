@@ -8,6 +8,7 @@ namespace Application\EMR\PatientCard\Card\Domains;
 use Application\Base\AppDomain;
 use DateTime;
 use Engine\Database\Connectors\ConnectorInterface;
+use Engine\DataStructures\StructuredResponse;
 
 class PatientCard extends AppDomain implements \JsonSerializable
 {
@@ -297,7 +298,10 @@ class PatientCard extends AppDomain implements \JsonSerializable
             'profession' => $castedData['profession'],
             'notation' => $castedData['notation'],
         ])){
-            return 'Updated';
+            $response = new StructuredResponse();
+            $message = $response->message('success', 'Обновлено');
+            $response->success()->complete('message', $message);
+            return $response;
         }
     }
 

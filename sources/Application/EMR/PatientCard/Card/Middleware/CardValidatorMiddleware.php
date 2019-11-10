@@ -5,6 +5,7 @@ declare(strict_types = 1);
 namespace Application\EMR\PatientCard\Card\Middleware;
 
 
+use Engine\DataStructures\StructuredResponse;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
@@ -32,25 +33,35 @@ class CardValidatorMiddleware implements MiddlewareInterface
         4 => 'policyNumber'
     ];
 
-    /**
-     * Ошибки возвращаемые для обработки
-     *
-     * @var array
-     */
-    private $_errors = [
-        'required',
-        'incorrectFullName'
-    ];
+    private $structuredResponse;
+
+    public function __construct()
+    {
+        $this->structuredResponse = new StructuredResponse();
+    }
+
+    private function camelCaseToDashes(string $fieldName) : string {
+        $words = preg_split('/(?<=[a-z])(?=[A-Z])/x', $fieldName);
+        foreach ($words as $word){
+            $lowerCaseWords[] = lcfirst($word);
+        }
+        return implode($lowerCaseWords, "-" );
+    }
 
     private function validateRequiredFields(array $validatingData) : bool {
         foreach ($this->_requiredFields as $key => $value){
             if (empty($validatingData[$value])){
-                $required['fieldName'] = $value;
-                $required['message'] = 'Поле не заполнено';
-                $this->_errors['required'][$key] = $required;
+                $this->structuredResponse->failed();
+                $message = $this->structuredResponse->message('fail', 'Поле не заполнено');
+                $field = $this->camelCaseToDashes($value);
+                $this->structuredResponse->errors('error', ['message' => $message, 'field' => $field]);
+            }else{
+                $message = $this->structuredResponse->message('success', 'Поле заполнено');
+                $field = $this->camelCaseToDashes($value);
+                $this->structuredResponse->complete('content', ['message' => $message, 'field' => $field]);
             }
         }
-        if (!empty($this->_errors['required'])){
+        if ($this->structuredResponse->_status === 'fail'){
             return false;   //Если валидация провалилась
         }
         return true;
@@ -62,7 +73,7 @@ class CardValidatorMiddleware implements MiddlewareInterface
         if (!empty($surname && $firstName)){
             return true;
         }
-        $this->_errors['incorrectFullName']['message'] = 'Фамилия и Имя обязательны для заполнения';
+        $this->structuredResponse->failed();
         return false;
     }
 
@@ -85,6 +96,6 @@ class CardValidatorMiddleware implements MiddlewareInterface
                 return $response = $handler->handle($request);
             }
         }
-        return new JsonResponse($this->_errors);
+        return new JsonResponse($this->structuredResponse);
     }
 }

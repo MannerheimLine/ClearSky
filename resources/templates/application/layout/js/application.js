@@ -123,7 +123,14 @@ const updatePatientCardData = function () {
         },
         cache: false
     });
-    request.done(function () {
+    request.done(function (response) {
+        if (response.status === 'fail'){
+            $.each(response.errors.error, function (key, value) {
+                console.log(value.field + ' ' +value.message.text);
+            });
+        }else {
+            alert(response.complete.message[0].text);
+        }
         console.log('Patient card '+ cardNumber + ' updated');
         console.log('Id '+ id + ' updated');
     });
