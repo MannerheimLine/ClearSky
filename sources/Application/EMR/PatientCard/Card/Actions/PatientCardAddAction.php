@@ -29,7 +29,7 @@ class PatientCardAddAction extends AppAction implements RequestHandlerInterface
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
         $addingData = $request->getParsedBody();
-        $payload = $this->_patientCard->addCardData($addingData);
+        $payload = $this->_patientCard->add($addingData);
         $response = $this->_responder->respond($request, $payload);
 
         return $response;

@@ -74,6 +74,8 @@ class CardValidatorMiddleware implements MiddlewareInterface
             return true;
         }
         $this->structuredResponse->failed();
+        $message = $this->structuredResponse->message('fail', 'Фамилия и имя должны быть заполнены');
+        $this->structuredResponse->errors('error', ['message' => $message, 'field' => 'full-name']); //Пришлось поле руками вписать
         return false;
     }
 

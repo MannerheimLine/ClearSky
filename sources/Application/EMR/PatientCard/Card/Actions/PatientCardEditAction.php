@@ -7,17 +7,16 @@ namespace Application\EMR\PatientCard\Card\Actions;
 
 use Application\Base\AppAction;
 use Application\EMR\PatientCard\Card\Domains\PatientCard;
-use Application\EMR\PatientCard\Card\Responders\PatientCardShowResponder;
+use Application\EMR\PatientCard\Card\Responders\PatientCardEditResponder;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 
-class PatientCardShowAction extends AppAction implements RequestHandlerInterface
+class PatientCardEditAction extends AppAction implements RequestHandlerInterface
 {
     private $_patientCard;
 
-    public function __construct(PatientCard $patientCard, PatientCardShowResponder $responder)
-    {
+    public function __construct(PatientCard $patientCard, PatientCardEditResponder $responder){
         $this->_patientCard = $patientCard;
         $this->_responder = $responder;
     }
@@ -29,14 +28,10 @@ class PatientCardShowAction extends AppAction implements RequestHandlerInterface
      */
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
-        $id = $request->getAttribute('id');
-        $payload['genders'] = $this->_patientCard->getGenders();
-        $payload['card_data'] = $this->_patientCard->get($id); //return json
-        /**
-         * В респондер пока не вижу смысла передавать request
-         */
+        $id = $request->getParsedBody()['id'];
+        $payload = $this->_patientCard->edit($id);
         $response = $this->_responder->respond($request, $payload);
-        $response = $response->withAddedHeader('PatientCardIndexAction', 'Handled');
+
         return $response;
     }
 }

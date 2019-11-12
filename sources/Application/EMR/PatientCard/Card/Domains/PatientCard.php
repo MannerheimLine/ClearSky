@@ -114,11 +114,10 @@ class PatientCard extends AppDomain implements \JsonSerializable
         $castedData['dateBirth'] = $this->sanitize($addingData['dateBirth']);
         $castedData['insurance'] = $this->sanitize($addingData['insurance']);
         $castedData['policyNumber'] = $this->sanitize($addingData['policyNumber']);
-        $castedData['insuranceCompany'] = $this->sanitize($addingData['insuranceCompany']);
         return $castedData;
     }
 
-    private function getHumanType(){
+    private function getHumanType() : int {
         $today = new DateTime();
         $dateBirth = DateTime::createFromFormat("Y-m-d H:i", $this->_dateBirth.' 00:00');
         $difference = $today->diff($dateBirth);
@@ -132,10 +131,34 @@ class PatientCard extends AppDomain implements \JsonSerializable
         }
     }
 
+    private function isBlocked($id) : bool {
+        $query = ("SELECT `state` FROM `patient_cards` WHERE `id` = :id");
+        $result = $this->_dbConnection->prepare($query);
+        $result->execute([
+            'id' => $id
+        ]);
+        if ($result->rowCount() > 0){
+            $state = $result->fetch();
+            return $state['state'] === 'block' ? true : false;
+        }
+    }
+
+    private function setState( int $id, string $state) : bool {
+        $query = ("UPDATE `patient_cards` SET `state` = :state WHERE `id` = :id");
+        $result = $this->_dbConnection->prepare($query);
+        if ($result->execute([
+            'id' => $id,
+            'state' => $state
+        ])){
+            return true;
+        }
+        return false;
+    }
+
     /**
      * @return PatientCard
      */
-    public function getCardData($id) : PatientCard {
+    public function get($id) : PatientCard {
         $query = ("SELECT 
         `patient_cards`.`id`,
         `patient_cards`.`card_number` as `card_number`,
@@ -233,7 +256,7 @@ class PatientCard extends AppDomain implements \JsonSerializable
         return $this;
     }
 
-    public function updateCardData(array $updatingData){
+    public function update(array $updatingData) : StructuredResponse {
         $castedData = $this->prepareUpdatingData($updatingData);
         $query = ("UPDATE `patient_cards` 
         SET 
@@ -298,14 +321,40 @@ class PatientCard extends AppDomain implements \JsonSerializable
             'profession' => $castedData['profession'],
             'notation' => $castedData['notation'],
         ])){
+            /**
+             * Освобождаю карту от статуса "Заблокирована". Теперь с ней могут работать другие
+             */
+            $this->setState($castedData['id'], 'free');
             $response = new StructuredResponse();
             $message = $response->message('success', 'Обновлено');
             $response->success()->complete('message', $message);
-            return $response;
         }
+        return $response;
     }
 
-    public function addCardData(array $addingData){
+    public function edit($id) : StructuredResponse {
+        $id = (int) $id;
+        $response = new StructuredResponse();
+        $status = $this->isBlocked($id);
+        if (!$this->isBlocked($id)){
+            if ($this->setState($id, 'block')){
+                $response->success();
+                $message = $response->message('success', 'Начато редактирование карты');
+                $response->complete('content', ['message' => $message, 'cardId' => $id]);
+            }else{
+                $response->failed();
+                $message = $response->message('fail', 'Ошибка редактирования карты');
+                $response->errors('error', ['message' => $message, 'cardId' => $id]);
+            }
+        }else{
+            $response->failed();
+            $message = $response->message('fail', 'Карта заблокирована другим пользователем');
+            $response->errors('error', ['message' => $message, 'cardId' => $id]);
+        }
+        return $response;
+    }
+
+    public function add(array $addingData) : string {
         $castedData = $this->prepareAddingData($addingData);
         $query = ("INSERT INTO `patient_cards` 
         (`card_number`,  
@@ -315,8 +364,7 @@ class PatientCard extends AppDomain implements \JsonSerializable
          `gender`, 
          `date_birth`, 
          `insurance`, 
-         `policy_number`, 
-         `insurance_company`) 
+         `policy_number`) 
          VALUES (
         :cardNumber,
         :surname,
@@ -325,8 +373,7 @@ class PatientCard extends AppDomain implements \JsonSerializable
         :gender,
         :dateBirth,
         :insurance,
-        :policyNumber,
-        :insuranceCompany)");
+        :policyNumber)");
         $result = $this->_dbConnection->prepare($query);
         $result->execute([
             'cardNumber' => $castedData['cardNumber'],
@@ -336,12 +383,15 @@ class PatientCard extends AppDomain implements \JsonSerializable
             'gender' => $castedData['gender'],
             'dateBirth' => $castedData['dateBirth'],
             'insurance' => $castedData['insurance'],
-            'policyNumber' => $castedData['policyNumber'],
-            'insuranceCompany' => $castedData['insuranceCompany'],
+            'policyNumber' => $castedData['policyNumber']
         ]);
         if ($result){
             return $this->_dbConnection->lastInsertId();
         }
+    }
+
+    public function delete($id){
+
     }
 
     /**

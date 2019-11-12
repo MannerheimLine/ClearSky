@@ -1,6 +1,7 @@
 <?php
 
 use Application\EMR\PatientCard\Card\Actions\PatientCardAddAction;
+use Application\EMR\PatientCard\Card\Actions\PatientCardEditAction;
 use Application\EMR\PatientCard\Card\Actions\PatientCardIndexAction;
 use Application\EMR\PatientCard\Card\Actions\PatientCardShowAction;
 use Application\EMR\PatientCard\Card\Actions\PatientCardUpdateAction;
@@ -37,6 +38,7 @@ $aura = new RouterContainer();
 $map = $aura->getMap();
 $map->get('patient_card', '/patient-card', PatientCardIndexAction::class);
 $map->post('patient-card/update', '/patient-card/update', PatientCardUpdateAction::class);
+$map->post('patient-card/edit', '/patient-card/edit', PatientCardEditAction::class);
 $map->post('patient-card/add', '/patient-card/add', PatientCardAddAction::class);
 $map->get('patient-card/show', '/patient-card/show/{id}', PatientCardShowAction::class)->tokens(['id' => '\d+']);
 $map->post('patient-card/search-cards', '/patient-card/search-cards', PatientCardsSearchAction::class)->tokens(['searchString' => '\w+']);
@@ -94,7 +96,7 @@ if ($route){
     $pipeline->pipe(path('/', new MemoryUsageMiddleware()));
     $pipeline->pipe(path('patient-card', new BasicAuthMiddleware()));
     $pipeline->pipe(path('patient-card/update', new CardValidatorMiddleware()));
-    $pipeline->pipe(path('patient-card/add', new CardValidatorMiddleware()));
+    //$pipeline->pipe(path('patient-card/add', new CardValidatorMiddleware()));
     $pipeline->pipe(new PathMiddlewareDecorator('patient_card', new ModifyMiddleware()));
 #Запуск трубопровода
     $response = $pipeline->process($request, $action);

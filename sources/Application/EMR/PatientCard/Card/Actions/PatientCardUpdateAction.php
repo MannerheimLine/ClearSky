@@ -30,7 +30,7 @@ class PatientCardUpdateAction extends AppAction implements RequestHandlerInterfa
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
         $updatingData = $request->getParsedBody();
-        $payload = $this->_patientCard->updateCardData($updatingData);
+        $payload = $this->_patientCard->update($updatingData);
         $response = $this->_responder->respond($request, $payload);
 
         return $response;

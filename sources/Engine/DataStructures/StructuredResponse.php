@@ -60,6 +60,7 @@ class StructuredResponse implements \JsonSerializable
     public function message(string $status, string $text) : array {
         return ['status' => $status, 'text' => $text];
     }
+
     public function complete(string $field, $data) : void {
         $this->_complete[$field][] = $data;
     }

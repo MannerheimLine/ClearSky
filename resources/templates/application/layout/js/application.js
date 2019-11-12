@@ -125,16 +125,43 @@ const updatePatientCardData = function () {
     });
     request.done(function (response) {
         if (response.status === 'fail'){
+            $('.incorrect-input-message').remove();
             $.each(response.errors.error, function (key, value) {
-                console.log(value.field + ' ' +value.message.text);
+                let parent = $(`#${value.field}`).parent();
+                let panel = `<div class="incorrect-input-message"><i>${value.message.text}</i></div>`;
+                let input_group_text = parent.find($(".input-group-text"));
+                let input = parent.find('input');
+                parent.before(panel);
+                input_group_text.addClass('incorrect-input-group');
+                input.addClass('incorrect-input-border');
             });
         }else {
-            alert(response.complete.message[0].text);
+            console.log(response.complete.message[0].text);
         }
-        console.log('Patient card '+ cardNumber + ' updated');
-        console.log('Id '+ id + ' updated');
     });
     return id;
+};
+
+const editPatientCardData = function () {
+    let id = $("input[name='id']").val();
+    let request = $.ajax({
+        type: "POST",
+        url: "/patient-card/edit",
+        data: {'id': id},
+        cache: false
+    });
+    request.done(function (response) {
+        console.log(response);
+        if (response.status === 'success'){
+            console.log(response.complete.content[0].message.text + ' ' + response.complete.content[0].cardId);
+            patient_card_body.each(function(){
+                $(this).find(':input').removeAttr('disabled');
+            });
+        }else {
+            onsole.log(response.errors.error[0].message.text + ' ' + response.errors.error[0].cardId);
+        }
+
+    });
 };
 
 const addPatientCardData = function () {
