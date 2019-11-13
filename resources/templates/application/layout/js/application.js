@@ -19,14 +19,15 @@ const patient_card_body = $('#patient-card-body');
 
 const card_search_input =  $("input[name='card-search']");
 
+const add_button = $('#add-card-button');
+const edit_button = $('#edit-card-button');
+const save_button = $('#save-card-button');
+const delete_button = $('#delete-card-button');
+
 $(function () {
     loadPatientCardData(1);
     loadMasksForDynamicInputs();
     loadMasksForStaticInputs();
-});
-
-$("#patient-card-body :input").not(specInputs.join(',')).change(function() {
-    updatePatientCardData();
 });
 
 $('#patient-card-alive-section').click(function () {
@@ -64,6 +65,19 @@ const flipPatientCardStatus = function (name) {
         input.val(1);
     }
 };
+
+
+/**
+ * Редактировнаие карты, обновление, добавление, сохранение
+ */
+
+edit_button.on('click', function () {
+    editPatientCardData();
+});
+
+save_button.on('click', function () {
+    updatePatientCardData();
+});
 
 const updatePatientCardData = function () {
     let id = $("input[name='id']").val();
@@ -137,6 +151,11 @@ const updatePatientCardData = function () {
             });
         }else {
             console.log(response.complete.message[0].text);
+            $('#save-card-button').attr('hidden', 'true');
+            $('#edit-card-button').removeAttr('hidden').hide().fadeIn(1000);
+            patient_card_body.each(function() {
+                $(this).find(':input').attr('disabled', 'true');
+            });
         }
     });
     return id;
@@ -151,14 +170,15 @@ const editPatientCardData = function () {
         cache: false
     });
     request.done(function (response) {
-        console.log(response);
         if (response.status === 'success'){
+            $('#save-card-button').removeAttr('hidden').hide().fadeIn(1000);
+            $('#edit-card-button').attr('hidden', 'true');
             console.log(response.complete.content[0].message.text + ' ' + response.complete.content[0].cardId);
             patient_card_body.each(function(){
                 $(this).find(':input').removeAttr('disabled');
             });
         }else {
-            onsole.log(response.errors.error[0].message.text + ' ' + response.errors.error[0].cardId);
+            console.log(response.errors.error[0].message.text + ' ' + response.errors.error[0].cardId);
         }
 
     });
@@ -191,6 +211,7 @@ const addPatientCardData = function () {
         loadPatientCard(response);
     });
 };
+
 
 /**
  * Поиск карт
@@ -359,7 +380,6 @@ const loadPatientCard = function (id) {
     patient_card_body.append(loadPatientCardTemplate());
     let recordBadge = $('#patient-card-found-records');
     loadPatientCardData(id);
-    $("#patient-card-body :input").not(specInputs.join(',')).change(function() {updatePatientCardData()});
     $('#patient-card-alive-section').click(function () {
         flipPatientCardStatus('is-alive-id');
         let updatedCardId = updatePatientCardData();
@@ -547,42 +567,42 @@ const loadPatientCardTemplate = function () {
                                     <div class="input-group-prepend">
                                         <div class="input-group-text"><i class="fa fa-id-card"></i> </div>
                                     </div>
-                                    <input type="text" class="form-control" id="card-number" name="card-number" placeholder="Номер карты" required>
+                                    <input type="text" class="form-control" id="card-number" name="card-number" placeholder="Номер карты" disabled>
                                 </div>
                                 <label  for="full-name">ФИО<span class="red-asterisk">*</span>:</label>
                                 <div class="input-group mb-2">
                                     <div class="input-group-prepend">
                                         <div class="input-group-text"><i class="fa fa-user-circle"></i> </div>
                                     </div>
-                                    <input type="text" class="form-control" id="full-name" name="full-name" placeholder="ФИО" required>
+                                    <input type="text" class="form-control" id="full-name" name="full-name" placeholder="ФИО" disabled>
                                 </div>
                                 <label  for="gender">Пол:</label>
                                 <div class="input-group mb-2">
                                     <div class="input-group-prepend">
                                         <div class="input-group-text"><i class="fa fa-venus-mars"></i> </div>
                                     </div>
-                                    <select id="gender" name="gender" class="custom-select"></select>
+                                    <select id="gender" name="gender" class="custom-select" disabled></select>
                                 </div>
                                 <label  for="date-birth">Дата рождения<span class="red-asterisk">*</span>:</label>
                                 <div class="input-group mb-2">
                                     <div class="input-group-prepend">
                                         <div class="input-group-text"><i class="fa fa-birthday-cake"></i> </div>
                                     </div>
-                                    <input type="date" class="form-control" id="date-birth" name="date-birth">
+                                    <input type="date" class="form-control" id="date-birth" name="date-birth" disabled>
                                 </div>
                                 <label  for="telephone">Номер телефона:</label>
                                 <div class="input-group mb-2">
                                     <div class="input-group-prepend">
                                         <div class="input-group-text"><i class="fa fa-phone"></i> </div>
                                     </div>
-                                    <input type="text" class="form-control" id="telephone" name="telephone" placeholder="Номер телефона">
+                                    <input type="text" class="form-control" id="telephone" name="telephone" placeholder="Номер телефона" disabled>
                                 </div>
                                 <label  for="email">Электронная почта:</label>
                                 <div class="input-group mb-2">
                                     <div class="input-group-prepend">
                                         <div class="input-group-text"><i class="fa fa-envelope"></i> </div>
                                     </div>
-                                    <input type="text" class="form-control" id="email" name="email" placeholder="Email">
+                                    <input type="text" class="form-control" id="email" name="email" placeholder="Email" disabled>
                                 </div>
                             </div>
                         </div>
@@ -598,7 +618,7 @@ const loadPatientCardTemplate = function () {
                                     <div class="input-group-prepend">
                                         <div class="input-group-text"><i class="fa fa-id-card"></i> </div>
                                     </div>
-                                    <input type="text" class="form-control" id="insurance-certificate" name="insurance-certificate" placeholder="СНИЛС">
+                                    <input type="text" class="form-control" id="insurance-certificate" name="insurance-certificate" placeholder="СНИЛС" disabled>
                                 </div>
                                 <hr>
                                 <label for="policy-number">Единый номер полиса<span class="red-asterisk">*</span>:</label>
@@ -606,7 +626,7 @@ const loadPatientCardTemplate = function () {
                                     <div class="input-group-prepend">
                                         <div class="input-group-text"><i class="fa fa-clipboard"></i> </div>
                                     </div>
-                                    <input type="text" class="form-control" id="policy-number" name="policy-number" placeholder="Номер полиса">
+                                    <input type="text" class="form-control" id="policy-number" name="policy-number" placeholder="Номер полиса" disabled>
                                 </div>
                                 <label for="insurance-company">Страховая компания:</label>
                                 <div class="input-group mb-2">
@@ -614,7 +634,7 @@ const loadPatientCardTemplate = function () {
                                     <div class="input-group-prepend">
                                         <div class="input-group-text"><i class="fa fa-clipboard"></i> </div>
                                     </div>
-                                    <input type="text" class="form-control" id="insurance-company" name="insurance-company" placeholder="Страховая компания">
+                                    <input type="text" class="form-control" id="insurance-company" name="insurance-company" placeholder="Страховая компания" disabled>
                                     <div id="insurance-company-search-result-area" class="search-result-area"></div>
                                 </div>
                                 <hr>
@@ -633,14 +653,14 @@ const loadPatientCardTemplate = function () {
                                             <div class="input-group-prepend">
                                                 <div class="input-group-text"><i class="fa fa-id-card"></i> </div>
                                             </div>
-                                            <input type="text" class="form-control" id="passport" name="passport" placeholder="Серия, номер паспорта">
+                                            <input type="text" class="form-control" id="passport" name="passport" placeholder="Серия, номер паспорта" disabled>
                                         </div>
                                         <label for="fms-department">Отдел ФМС выдавший паспорт:</label>
                                         <div class="input-group mb-2">
                                             <div class="input-group-prepend">
                                                 <div class="input-group-text"><i class="fa fa-id-card"></i> </div>
                                             </div>
-                                            <textarea class="form-control" id="fms-department" name="fms-department"></textarea>
+                                            <textarea class="form-control" id="fms-department" name="fms-department" disabled></textarea>
                                         </div>
                                     </div>
                                     <div class="tab-pane fade" id="birth-certificate-panel" role="tabpanel">
@@ -649,14 +669,14 @@ const loadPatientCardTemplate = function () {
                                             <div class="input-group-prepend">
                                                 <div class="input-group-text"><i class="fa fa-id-card"></i> </div>
                                             </div>
-                                            <input type="text" class="form-control" id="birth-certificate" name="birth-certificate" placeholder="Серия, номер свидетельства">
+                                            <input type="text" class="form-control" id="birth-certificate" name="birth-certificate" placeholder="Серия, номер свидетельства" disabled>
                                         </div>
                                         <label for="registry-office">Отдел ЗАГС выдавший свидетельство:</label>
                                         <div class="input-group mb-2">
                                             <div class="input-group-prepend">
                                                 <div class="input-group-text"><i class="fa fa-id-card"></i> </div>
                                             </div>
-                                            <textarea class="form-control" id="registry-office" name="registry-office"></textarea>
+                                            <textarea class="form-control" id="registry-office" name="registry-office" disabled></textarea>
                                             <div id="fms-department-search-result-area" class="search-result-area"></div>
                                         </div>
                                     </div>
@@ -676,7 +696,7 @@ const loadPatientCardTemplate = function () {
                                     <div class="input-group-prepend">
                                         <div class="input-group-text"><i class="fa fa-address-book"></i> </div>
                                     </div>
-                                    <input type="text" class="form-control" id="region" name="region" placeholder="Регион">
+                                    <input type="text" class="form-control" id="region" name="region" placeholder="Регион" disabled>
                                     <div id="region-search-result-area" class="search-result-area"></div>
                                 </div>
                                 <label for="district">Район:</label>
@@ -685,7 +705,7 @@ const loadPatientCardTemplate = function () {
                                     <div class="input-group-prepend">
                                         <div class="input-group-text"><i class="fa fa-address-book"></i> </div>
                                     </div>
-                                    <input type="text" class="form-control" id="district" name="district" placeholder="Район">
+                                    <input type="text" class="form-control" id="district" name="district" placeholder="Район" disabled>
                                     <div id="district-search-result-area" class="search-result-area"></div>
                                 </div>
                                 <label for="locality">Населенный пункт:</label>
@@ -694,7 +714,7 @@ const loadPatientCardTemplate = function () {
                                     <div class="input-group-prepend">
                                         <div class="input-group-text"><i class="fa fa-address-book"></i> </div>
                                     </div>
-                                    <input type="text" class="form-control" id="locality" name="locality" placeholder="Населенный пункт">
+                                    <input type="text" class="form-control" id="locality" name="locality" placeholder="Населенный пункт" disabled>
                                     <div id="locality-search-result-area" class="search-result-area"></div>
                                 </div>
                                 <label for="street">Улица:</label>
@@ -703,7 +723,7 @@ const loadPatientCardTemplate = function () {
                                     <div class="input-group-prepend">
                                         <div class="input-group-text"><i class="fa fa-address-book"></i> </div>
                                     </div>
-                                    <input type="text" class="form-control" id="street" name="street" placeholder="Улица">
+                                    <input type="text" class="form-control" id="street" name="street" placeholder="Улица" disabled>
                                     <div id="street-search-result-area" class="search-result-area"></div>
                                 </div>
                                 <div class="row">
@@ -713,7 +733,7 @@ const loadPatientCardTemplate = function () {
                                             <div class="input-group-prepend">
                                                 <div class="input-group-text"><i class="fa fa-building"></i> </div>
                                             </div>
-                                            <input type="text" class="form-control" id="house-number" name="house-number">
+                                            <input type="text" class="form-control" id="house-number" name="house-number" disabled>
                                         </div>
                                     </div>
                                     <div class="col-6">
@@ -722,7 +742,7 @@ const loadPatientCardTemplate = function () {
                                             <div class="input-group-prepend">
                                                 <div class="input-group-text"><i class="fa fa-building"></i> </div>
                                             </div>
-                                            <input type="text" class="form-control" id="apartment" name="apartment">
+                                            <input type="text" class="form-control" id="apartment" name="apartment" disabled>
                                         </div>
                                     </div>
                                 </div>
@@ -740,14 +760,14 @@ const loadPatientCardTemplate = function () {
                                     <div class="input-group-prepend">
                                         <div class="input-group-text"><i class="fa fa-info-circle"></i> </div>
                                     </div>
-                                    <input type="text" class="form-control" id="workplace" name="workplace" placeholder="Место работы">
+                                    <input type="text" class="form-control" id="workplace" name="workplace" placeholder="Место работы" disabled>
                                 </div>
                                 <label for="profession">Профессия:</label>
                                 <div class="input-group mb-2">
                                     <div class="input-group-prepend">
                                         <div class="input-group-text"><i class="fa fa-info-circle"></i> </div>
                                     </div>
-                                    <input type="text" class="form-control" id="profession" name="profession" placeholder="Место работы">
+                                    <input type="text" class="form-control" id="profession" name="profession" placeholder="Место работы" disabled>
                                 </div>
                                 <hr>
                                 <label for="notation">Примечание:</label>
@@ -755,7 +775,7 @@ const loadPatientCardTemplate = function () {
                                     <div class="input-group-prepend">
                                         <div class="input-group-text"><i class="fa fa-info-circle"></i> </div>
                                     </div>
-                                    <textarea class="form-control" id="notation" name="notation"></textarea>
+                                    <textarea class="form-control" id="notation" name="notation" disabled></textarea>
                                 </div>
                             </div>
                         </div>
@@ -873,7 +893,6 @@ patient_card_body.on('click', '.with-result', function () {
     Id.val(selectedValue);  //Установка id для обновления в БД
     SearchResultArea.empty();   //Очищаю место вывода результатов
     InputText.val(selectedText);    //Меняю текст, для того что бы было понятно, что выбрано
-    updatePatientCardData();    //Обновляю данные в БД
 });
 
 const searchInSection = function(field, params){

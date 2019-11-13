@@ -131,24 +131,51 @@ class PatientCard extends AppDomain implements \JsonSerializable
         }
     }
 
-    private function isBlocked($id) : bool {
-        $query = ("SELECT `state` FROM `patient_cards` WHERE `id` = :id");
+    /**
+     * Вернет одно из трех состояний:
+     * - owner - нажал кнопку редактирования тот кто карту заблокировал (если вдруг произойдет сбой, то карту может разблокировтаь тот кто ее блокировал)
+     * - other - карту редактирует, кто то другой
+     * - free - карта не реадктируется, готова к редактированию
+     *
+     * @param int $patient_card_id
+     * @return string
+     */
+    private function getEditStatus(int $patient_card_id) : string {
+        $query = ("SELECT * FROM `being_edited_patient_cards` WHERE `patient_card_id` = :patient_card_id");
         $result = $this->_dbConnection->prepare($query);
         $result->execute([
-            'id' => $id
+            'patient_card_id' => $patient_card_id
         ]);
         if ($result->rowCount() > 0){
-            $state = $result->fetch();
-            return $state['state'] === 'block' ? true : false;
+            $data = $result->fetch();
+            if ($data['user_account'] === 1){ //Пользовтаель (id) должен браться из сессии
+                $result = 'owner';
+            }else{
+                $result = 'other';
+            }
+        }else{
+            $result = 'free';
         }
+        return $result;
     }
 
-    private function setState( int $id, string $state) : bool {
-        $query = ("UPDATE `patient_cards` SET `state` = :state WHERE `id` = :id");
+    private function setBeingEdited(int $patient_card_id, $user = 1) : bool {
+        $query = ("INSERT INTO `being_edited_patient_cards` (`patient_card_id`, `user_account`) VALUES (:patient_card_id, :user_account)");
         $result = $this->_dbConnection->prepare($query);
         if ($result->execute([
-            'id' => $id,
-            'state' => $state
+            'patient_card_id' => $patient_card_id,
+            'user_account' => $user
+        ])){
+            return true;
+        }
+        return false;
+    }
+
+    private function setEditable(int $patient_card_id) : bool {
+        $query = ("DELETE FROM `being_edited_patient_cards` WHERE `patient_card_id` = :patient_card_id");
+        $result = $this->_dbConnection->prepare($query);
+        if ($result->execute([
+            'patient_card_id' => $patient_card_id
         ])){
             return true;
         }
@@ -321,10 +348,7 @@ class PatientCard extends AppDomain implements \JsonSerializable
             'profession' => $castedData['profession'],
             'notation' => $castedData['notation'],
         ])){
-            /**
-             * Освобождаю карту от статуса "Заблокирована". Теперь с ней могут работать другие
-             */
-            $this->setState($castedData['id'], 'free');
+            $this->setEditable($castedData['id']);
             $response = new StructuredResponse();
             $message = $response->message('success', 'Обновлено');
             $response->success()->complete('message', $message);
@@ -332,24 +356,29 @@ class PatientCard extends AppDomain implements \JsonSerializable
         return $response;
     }
 
-    public function edit($id) : StructuredResponse {
-        $id = (int) $id;
+    public function edit($patient_card_id) : StructuredResponse {
+        $id = (int) $patient_card_id;
         $response = new StructuredResponse();
-        $status = $this->isBlocked($id);
-        if (!$this->isBlocked($id)){
-            if ($this->setState($id, 'block')){
+        /**
+         * Получаю статус карты, кем редактируется или свободна и формирую ответ
+         */
+        switch ($this->getEditStatus($id)){
+            case 'owner' :
                 $response->success();
                 $message = $response->message('success', 'Начато редактирование карты');
                 $response->complete('content', ['message' => $message, 'cardId' => $id]);
-            }else{
+                break;
+            case 'other' :
                 $response->failed();
-                $message = $response->message('fail', 'Ошибка редактирования карты');
+                $message = $response->message('fail', 'Карта редактируется другим пользователем');
                 $response->errors('error', ['message' => $message, 'cardId' => $id]);
-            }
-        }else{
-            $response->failed();
-            $message = $response->message('fail', 'Карта заблокирована другим пользователем');
-            $response->errors('error', ['message' => $message, 'cardId' => $id]);
+                break;
+            default : //free
+                $this->setBeingEdited($id);
+                $response->success();
+                $message = $response->message('success', 'Начато редактирование карты');
+                $response->complete('content', ['message' => $message, 'cardId' => $id]);
+                break;
         }
         return $response;
     }
