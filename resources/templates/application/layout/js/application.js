@@ -7,22 +7,13 @@
  */
 
 let typingTimer;
-let specInputs = [
-    '#region',
-    '#district',
-    '#locality',
-    '#street',
-    '#insurance-company'
-];
 
 const patient_card_body = $('#patient-card-body');
 
 const card_search_input =  $("input[name='card-search']");
 
-const add_button = $('#add-card-button');
 const edit_button = $('#edit-card-button');
 const save_button = $('#save-card-button');
-const delete_button = $('#delete-card-button');
 
 $(function () {
     loadPatientCardData(1);
@@ -140,21 +131,25 @@ const updatePatientCardData = function () {
     request.done(function (response) {
         if (response.status === 'fail'){
             $('.incorrect-input-message').remove();
-            $.each(response.errors.error, function (key, value) {
-                let parent = $(`#${value.field}`).parent();
-                let panel = `<div class="incorrect-input-message"><i>${value.message.text}</i></div>`;
-                let input_group_text = parent.find($(".input-group-text"));
-                let input = parent.find('input');
-                parent.before(panel);
-                input_group_text.addClass('incorrect-input-group');
-                input.addClass('incorrect-input-border');
+            patient_card_body.each(function () {
+                $(this).find(':input').removeClass('incorrect-input-border');
+                $(this).find($(".input-group-text")).removeClass('incorrect-input-group');
+            });
+            $.each(response.incomplete.errors, function (key, value) {
+                switch (value.errorType) {
+                    case 'Duplicate Key Entrance' : duplicateErrorHandle(value); break;
+                    case 'Required Field Is Empty' : drawIncorrectInputMessage(value); break;
+                    case 'Wrong Full Name' : drawIncorrectInputMessage(value); break;
+                }
             });
         }else {
-            console.log(response.complete.message[0].text);
             $('#save-card-button').attr('hidden', 'true');
             $('#edit-card-button').removeAttr('hidden').hide().fadeIn(1000);
+            $('.incorrect-input-message').remove();
             patient_card_body.each(function() {
                 $(this).find(':input').attr('disabled', 'true');
+                $(this).find(':input').removeClass('incorrect-input-border');
+                $(this).find($(".input-group-text")).removeClass('incorrect-input-group');
             });
         }
     });
@@ -178,7 +173,7 @@ const editPatientCardData = function () {
                 $(this).find(':input').removeAttr('disabled');
             });
         }else {
-            console.log(response.errors.error[0].message.text + ' ' + response.errors.error[0].cardId);
+            console.log(response.incomplete.errors[0].message.text + ' ' + response.incomplete.errors[0].cardId);
         }
 
     });
@@ -359,7 +354,7 @@ const loadCardsDataTableContentLine = function(response){
                     <td>${response.surname} ${response.firstname} ${response.secondname}</td>
                     <td>${response.card_number}</td>
                     <td>${response.policy_number}</td>
-                    <td>${response.insurance}</td>
+                    <td>${response.insurance_certificate}</td>
                     <td><i class="${live_status_image}" style="font-size: 18px;"></i></td>
                     <td><i class="${attached_status_image}" style="font-size: 18px;"></i></td>
                     <td>
@@ -930,3 +925,24 @@ const loadSearchInSectionLine = function (response) {
                 <div class="search-text">${response.value}</div>
               </div>`).hide().fadeIn(1000);
 };
+
+
+/**
+ * Обработка ошибок
+ */
+const drawIncorrectInputMessage = function (value) {
+    let parent = $(`#${value.field}`).parent();
+    let panel = `<div class="incorrect-input-message"><i>${value.message.text}</i></div>`;
+    let input_group_text = parent.find($(".input-group-text"));
+    let input = parent.find('input');
+    parent.before(panel);
+    input_group_text.addClass('incorrect-input-group');
+    input.addClass('incorrect-input-border');
+};
+
+const duplicateErrorHandle = function (value) {
+    drawIncorrectInputMessage(value);
+    let button = `<div class="input-group-append"><button class="btn btn-danger btn-sm"><i class="fa fa-clipboard"></i> Смотреть</button></div>`;
+    $(`#${value.field}`).parent().find('input').after(button);
+};
+

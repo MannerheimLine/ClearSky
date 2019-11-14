@@ -7,7 +7,6 @@
                         <button id="add-card-button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#addPatientCardModal"><i class="fa fa-plus-circle"></i> Создать</button>
                         <button id="edit-card-button" class="btn btn-info btn-sm"><i class="fa fa-edit"></i> Изменить</button>
                         <button id="save-card-button" class="btn btn-success btn-sm"  hidden><i class="fa fa-save"></i> Сохранить</button>
-                        <button id="delete-card-button" class="btn btn-danger btn-sm"><i class="fa fa-trash"></i> Удалить</button>
                     </div>
                     <div id="search" class="col-6 right-border">
                         <div class="input-group mb-2">

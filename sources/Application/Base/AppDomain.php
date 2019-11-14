@@ -12,4 +12,12 @@ class AppDomain
         return preg_replace ("/[^a-zA-ZА-Яа-я0-9\s-]/ui","", $convertedString);
     }
 
+    protected function camelCaseToDashes(string $fieldName) : string {
+        $words = preg_split('/(?<=[a-z])(?=[A-Z])/x', $fieldName);
+        foreach ($words as $word){
+            $lowerCaseWords[] = lcfirst($word);
+        }
+        return implode($lowerCaseWords, "-" );
+    }
+
 }

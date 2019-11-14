@@ -38,7 +38,7 @@ class StructuredResponse implements \JsonSerializable
         return [
             'status' => $this->_status,
             'complete' => $this->_complete,
-            'errors' => $this->_errors
+            'incomplete' => $this->_errors
         ];
     }
 
@@ -65,7 +65,7 @@ class StructuredResponse implements \JsonSerializable
         $this->_complete[$field][] = $data;
     }
 
-    public function errors(string $field, $data) : void {
+    public function incomplete(string $field, $data) : void {
         $this->_errors[$field][] = $data;
     }
 

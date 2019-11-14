@@ -159,7 +159,7 @@ class PatientCard extends AppDomain implements \JsonSerializable
         return $result;
     }
 
-    private function setBeingEdited(int $patient_card_id, $user = 1) : bool {
+    private function setOnEdit(int $patient_card_id, $user = 1) : bool {
         $query = ("INSERT INTO `being_edited_patient_cards` (`patient_card_id`, `user_account`) VALUES (:patient_card_id, :user_account)");
         $result = $this->_dbConnection->prepare($query);
         if ($result->execute([
@@ -201,7 +201,7 @@ class PatientCard extends AppDomain implements \JsonSerializable
         `patient_cards`.`date_birth` as `date_birth`,
         `patient_cards`.`telephone_number` as `telephone_number`,
         `patient_cards`.`email` as `email`,
-        `patient_cards`.`insurance` as `insurance`,
+        `patient_cards`.`insurance_certificate` as `insurance`,
         `patient_cards`.`policy_number` as `policy_number`,
         `patient_cards`.`insurance_company` as `insurance_company_id`,
         `insurance_companies`.`insurance_company_name` as `insurance_company`,
@@ -284,8 +284,9 @@ class PatientCard extends AppDomain implements \JsonSerializable
     }
 
     public function update(array $updatingData) : StructuredResponse {
-        $castedData = $this->prepareUpdatingData($updatingData);
-        $query = ("UPDATE `patient_cards` 
+        try{
+            $castedData = $this->prepareUpdatingData($updatingData);
+            $query = ("UPDATE `patient_cards` 
         SET 
             `card_number` = :cardNumber,
             `is_alive` = :isAlive,
@@ -299,7 +300,7 @@ class PatientCard extends AppDomain implements \JsonSerializable
             `email` = :email,
             `policy_number` = :policyNumber,
             `insurance_company` = :insuranceCompany,
-            `insurance` = :insuranceCertificate,
+            `insurance_certificate` = :insuranceCertificate,
             `passport_serial` = :passportSerial,
             `passport_number` = :passportNumber,
             `fms_department` = :fmsDepartment,
@@ -316,44 +317,67 @@ class PatientCard extends AppDomain implements \JsonSerializable
             `profession` = :profession,
             `notation` = :notation
         WHERE `patient_cards`.`id` = :id;");
-        $result = $this->_dbConnection->prepare($query);
-        if($result->execute([
-            'id' => $castedData['id'],
-            'isAlive' => $castedData['isAlive'],
-            'isAttach' => $castedData['isAttach'],
-            'cardNumber' => $castedData['cardNumber'],
-            'surname' => $castedData['surname'],
-            'firstName' => $castedData['firstName'],
-            'secondName' => $castedData['secondName'],
-            'gender' => $castedData['gender'],
-            'dateBirth' => $castedData['dateBirth'],
-            'telephoneNumber' => $castedData['telephone'],
-            'email' => $castedData['email'],
-            'policyNumber' => $castedData['policyNumber'],
-            'insuranceCompany' => $castedData['insuranceCompany'],
-            'insuranceCertificate' => $castedData['insuranceCertificate'],
-            'passportSerial' => $castedData['passportSerial'],
-            'passportNumber' => $castedData['passportNumber'],
-            'fmsDepartment' => $castedData['fmsDepartment'],
-            'birthCertificateSerial' => $castedData['birthCertificateSerial'],
-            'birthCertificateNumber' => $castedData['birthCertificateNumber'],
-            'registryOffice' => $castedData['registryOffice'],
-            'region' => $castedData['region'],
-            'district' => $castedData['district'],
-            'locality' => $castedData['locality'],
-            'street' => $castedData['street'],
-            'houseNumber' => $castedData['houseNumber'],
-            'apartment' => $castedData['apartment'],
-            'workPlace' => $castedData['workplace'],
-            'profession' => $castedData['profession'],
-            'notation' => $castedData['notation'],
-        ])){
-            $this->setEditable($castedData['id']);
+            $result = $this->_dbConnection->prepare($query);
+            if($result->execute([
+                'id' => $castedData['id'],
+                'isAlive' => $castedData['isAlive'],
+                'isAttach' => $castedData['isAttach'],
+                'cardNumber' => $castedData['cardNumber'],
+                'surname' => $castedData['surname'],
+                'firstName' => $castedData['firstName'],
+                'secondName' => $castedData['secondName'],
+                'gender' => $castedData['gender'],
+                'dateBirth' => $castedData['dateBirth'],
+                'telephoneNumber' => $castedData['telephone'],
+                'email' => $castedData['email'],
+                'policyNumber' => $castedData['policyNumber'],
+                'insuranceCompany' => $castedData['insuranceCompany'],
+                'insuranceCertificate' => $castedData['insuranceCertificate'],
+                'passportSerial' => $castedData['passportSerial'],
+                'passportNumber' => $castedData['passportNumber'],
+                'fmsDepartment' => $castedData['fmsDepartment'],
+                'birthCertificateSerial' => $castedData['birthCertificateSerial'],
+                'birthCertificateNumber' => $castedData['birthCertificateNumber'],
+                'registryOffice' => $castedData['registryOffice'],
+                'region' => $castedData['region'],
+                'district' => $castedData['district'],
+                'locality' => $castedData['locality'],
+                'street' => $castedData['street'],
+                'houseNumber' => $castedData['houseNumber'],
+                'apartment' => $castedData['apartment'],
+                'workPlace' => $castedData['workplace'],
+                'profession' => $castedData['profession'],
+                'notation' => $castedData['notation'],
+            ])){
+                $this->setEditable($castedData['id']);
+                $response = new StructuredResponse();
+                $message = $response->message('success', 'Обновлено');
+                $response->success()->complete('message', $message);
+            }
+            return $response;
+        }catch (\Exception $e){
+            /**
+             * Пока что я не отслеживаю ошибку по коду и не разбираю варианты действий через switch, case
+             * Я знаю пока о существовании всего одной ошибки на дублирование записи "on duplicate key"
+             * Ее я и обрабатываю
+             */
             $response = new StructuredResponse();
-            $message = $response->message('success', 'Обновлено');
-            $response->success()->complete('message', $message);
+            $response->failed();
+            $errorInfo = $result->errorInfo(); //[23000, 1062, "Duplicate entry ..."]
+            if (preg_match_all('/\'([^\']+)+\'/', $errorInfo[2], $matches)) {
+                $fields = ['policy-number' => 'полисом', 'insurance-certificate' => 'СНИЛС'];
+                $match =  $matches[1];
+                $field = str_replace('_', '-', $match[1]);
+                $fieldValue = $match[0];
+                $message = $response->message('fail', "Карта с таким $fields[$field] уже существует");
+            }
+            $response->incomplete(
+                'errors', ['message' => $message,
+                'field' => $field,
+                'fieldValue' => $fieldValue,
+                'errorType' => 'Duplicate Key Entrance']);
+            return $response;
         }
-        return $response;
     }
 
     public function edit($patient_card_id) : StructuredResponse {
@@ -371,10 +395,10 @@ class PatientCard extends AppDomain implements \JsonSerializable
             case 'other' :
                 $response->failed();
                 $message = $response->message('fail', 'Карта редактируется другим пользователем');
-                $response->errors('error', ['message' => $message, 'cardId' => $id]);
+                $response->incomplete('errors', ['message' => $message, 'cardId' => $id]);
                 break;
             default : //free
-                $this->setBeingEdited($id);
+                $this->setOnEdit($id);
                 $response->success();
                 $message = $response->message('success', 'Начато редактирование карты');
                 $response->complete('content', ['message' => $message, 'cardId' => $id]);
@@ -392,7 +416,7 @@ class PatientCard extends AppDomain implements \JsonSerializable
          `secondname`, 
          `gender`, 
          `date_birth`, 
-         `insurance`, 
+         `insurance_certificate`, 
          `policy_number`) 
          VALUES (
         :cardNumber,

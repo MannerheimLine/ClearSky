@@ -54,7 +54,7 @@ class CardValidatorMiddleware implements MiddlewareInterface
                 $this->structuredResponse->failed();
                 $message = $this->structuredResponse->message('fail', 'Поле не заполнено');
                 $field = $this->camelCaseToDashes($value);
-                $this->structuredResponse->errors('error', ['message' => $message, 'field' => $field]);
+                $this->structuredResponse->incomplete('errors', ['message' => $message, 'field' => $field, 'errorType' => 'Required Field Is Empty']);
             }else{
                 $message = $this->structuredResponse->message('success', 'Поле заполнено');
                 $field = $this->camelCaseToDashes($value);
@@ -75,7 +75,7 @@ class CardValidatorMiddleware implements MiddlewareInterface
         }
         $this->structuredResponse->failed();
         $message = $this->structuredResponse->message('fail', 'Фамилия и имя должны быть заполнены');
-        $this->structuredResponse->errors('error', ['message' => $message, 'field' => 'full-name']); //Пришлось поле руками вписать
+        $this->structuredResponse->incomplete('errors', ['message' => $message, 'field' => 'full-name', 'errorType' => 'Wrong Full Name']); //Пришлось поле руками вписать
         return false;
     }
 
