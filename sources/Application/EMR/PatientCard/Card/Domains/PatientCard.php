@@ -54,6 +54,7 @@ class PatientCard extends AppDomain implements \JsonSerializable
     private $_workPlace;
     private $_profession;
     private $_notation;
+    private $_status;
 
     /**
      * patient_card constructor.
@@ -279,6 +280,7 @@ class PatientCard extends AppDomain implements \JsonSerializable
                 $this->_notation = $row['notation'];
             }
             $this->_humanType = $this->getHumanType();
+            $this->_status = $this->getEditStatus((int) $id);
         }
         return $this;
     }
@@ -286,73 +288,87 @@ class PatientCard extends AppDomain implements \JsonSerializable
     public function update(array $updatingData) : StructuredResponse {
         try{
             $castedData = $this->prepareUpdatingData($updatingData);
-            $query = ("UPDATE `patient_cards` 
-        SET 
-            `card_number` = :cardNumber,
-            `is_alive` = :isAlive,
-            `is_attached` = :isAttach,
-            `surname` = :surname,
-            `firstname` = :firstName,
-            `secondname` = :secondName,
-            `gender` = :gender,
-            `date_birth` = :dateBirth,
-            `telephone_number` = :telephoneNumber,
-            `email` = :email,
-            `policy_number` = :policyNumber,
-            `insurance_company` = :insuranceCompany,
-            `insurance_certificate` = :insuranceCertificate,
-            `passport_serial` = :passportSerial,
-            `passport_number` = :passportNumber,
-            `fms_department` = :fmsDepartment,
-            `birth_certificate_serial` = :birthCertificateSerial,
-            `birth_certificate_number` = :birthCertificateNumber,
-            `registry_office` = :registryOffice,
-            `region` = :region,
-            `district` = :district,
-            `locality` = :locality,
-            `street` = :street,
-            `house_number` = :houseNumber,
-            `apartment` = :apartment,
-            `work_place` = :workPlace,
-            `profession` = :profession,
-            `notation` = :notation
-        WHERE `patient_cards`.`id` = :id;");
-            $result = $this->_dbConnection->prepare($query);
-            if($result->execute([
-                'id' => $castedData['id'],
-                'isAlive' => $castedData['isAlive'],
-                'isAttach' => $castedData['isAttach'],
-                'cardNumber' => $castedData['cardNumber'],
-                'surname' => $castedData['surname'],
-                'firstName' => $castedData['firstName'],
-                'secondName' => $castedData['secondName'],
-                'gender' => $castedData['gender'],
-                'dateBirth' => $castedData['dateBirth'],
-                'telephoneNumber' => $castedData['telephone'],
-                'email' => $castedData['email'],
-                'policyNumber' => $castedData['policyNumber'],
-                'insuranceCompany' => $castedData['insuranceCompany'],
-                'insuranceCertificate' => $castedData['insuranceCertificate'],
-                'passportSerial' => $castedData['passportSerial'],
-                'passportNumber' => $castedData['passportNumber'],
-                'fmsDepartment' => $castedData['fmsDepartment'],
-                'birthCertificateSerial' => $castedData['birthCertificateSerial'],
-                'birthCertificateNumber' => $castedData['birthCertificateNumber'],
-                'registryOffice' => $castedData['registryOffice'],
-                'region' => $castedData['region'],
-                'district' => $castedData['district'],
-                'locality' => $castedData['locality'],
-                'street' => $castedData['street'],
-                'houseNumber' => $castedData['houseNumber'],
-                'apartment' => $castedData['apartment'],
-                'workPlace' => $castedData['workplace'],
-                'profession' => $castedData['profession'],
-                'notation' => $castedData['notation'],
-            ])){
-                $this->setEditable($castedData['id']);
-                $response = new StructuredResponse();
-                $message = $response->message('success', 'Обновлено');
-                $response->success()->complete('message', $message);
+            /**
+             * Несмотрю на то, что при загрузке старницы, JS не отрисовывает кнопку "Изменить", если карта
+             * заблокирована не этим пользователем. Я должен делать на стороне сервера в любом раскладе проверку, так как
+             * кнопку можно и самому нарисовать. А вот сервер уже точно не даст обновить карту если она кем то
+             * заблокирована. В итоге получается, при обновлениия я делаю на один запрос к БД больше, но зато так
+             * надежнее.
+             */
+            $response = new StructuredResponse();
+            if ($this->getEditStatus($castedData['id']) === 'owner'){
+                $query = ("UPDATE `patient_cards` 
+                SET 
+                    `card_number` = :cardNumber,
+                    `is_alive` = :isAlive,
+                    `is_attached` = :isAttach,
+                    `surname` = :surname,
+                    `firstname` = :firstName,
+                    `secondname` = :secondName,
+                    `gender` = :gender,
+                    `date_birth` = :dateBirth,
+                    `telephone_number` = :telephoneNumber,
+                    `email` = :email,
+                    `policy_number` = :policyNumber,
+                    `insurance_company` = :insuranceCompany,
+                    `insurance_certificate` = :insuranceCertificate,
+                    `passport_serial` = :passportSerial,
+                    `passport_number` = :passportNumber,
+                    `fms_department` = :fmsDepartment,
+                    `birth_certificate_serial` = :birthCertificateSerial,
+                    `birth_certificate_number` = :birthCertificateNumber,
+                    `registry_office` = :registryOffice,
+                    `region` = :region,
+                    `district` = :district,
+                    `locality` = :locality,
+                    `street` = :street,
+                    `house_number` = :houseNumber,
+                    `apartment` = :apartment,
+                    `work_place` = :workPlace,
+                    `profession` = :profession,
+                    `notation` = :notation
+                WHERE `patient_cards`.`id` = :id;");
+                $result = $this->_dbConnection->prepare($query);
+                if($result->execute([
+                    'id' => $castedData['id'],
+                    'isAlive' => $castedData['isAlive'],
+                    'isAttach' => $castedData['isAttach'],
+                    'cardNumber' => $castedData['cardNumber'],
+                    'surname' => $castedData['surname'],
+                    'firstName' => $castedData['firstName'],
+                    'secondName' => $castedData['secondName'],
+                    'gender' => $castedData['gender'],
+                    'dateBirth' => $castedData['dateBirth'],
+                    'telephoneNumber' => $castedData['telephone'],
+                    'email' => $castedData['email'],
+                    'policyNumber' => $castedData['policyNumber'],
+                    'insuranceCompany' => $castedData['insuranceCompany'],
+                    'insuranceCertificate' => $castedData['insuranceCertificate'],
+                    'passportSerial' => $castedData['passportSerial'],
+                    'passportNumber' => $castedData['passportNumber'],
+                    'fmsDepartment' => $castedData['fmsDepartment'],
+                    'birthCertificateSerial' => $castedData['birthCertificateSerial'],
+                    'birthCertificateNumber' => $castedData['birthCertificateNumber'],
+                    'registryOffice' => $castedData['registryOffice'],
+                    'region' => $castedData['region'],
+                    'district' => $castedData['district'],
+                    'locality' => $castedData['locality'],
+                    'street' => $castedData['street'],
+                    'houseNumber' => $castedData['houseNumber'],
+                    'apartment' => $castedData['apartment'],
+                    'workPlace' => $castedData['workplace'],
+                    'profession' => $castedData['profession'],
+                    'notation' => $castedData['notation'],
+                ])){
+                    $this->setEditable($castedData['id']);
+                    $message = $response->message('success', 'Обновлено');
+                    $response->success()->complete('message', $message);
+                }
+
+            }else{
+                $message = $response->message('fail', 'Попытка обновить заблокированную запись');
+                $response->failed()->incomplete(
+                    'errors', ['message' => $message, 'errorType' => 'Not Owner Access']);
             }
             return $response;
         }catch (\Exception $e){
@@ -447,6 +463,24 @@ class PatientCard extends AppDomain implements \JsonSerializable
 
     }
 
+    public function unblock($id) : StructuredResponse{
+        $id = (int)$id;
+        $response = new StructuredResponse();
+        if ($this->getEditStatus($id) === 'owner'){
+            if ($this->setEditable($id)){
+                $message = $response->message('success', 'Блокировка снята');
+                $response->success()->complete('message', $message);
+            }else{
+                $message = $response->message('fail', 'Блокировка не снята');
+                $response->failed()->incomplete('message', $message);
+            }
+        }else{
+            $message = $response->message('fail', 'Только пользователь заблокироваший карту, может снять блокировку');
+            $response->failed()->incomplete('message', $message);
+        }
+        return $response;
+    }
+
     /**
      * @return array
      */
@@ -504,7 +538,8 @@ class PatientCard extends AppDomain implements \JsonSerializable
             'apartment' => $this->_apartment,
             'workPlace' => $this->_workPlace,
             'profession' => $this->_profession,
-            'notation' => $this->_notation
+            'notation' => $this->_notation,
+            'status' => $this->_status
         ];
     }
 

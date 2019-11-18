@@ -9,43 +9,18 @@
 let typingTimer;
 
 const patient_card_body = $('#patient-card-body');
+const patient_card_menu = $('#patient-card-menu');
+const modals = $('#modals');
 
 const card_search_input =  $("input[name='card-search']");
 
-const edit_button = $('#edit-card-button');
-const save_button = $('#save-card-button');
-
 $(function () {
-    loadPatientCardData(1);
+    getCardData(1).done(function (result) {
+        loadCardMenu(result);
+        loadCardData(result);
+    });
     loadMasksForDynamicInputs();
     loadMasksForStaticInputs();
-});
-
-$('#patient-card-alive-section').click(function () {
-    flipPatientCardStatus('is-alive-id');
-    let updatedCardId = updatePatientCardData();
-    /**
-     * Идея в том чтобы заморозить запрос на получение данных у БД хотя бы на немного.
-     * Тем самы запрос на обновление записей всегда пройдет первым, а запрос на получение всегда будет вторым
-     * соответсвенн овозвращая всегда актуальные данные.
-     * -------------------------------------------------------------------------------------------------------
-     * Решит ьпроблему нужно в любом случае через promise или callback, так как вставка данных может длиться и больше
-     * 50 мс, а значит в этом случае, функция по запросу будет отправленна первой!.
-     */
-
-    let freezeToSql = function (){
-        loadPatientCardData(updatedCardId);
-    };
-    setTimeout(freezeToSql, 50);
-});
-
-$('#patient-card-attached-section').click(function () {
-    flipPatientCardStatus('is-attach-id');
-    let updatedCardId = updatePatientCardData();
-    let freezeToSql = function (){
-        loadPatientCardData(updatedCardId);
-    };
-    setTimeout(freezeToSql, 50);
 });
 
 const flipPatientCardStatus = function (name) {
@@ -57,20 +32,60 @@ const flipPatientCardStatus = function (name) {
     }
 };
 
-
 /**
  * Редактировнаие карты, обновление, добавление, сохранение
  */
 
-edit_button.on('click', function () {
-    editPatientCardData();
+patient_card_menu.on('click', '#edit-card-button',function () {
+    editCardData();
 });
 
-save_button.on('click', function () {
-    updatePatientCardData();
+patient_card_menu.on('click', '#save-card-button', function () {
+    saveCardData();
 });
 
-const updatePatientCardData = function () {
+patient_card_menu.on('click', '#unblock-card-button', function () {
+    unblockCardData();
+});
+
+modals.on('click', '#add-card-button', function () {
+    addCardData();
+});
+
+const saveCardData = function () {
+    updateCardData().done(function (response) {
+        if (response.status === 'fail'){
+            $('.incorrect-input-message').remove();
+            patient_card_body.each(function () {
+                $(this).find(':input').removeClass('incorrect-input-border');
+                $(this).find($(".input-group-text")).removeClass('incorrect-input-group');
+            });
+            $.each(response.incomplete.errors, function (key, value) {
+                switch (value.errorType) {
+                    case 'Duplicate Key Entrance' : duplicateErrorHandle(value); break;
+                    case 'Required Field Is Empty' : drawIncorrectInputMessage(value); break;
+                    case 'Wrong Full Name' : drawIncorrectInputMessage(value); break;
+                    case 'Not Owner Access' : notOwnerAccessHandler(value); break;
+                }
+            });
+        }else {
+            $('#save-card-button').delay(500).fadeOut(500, function () {
+                $(this).remove();
+            });
+            let buttons_panel = $('#buttons');
+            let edit_button = $(`<button id="edit-card-button" class="btn btn-info btn-sm mr-1" ><i class="fa fa-edit"></i> Изменить</button>`).hide().fadeIn(1000);
+            buttons_panel.append(edit_button);
+            $('.incorrect-input-message').remove();
+            patient_card_body.each(function() {
+                $(this).find(':input').attr('disabled', 'true');
+                $(this).find(':input').removeClass('incorrect-input-border');
+                $(this).find($(".input-group-text")).removeClass('incorrect-input-group');
+            });
+        }
+    });
+};
+
+const updateCardData = function () {
     let id = $("input[name='id']").val();
     let cardNumber = $("input[name='card-number']").val();
     let isAliveId = $("input[name='is-alive-id']").val();
@@ -96,7 +111,7 @@ const updatePatientCardData = function () {
     let workplace = $("input[name='workplace']").val();
     let profession = $("input[name='profession']").val();
     let notation = $("textarea[name='notation']").val();
-    let request = $.ajax({
+    return $.ajax({
         type: "POST",
         url: "/patient-card/update",
         data: {
@@ -128,35 +143,9 @@ const updatePatientCardData = function () {
         },
         cache: false
     });
-    request.done(function (response) {
-        if (response.status === 'fail'){
-            $('.incorrect-input-message').remove();
-            patient_card_body.each(function () {
-                $(this).find(':input').removeClass('incorrect-input-border');
-                $(this).find($(".input-group-text")).removeClass('incorrect-input-group');
-            });
-            $.each(response.incomplete.errors, function (key, value) {
-                switch (value.errorType) {
-                    case 'Duplicate Key Entrance' : duplicateErrorHandle(value); break;
-                    case 'Required Field Is Empty' : drawIncorrectInputMessage(value); break;
-                    case 'Wrong Full Name' : drawIncorrectInputMessage(value); break;
-                }
-            });
-        }else {
-            $('#save-card-button').attr('hidden', 'true');
-            $('#edit-card-button').removeAttr('hidden').hide().fadeIn(1000);
-            $('.incorrect-input-message').remove();
-            patient_card_body.each(function() {
-                $(this).find(':input').attr('disabled', 'true');
-                $(this).find(':input').removeClass('incorrect-input-border');
-                $(this).find($(".input-group-text")).removeClass('incorrect-input-group');
-            });
-        }
-    });
-    return id;
 };
 
-const editPatientCardData = function () {
+const editCardData = function () {
     let id = $("input[name='id']").val();
     let request = $.ajax({
         type: "POST",
@@ -166,8 +155,12 @@ const editPatientCardData = function () {
     });
     request.done(function (response) {
         if (response.status === 'success'){
-            $('#save-card-button').removeAttr('hidden').hide().fadeIn(1000);
-            $('#edit-card-button').attr('hidden', 'true');
+            $('#edit-card-button').delay(500).fadeOut(500, function () {
+                $(this).remove();
+            });
+            let buttons_panel = $('#buttons');
+            let save_button = $(`<button id="save-card-button" class="btn btn-success btn-sm mr-1"><i class="fa fa-save"></i> Сохранить</button>`).hide().fadeIn(1000);
+            buttons_panel.append(save_button);
             console.log(response.complete.content[0].message.text + ' ' + response.complete.content[0].cardId);
             patient_card_body.each(function(){
                 $(this).find(':input').removeAttr('disabled');
@@ -175,11 +168,10 @@ const editPatientCardData = function () {
         }else {
             console.log(response.incomplete.errors[0].message.text + ' ' + response.incomplete.errors[0].cardId);
         }
-
     });
 };
 
-const addPatientCardData = function () {
+const addCardData = function () {
     let card_number_value = $("input[name='add-card-number']").val();
     let full_name_value = $("input[name='add-full-name']").val();
     let gender_value = $("select[name='add-gender']").val();
@@ -203,7 +195,27 @@ const addPatientCardData = function () {
     });
     request.done(function (response) {
         $("#addPatientCardModal").modal('hide');
-        loadPatientCard(response);
+        loadCard(response);
+    });
+};
+
+const unblockCardData = function () {
+    let id = $("input[name='id']").val();
+    let request = $.ajax({
+        type: "POST",
+        url: "/patient-card/unblock",
+        data: {
+            'id' : id
+        },
+        cache: false
+    });
+    request.done(function (response) {
+        $('#unblock-card-button').delay(500).fadeOut(500, function () {
+            $(this).remove();
+        });
+        let buttons_panel = $('#buttons');
+        let edit_button = $(`<button id="edit-card-button" class="btn btn-info btn-sm mr-1" ><i class="fa fa-edit"></i> Изменить</button>`).hide().fadeIn(1000);
+        buttons_panel.append(edit_button);
     });
 };
 
@@ -228,7 +240,7 @@ card_search_input.keyup(function (e) {
          * Легкая задержка чтобы не делать кучу запросов к БД, когда отпускаешь ЗАЖАТУЮ клавишу
          */
         setTimeout(function () {
-            loadPatientCard(1)
+           loadCard(1);
         }, 100);
         loadMasksForDynamicInputs();
     }
@@ -245,6 +257,48 @@ patient_card_body.on('click', '#previous-page', function () {
     let selectedPage = +$('#current-page').val() - 1 || 1;
     searchCards(searchString, selectedPage);
 
+});
+
+patient_card_body.on('click', '#patient-card-alive-section', function () {
+    flipPatientCardStatus('is-alive-id');
+    let updatedCardId = $("input[name='id']").val();
+    updateCardData();
+    /**
+     * Идея в том чтобы заморозить запрос на получение данных у БД хотя бы на немного.
+     * Тем самы запрос на обновление записей всегда пройдет первым, а запрос на получение всегда будет вторым
+     * соответсвенн овозвращая всегда актуальные данные.
+     * -------------------------------------------------------------------------------------------------------
+     * Решит ьпроблему нужно в любом случае через promise или callback, так как вставка данных может длиться и больше
+     * 50 мс, а значит в этом случае, функция по запросу будет отправленна первой!.
+     */
+
+    let freezeToSql = function (){
+        getCardData(updatedCardId).done(function (result) {
+            loadCardData(result);
+        });
+    };
+    setTimeout(freezeToSql, 50);
+});
+
+patient_card_body.on('click', '#patient-card-attached-section', function () {
+    flipPatientCardStatus('is-attach-id');
+    let updatedCardId = $("input[name='id']").val();
+    updateCardData();
+    /**
+     * Идея в том чтобы заморозить запрос на получение данных у БД хотя бы на немного.
+     * Тем самы запрос на обновление записей всегда пройдет первым, а запрос на получение всегда будет вторым
+     * соответсвенн овозвращая всегда актуальные данные.
+     * -------------------------------------------------------------------------------------------------------
+     * Решит ьпроблему нужно в любом случае через promise или callback, так как вставка данных может длиться и больше
+     * 50 мс, а значит в этом случае, функция по запросу будет отправленна первой!.
+     */
+
+    let freezeToSql = function (){
+        getCardData(updatedCardId).done(function (result) {
+            loadCardData(result);
+        });
+    };
+    setTimeout(freezeToSql, 50);
 });
 
 const searchCards = function (searchString, selectedPage) {
@@ -358,7 +412,7 @@ const loadCardsDataTableContentLine = function(response){
                     <td><i class="${live_status_image}" style="font-size: 18px;"></i></td>
                     <td><i class="${attached_status_image}" style="font-size: 18px;"></i></td>
                     <td>
-                        <button class="btn btn-outline-success btn-sm" onclick="loadPatientCard(${response.id})">
+                        <button class="btn btn-outline-success btn-sm" onclick="loadCard(${response.id})">
                             <i class="fa fa-search"></i> Посмотреть
                         </button>
                     </td>
@@ -370,168 +424,77 @@ const loadCardsDataTableContentLine = function(response){
  * Загрузка карты пациента
  */
 
-const loadPatientCard = function (id) {
-    patient_card_body.empty();
-    patient_card_body.append(loadPatientCardTemplate());
-    let recordBadge = $('#patient-card-found-records');
-    loadPatientCardData(id);
-    $('#patient-card-alive-section').click(function () {
-        flipPatientCardStatus('is-alive-id');
-        let updatedCardId = updatePatientCardData();
-        /**
-         * Идея в том чтобы заморозить запрос на получение данных у БД хотя бы на немного.
-         * Тем самы запрос на обновление записей всегда пройдет первым, а запрос на получение всегда будет вторым
-         * соответсвенн овозвращая всегда актуальные данные.
-         * -------------------------------------------------------------------------------------------------------
-         * Решит ьпроблему нужно в любом случае через promise или callback, так как вставка данных может длиться и больше
-         * 50 мс, а значит в этом случае, функция по запросу будет отправленна первой!.
-         */
+const loadCard = function (cardId) {
+    getCardData(cardId).done(function (result) {
+        loadCardData(result);
+    });
+};
 
-        let freezeToSql = function (){
-            loadPatientCardData(updatedCardId);
-        };
-        setTimeout(freezeToSql, 50);
+const getCardData = function (id) {
+    return $.ajax({
+        type: "GET",
+        url: "/patient-card/show/" +id,
+        cache: false
     });
-    $('#patient-card-attached-section').click(function () {
-        flipPatientCardStatus('is-attach-id');
-        let updatedCardId = updatePatientCardData();
-        let freezeToSql = function (){
-            loadPatientCardData(updatedCardId);
-        };
-        setTimeout(freezeToSql, 50);
-    });
-    $('#cards-data-search-section').remove();
+};
+
+const loadCardData = function (data) {
+    let recordBadge = $('#patient-card-found-records');
+    patient_card_body.empty();
+    patient_card_body.append(loadCardTemplate());
+    showCardData(data);
+    showCardStatuses(data);
     recordBadge.text(0);
     loadMasksForDynamicInputs();
 };
 
-const loadPatientCardData = function (requestedId) {
-    let id = $("input[name='id']");
-    let cardNumber = $("input[name='card-number']");
-    let isAliveId = $("input[name='is-alive-id']");
-    let isAlive = $("#patient-alive-status");
-    let isAttachedId = $("input[name='is-attach-id']");
-    let isAttached = $("#patient-attach-status");
-    let fullName = $("input[name='full-name']");
-    let gender = $("select[name='gender']");
-    let dateBirth = $("input[name='date-birth']");
-    let telephone = $("input[name='telephone']");
-    let email = $("input[name='email']");
-    let insuranceCertificate = $("input[name='insurance-certificate']");
-    let policyNumber = $("input[name='policy-number']");
-    let insuranceCompanyId = $("input[name='insurance-company-id']");
-    let insuranceCompany = $("input[name='insurance-company']");
-    let passport = $("input[name='passport']");
-    let fmsDepartment = $("textarea[name='fms-department']");
-    let birthCertificate = $("input[name='birth-certificate']");
-    let registryOffice = $("textarea[name='registry-office']");
-    let regionId = $("input[name='region-id']");
-    let region = $("input[name='region']");
-    let districtId = $("input[name='district-id']");
-    let district = $("input[name='district']");
-    let localityId = $("input[name='locality-id']");
-    let locality = $("input[name='locality']");
-    let streetId = $("input[name='street-id']");
-    let street = $("input[name='street']");
-    let houseNumber = $("input[name='house-number']");
-    let apartment = $("input[name='apartment']");
-    let workplace = $("input[name='workplace']");
-    let profession = $("input[name='profession']");
-    let notation = $("textarea[name='notation']");
-    let request = $.ajax({
-        type: "GET",
-        url: "/patient-card/show/" + requestedId,
-        cache: false
+const showCardData = function(data){
+    let card_data = data.card_data;
+    $("input[name='id']").val(card_data.id);
+    $("input[name='card-number']").val(card_data.cardNumber);
+    $("input[name='is-alive-id']").val(card_data.isAliveId);
+    $("#patient-alive-status").text(card_data.isAlive);
+    $("input[name='is-attach-id']").val(card_data.isAttachId);
+    $("#patient-attach-status").text(card_data.isAttached);
+    $("input[name='full-name']").val(card_data.surname + ' ' + card_data.firstName + ' ' + (card_data.secondName || ''));
+    $.each(data.genders, function (key, value) {
+        $("select[name='gender']").append(`<option value="${value.id}" ${card_data.genderId == value.id ?' selected':''}>${value.description}</option>`)
     });
-    request.done(function (response) {
-        let card_data = response.card_data;
-        id.val(card_data.id);
-        cardNumber.val(card_data.cardNumber);
-        isAliveId.val(card_data.isAliveId);
-        isAlive.text(card_data.isAlive);
-        isAttachedId.val(card_data.isAttachId);
-        isAttached.text(card_data.isAttached);
-        fullName.val(card_data.surname + ' ' + card_data.firstName + ' ' + (card_data.secondName || ''));
-        $.each(response.genders, function (key, value) {
-            gender.append(`<option value="${value.id}" ${card_data.genderId == value.id ?' selected':''}>${value.description}</option>`)
-        });
-        dateBirth.val(card_data.dateBirth);
-        telephone.val(card_data.telephone);
-        email.val(card_data.email);
-        insuranceCertificate.val(card_data.insuranceCertificate);
-        policyNumber.val(card_data.policyNumber);
-        insuranceCompanyId.val(card_data.insuranceCompanyId);
-        insuranceCompany.val(card_data.insuranceCompany);
-        if((card_data.passportSerial && card_data.passportNumber) != null){
-            passport.val(card_data.passportSerial + ' ' + card_data.passportNumber);
-        }else{
-            passport.val('');
-        }
-        fmsDepartment.val(card_data.fmsDepartment);
-        if ((card_data.birthCertificateSerial && card_data.birthCertificateNumber) != null){
-            birthCertificate.val(card_data.birthCertificateSerial + ' ' + card_data.birthCertificateNumber);
-        }else {
-            birthCertificate.val('');
-        }
-        registryOffice.val(card_data.registryOffice);
-        regionId .val(card_data.regionId);
-        region .val(card_data.region);
-        districtId.val(card_data.districtId);
-        district.val(card_data.district);
-        localityId.val(card_data.localityId);
-        locality.val(card_data.locality);
-        streetId.val(card_data.streetId);
-        street.val(card_data.street);
-        houseNumber.val(card_data.houseNumber);
-        apartment.val(card_data.apartment);
-        workplace.val(card_data.workPlace);
-        profession.val(card_data.profession);
-        notation.val(card_data.notation);
-
-        /*
-        * Значки fontawesome для статусов
-        */
-        let patient_card_alive_section = $('#patient-card-alive-section');
-        let patient_card_attached_section = $('#patient-card-attached-section');
-        let is_alive_image = $("#patient-alive-image");
-        let is_attached_image = $("#patient-attached-image");
-        /*
-         * Статус по карте: жив/мертв, прикреплен/откреплен
-         */
-        $('#patient-alive-status').text(card_data.isAlive);
-        $('#patient-attached-status').text(card_data.isAttached);
-
-        switch (card_data.isAliveId) {
-            //Если пациент жив.
-            case 1 :
-                patient_card_alive_section.css({'color' : '#28a745'});
-                switch (card_data.humanType) {
-                    case 1 : is_alive_image.attr('class', 'fa fa-male'); break;
-                    case 2 : is_alive_image.attr('class', 'fa fa-female'); break;
-                    case 3 : is_alive_image.attr('class', 'fa fa-child'); break;
-                    default : is_alive_image.attr('class', 'fa fa-male');
-                }
-                break;
-            case 2 :
-                patient_card_alive_section.css({'color' : '#d80e1b'});
-                is_alive_image.attr('class', 'fa fa-skull');
-                break;
-        }
-        switch (card_data.isAttachId) {
-            case 1 :
-                patient_card_attached_section.css({'color' : '#28a745'});
-                is_attached_image.attr('class', 'fa fa-user-plus');
-                break;
-            case 2 :
-                patient_card_attached_section.css({'color' : '#d80e1b'});
-                is_attached_image.attr('class', 'fa fa-user-times');
-                break;
-
-        }
-    })
+    $("input[name='date-birth']").val(card_data.dateBirth);
+    $("input[name='telephone']").val(card_data.telephone);
+    $("input[name='email']").val(card_data.email);
+    $("input[name='insurance-certificate']").val(card_data.insuranceCertificate);
+    $("input[name='policy-number']").val(card_data.policyNumber);
+    $("input[name='insurance-company-id']").val(card_data.insuranceCompanyId);
+    $("input[name='insurance-company']").val(card_data.insuranceCompany);
+    if((card_data.passportSerial && card_data.passportNumber) != null){
+        $("input[name='passport']").val(card_data.passportSerial + ' ' + card_data.passportNumber);
+    }else{
+        $("input[name='passport']").val('');
+    }
+    $("textarea[name='fms-department']").val(card_data.fmsDepartment);
+    if ((card_data.birthCertificateSerial && card_data.birthCertificateNumber) != null){
+        $("input[name='birth-certificate']").val(card_data.birthCertificateSerial + ' ' + card_data.birthCertificateNumber);
+    }else {
+        $("input[name='birth-certificate']").val('');
+    }
+    $("textarea[name='registry-office']").val(card_data.registryOffice);
+    $("input[name='region-id']").val(card_data.regionId);
+    $("input[name='region']").val(card_data.region);
+    $("input[name='district-id']").val(card_data.districtId);
+    $("input[name='district']").val(card_data.district);
+    $("input[name='locality-id']").val(card_data.localityId);
+    $("input[name='locality']").val(card_data.locality);
+    $("input[name='street-id']").val(card_data.streetId);
+    $("input[name='street']").val(card_data.street);
+    $("input[name='house-number']").val(card_data.houseNumber);
+    $("input[name='apartment']").val(card_data.apartment);
+    $("input[name='workplace']").val(card_data.workPlace);
+    $("input[name='profession']").val(card_data.profession);
+    $("textarea[name='notation']").val(card_data.notation);
 };
 
-const loadPatientCardTemplate = function () {
+const loadCardTemplate = function () {
     return `<div class="row">
                     <div id="personal-data-section" class="col-3">
                         <div class="patient-card-information-section box-shadow--2dp">
@@ -778,6 +741,68 @@ const loadPatientCardTemplate = function () {
                 </div>`;
 };
 
+const showCardStatuses = function (data) {
+    let card_data = data.card_data;
+    /*
+     * Значки fontawesome для статусов
+     */
+    let patient_card_alive_section = $('#patient-card-alive-section');
+    let patient_card_attached_section = $('#patient-card-attached-section');
+    let is_alive_image = $("#patient-alive-image");
+    let is_attached_image = $("#patient-attached-image");
+    /*
+     * Статус по карте: жив/мертв, прикреплен/откреплен
+     */
+    $('#patient-alive-status').text(card_data.isAlive);
+    $('#patient-attached-status').text(card_data.isAttached);
+
+    switch (card_data.isAliveId) {
+        //Если пациент жив.
+        case 1 :
+            patient_card_alive_section.css({'color' : '#28a745'});
+            switch (card_data.humanType) {
+                case 1 : is_alive_image.attr('class', 'fa fa-male'); break;
+                case 2 : is_alive_image.attr('class', 'fa fa-female'); break;
+                case 3 : is_alive_image.attr('class', 'fa fa-child'); break;
+                default : is_alive_image.attr('class', 'fa fa-male');
+            }
+            break;
+        case 2 :
+            patient_card_alive_section.css({'color' : '#d80e1b'});
+            is_alive_image.attr('class', 'fa fa-skull');
+            break;
+    }
+    switch (card_data.isAttachId) {
+        case 1 :
+            patient_card_attached_section.css({'color' : '#28a745'});
+            is_attached_image.attr('class', 'fa fa-user-plus');
+            break;
+        case 2 :
+            patient_card_attached_section.css({'color' : '#d80e1b'});
+            is_attached_image.attr('class', 'fa fa-user-times');
+            break;
+
+    }
+};
+
+const loadCardMenu = function (cardData) {
+    let status = cardData.card_data.status;
+    let buttons_panel = $('#buttons');
+    let create_button = $(`<button id="create-card-button" class="btn btn-primary btn-sm mr-1" data-toggle="modal" data-target="#addPatientCardModal"><i class="fa fa-plus-circle"></i> Создать</button>`).hide().fadeIn(1000);
+    let edit_button = $(`<button id="edit-card-button" class="btn btn-info btn-sm mr-1" ><i class="fa fa-edit"></i> Изменить</button>`).hide().fadeIn(1000);
+    let unblock_button = $(`<button id="unblock-card-button" class="btn btn-danger btn-sm mr-1"><i class="fa fa-save"></i> Разблокировать</button>`).hide().fadeIn(1000);
+    buttons_panel.append(create_button);
+    switch (status) {
+        case 'owner' :
+            buttons_panel.append(unblock_button);
+            break;
+        case 'other' :
+            buttons_panel.append(edit_button.attr('disabled', 'true'));
+            break;
+        default : buttons_panel.append(edit_button);
+    }
+};
+
 
 /**
  * Маски для input
@@ -944,5 +969,9 @@ const duplicateErrorHandle = function (value) {
     drawIncorrectInputMessage(value);
     let button = `<div class="input-group-append"><button class="btn btn-danger btn-sm"><i class="fa fa-clipboard"></i> Смотреть</button></div>`;
     $(`#${value.field}`).parent().find('input').after(button);
+};
+
+const notOwnerAccessHandler = function (value) {
+    alert(value.message.text);
 };
 
