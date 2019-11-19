@@ -74,6 +74,13 @@ html, body {
     border: solid 1px;
     padding: 3px;
     text-align: center;
+    cursor: not-allowed;
+}
+.blocked-status{
+    background: #e9ecef;
+}
+.editable-status{
+    background: white;
     cursor: pointer;
 }
 .red-asterisk{
@@ -85,10 +92,10 @@ html, body {
 #patient-attached-image{
     font-size: 40px;
 }
-.patient-card-status:hover{
+.editable-status:hover{
     background: #eeeeee;
 }
-.patient-card-status:hover i{
+.editable-status:hover i{
     color: #37474F;
 }
 .right-border{

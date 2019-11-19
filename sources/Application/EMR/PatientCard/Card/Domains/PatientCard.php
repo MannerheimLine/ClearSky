@@ -296,7 +296,7 @@ class PatientCard extends AppDomain implements \JsonSerializable
              * надежнее.
              */
             $response = new StructuredResponse();
-            if ($this->getEditStatus($castedData['id']) === 'owner'){
+            if ($this->getEditStatus($castedData['id']) !== 'other'){
                 $query = ("UPDATE `patient_cards` 
                 SET 
                     `card_number` = :cardNumber,
@@ -364,7 +364,6 @@ class PatientCard extends AppDomain implements \JsonSerializable
                     $message = $response->message('success', 'Обновлено');
                     $response->success()->complete('message', $message);
                 }
-
             }else{
                 $message = $response->message('fail', 'Попытка обновить заблокированную запись');
                 $response->failed()->incomplete(

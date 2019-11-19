@@ -8,6 +8,10 @@
 
 let typingTimer;
 
+const MAN = 1;
+const WOMAN = 2;
+const CHILD = 3;
+
 const patient_card_body = $('#patient-card-body');
 const patient_card_menu = $('#patient-card-menu');
 const modals = $('#modals');
@@ -23,12 +27,62 @@ $(function () {
     loadMasksForStaticInputs();
 });
 
-const flipPatientCardStatus = function (name) {
-    let input = $(`input[name=${name}]`);
-    if (input.val() == 1){
-       input.val(2);
+const flipAttachStatus = function () {
+    let attachedSection = $('#patient-card-attached-section');
+    let attachedImage = $("#patient-attached-image");
+    let attachedStatus = $('#patient-attached-status');
+    let input = $("input[name='is-attach-id']");
+    if (parseInt(input.val()) === 1){
+        input.val(2);
+        attachedSection.css({'color' : '#d80e1b'});
+        attachedImage.attr('class', 'fa fa-user-times');
+        attachedStatus.text('Откреплен');
     }else {
         input.val(1);
+        attachedSection.css({'color' : '#28a745'});
+        attachedImage.attr('class', 'fa fa-user-plus');
+        attachedStatus.text('Прикреплен');
+    }
+};
+
+const flipAliveStatus = function () {
+    let input = $("input[name='is-alive-id']");
+    let humanType = getHumanType();
+    let aliveSection = $('#patient-card-alive-section');
+    let aliveImage = $("#patient-alive-image");
+    let aliveStatus= $('#patient-alive-status');
+    if (parseInt(input.val()) === 1){
+        input.val(2);
+        aliveSection.css({'color' : '#d80e1b'});
+        aliveImage.attr('class', 'fa fa-skull');
+        aliveStatus.text('Мертвый');
+    }else {
+        input.val(1);
+        aliveSection.css({'color' : '#28a745'});
+        aliveStatus.text('Живой');
+        switch (humanType) {
+            case 1 : aliveImage.attr('class', 'fa fa-male'); break;
+            case 2 : aliveImage.attr('class', 'fa fa-female'); break;
+            case 3 : aliveImage.attr('class', 'fa fa-child'); break;
+            default : aliveImage.attr('class', 'fa fa-male');
+        }
+    }
+};
+
+const getHumanType = function(){
+    let dob = $('#date-birth').val();
+    let gender = $('#gender').val();
+    let birthDate = new Date(dob);
+    let cur = new Date();
+    let diff = cur - birthDate; // This is the difference in milliseconds
+    let age = Math.floor(diff/31557600000); // Divide by 1000*60*60*24*365.25
+    if (age >= 18){
+        switch (gender) {
+            case 1 : return MAN;
+            case 2 : return  WOMAN;
+        }
+    }else {
+        return CHILD;
     }
 };
 
@@ -80,6 +134,7 @@ const saveCardData = function () {
                 $(this).find(':input').attr('disabled', 'true');
                 $(this).find(':input').removeClass('incorrect-input-border');
                 $(this).find($(".input-group-text")).removeClass('incorrect-input-group');
+                $('.patient-card-status').addClass('blocked-status').removeClass('editable-status');
             });
         }
     });
@@ -164,6 +219,7 @@ const editCardData = function () {
             console.log(response.complete.content[0].message.text + ' ' + response.complete.content[0].cardId);
             patient_card_body.each(function(){
                 $(this).find(':input').removeAttr('disabled');
+                $('.patient-card-status').addClass('editable-status').removeClass('blocked-status');
             });
         }else {
             console.log(response.incomplete.errors[0].message.text + ' ' + response.incomplete.errors[0].cardId);
@@ -259,46 +315,18 @@ patient_card_body.on('click', '#previous-page', function () {
 
 });
 
-patient_card_body.on('click', '#patient-card-alive-section', function () {
-    flipPatientCardStatus('is-alive-id');
-    let updatedCardId = $("input[name='id']").val();
-    updateCardData();
-    /**
-     * Идея в том чтобы заморозить запрос на получение данных у БД хотя бы на немного.
-     * Тем самы запрос на обновление записей всегда пройдет первым, а запрос на получение всегда будет вторым
-     * соответсвенн овозвращая всегда актуальные данные.
-     * -------------------------------------------------------------------------------------------------------
-     * Решит ьпроблему нужно в любом случае через promise или callback, так как вставка данных может длиться и больше
-     * 50 мс, а значит в этом случае, функция по запросу будет отправленна первой!.
-     */
-
-    let freezeToSql = function (){
+patient_card_body.on('click', '.editable-status', function () {
+    let statusPanelId = $(this).attr('id');
+    switch (statusPanelId) {
+        case 'patient-card-alive-section' : flipAliveStatus(); break;
+        case 'patient-card-attached-section' : flipAttachStatus(); break;
+    }
+    /*let updatedCardId = $("input[name='id']").val();
+    updateCardData().done(function () {
         getCardData(updatedCardId).done(function (result) {
-            loadCardData(result);
+            showCardStatuses(result);
         });
-    };
-    setTimeout(freezeToSql, 50);
-});
-
-patient_card_body.on('click', '#patient-card-attached-section', function () {
-    flipPatientCardStatus('is-attach-id');
-    let updatedCardId = $("input[name='id']").val();
-    updateCardData();
-    /**
-     * Идея в том чтобы заморозить запрос на получение данных у БД хотя бы на немного.
-     * Тем самы запрос на обновление записей всегда пройдет первым, а запрос на получение всегда будет вторым
-     * соответсвенн овозвращая всегда актуальные данные.
-     * -------------------------------------------------------------------------------------------------------
-     * Решит ьпроблему нужно в любом случае через promise или callback, так как вставка данных может длиться и больше
-     * 50 мс, а значит в этом случае, функция по запросу будет отправленна первой!.
-     */
-
-    let freezeToSql = function (){
-        getCardData(updatedCardId).done(function (result) {
-            loadCardData(result);
-        });
-    };
-    setTimeout(freezeToSql, 50);
+    });*/
 });
 
 const searchCards = function (searchString, selectedPage) {
@@ -504,14 +532,14 @@ const loadCardTemplate = function () {
                             <div class='patient-card-information-section-body'>
                                 <div class="row">
                                     <div class="col-6">
-                                        <div id="patient-card-alive-section" class="patient-card-status">
+                                        <div id="patient-card-alive-section" class="patient-card-status blocked-status">
                                             <input name="is-alive-id" hidden>
                                             <i id="patient-alive-image"></i>
                                             <i id="patient-alive-status">Живой</i>
                                         </div>
                                     </div>
                                     <div class="col-6">
-                                        <div id="patient-card-attached-section" class="patient-card-status">
+                                        <div id="patient-card-attached-section" class="patient-card-status blocked-status">
                                             <input name="is-attach-id" hidden>
                                             <i id="patient-attached-image"></i>
                                             <i id="patient-attached-status">Прикреплен</i>
@@ -781,7 +809,6 @@ const showCardStatuses = function (data) {
             patient_card_attached_section.css({'color' : '#d80e1b'});
             is_attached_image.attr('class', 'fa fa-user-times');
             break;
-
     }
 };
 
