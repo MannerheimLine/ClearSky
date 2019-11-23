@@ -37,7 +37,7 @@ abstract class Template
      * @param $data
      * @return string
      */
-    public function render(string $page, $data) : string {
+    public function render(string $page = null, $data = null) : string {
         ob_start();
         include $this->_layout;
         $html = ob_get_clean();

@@ -15,6 +15,11 @@ use Application\EMR\PatientCard\Search\DispositionSearch\Actions\LocalitySearchA
 use Application\EMR\PatientCard\Search\DispositionSearch\Actions\RegionSearchAction;
 use Aura\Router\RouterContainer;
 use DI\ContainerBuilder;
+use Engine\AAIS\Actions\LoginDoAction;
+use Engine\AAIS\Actions\LoginIndexAction;
+use Engine\AAIS\Middleware\AuthFormValidatorMiddleware;
+use Engine\AAIS\Middleware\AuthMiddleware;
+use Engine\Base\App;
 use Engine\Database\Connectors\ConnectorInterface;
 use Engine\Database\Connectors\MySQLConnector;
 use Engine\Http\MimeType\MimeTypeResolver;
@@ -37,7 +42,7 @@ require "vendor/autoload.php";
 #Коллекция маршрутов
 $aura = new RouterContainer();
 $map = $aura->getMap();
-$map->get('patient_card', '/patient-card', PatientCardIndexAction::class);
+$map->get('patient-card', '/patient-card', PatientCardIndexAction::class);
 $map->post('patient-card/update', '/patient-card/update', PatientCardUpdateAction::class);
 $map->post('patient-card/unblock', '/patient-card/unblock', PatientCardUnblockAction::class);
 $map->post('patient-card/edit', '/patient-card/edit', PatientCardEditAction::class);
@@ -50,6 +55,8 @@ $map->post('patient-card/search-locality', '/patient-card/search-locality', Loca
 $map->post('patient-card/search-street', '/patient-card/search-street', StreetSearchAction::class)->tokens(['searchString' => '\w+']);
 $map->post('patient-card/search-insurance-company', '/patient-card/search-insurance-company', InsuranceCompanySearchAction::class)->tokens(['searchString' => '\w+']);
 //$map->get('catalog/detail', '/blog/{id}/view/{number}-{detail}', Application\Blog\Action\DetailsIndexAction::class)->tokens(['id' => '\d+', 'number' => '\d+', 'detail' => '\d+']);
+$map->get('login', '/login', LoginIndexAction::class);
+$map->post('login/do', '/login/do', LoginDoAction::class);
 
 #DI Container
 $definitions = [
@@ -58,8 +65,10 @@ $definitions = [
 $builder = new ContainerBuilder();
 $builder->addDefinitions($definitions);
 $container = $builder->build();
-
+App::initContainer($container);
+App::initRouter($aura);
 #Запуск
+session_start();
 $request = ServerRequestFactory::fromGlobals();
 #Решение проблем с определением типа Content Type для js/css файлов
 $resolver = new MimeTypeResolver();
@@ -96,7 +105,8 @@ if ($route){
     $pipeline->pipe(path('/', new ProfilerMiddleware()));
     $pipeline->pipe(path('/', new ClientIpMiddleware()));
     $pipeline->pipe(path('/', new MemoryUsageMiddleware()));
-    $pipeline->pipe(path('patient-card', new BasicAuthMiddleware()));
+    $pipeline->pipe(path('/login/do', new AuthFormValidatorMiddleware()));
+    $pipeline->pipe(path('patient-card', new AuthMiddleware()));
     $pipeline->pipe(path('patient-card/update', new CardValidatorMiddleware()));
     //$pipeline->pipe(path('patient-card/add', new CardValidatorMiddleware()));
     $pipeline->pipe(new PathMiddlewareDecorator('patient_card', new ModifyMiddleware()));

@@ -9,6 +9,10 @@ use Engine\Database\Connectors\ConnectorInterface;
 use Engine\DataStructures\StructuredResponse;
 
 /**
+ * Задачи класса:
+ * - Идентификация по введеному имени учетной записи
+ * - Аутентификация по введеному паролю учетной записи
+ *
  * Class Login
  * @package Engine\AAIS\Domains
  */
@@ -20,20 +24,8 @@ class Login
     }
 
     /**
-     * Слишком сильные пароли со спецсимволами это бред. Достаточно будет паролей в стиле VipNet Password Generator
+     * Проверяет наличие учетной записи пользователя, для дальнейшей авторизации
      *
-     * @param string $string
-     * @return bool
-     */
-    private function validateString(string $string) : bool {
-        $string = @trim($string);
-        if(preg_match("(^[A-Za-z0-9]+$)", $string)){
-            return true;
-        }
-        return false;
-    }
-
-    /**
      * @param string $login
      * @return bool|mixed
      */
@@ -49,59 +41,53 @@ class Login
         return false;
     }
 
-    /*
-     * После логина записывается uid в сессию и в cookie и в БД
+    /**
+     * Идентификация и аутентификация по введенным параметрам учетной записи
      */
     public function doLogin(string $login, string $password) : StructuredResponse{
         $response = new StructuredResponse();
-        /*
-         * Валидирую логин пароль, чтобы небыло лишних символов не предусмотренных мной
-         */
-        if ($this->validateString($login)){
-            if ($this->validateString($password)){
-                /*
+        /**
                  * Ищую если пользователь соответствующий логину. Логин уникален.
                  */
-                $accountData = $this->checkUser($login);
-                if ($accountData !== false){
-                    $hash = $accountData['password_hash'];
-                    $id = $accountData['id'];
-                    /*
-                     * Если пользователь найден, то проверяю правильный ли он ввел пароль
-                     */
-                    if (password_verify($password, $hash)){
-                        /*
-                         * Дальше мне нужно каждый установить уникальный ключ, который будет потом сверятс яс сессией и
-                         * Cookie для того, чтобы знать. Был ли выполнен вход в эту учетную запись на другой машине.
-                         * При каждом новом логине ключ обновляется, а значит, на старом устройстве будет log off.
-                         * --------------------------------------------------------------------------------------------
-                         * Если пароль прошел, то обновляю ключ
-                         */
-                        $key = sha1(uniqid().$login);
-                        $query = ("UPDATE `user_accounts` SET `secret_key` = :secret_key WHERE `id` = :id");
-                        $result = $this->_dbConnection->prepare($query);
-                        $result->execute([
-                            'secret_key' => $key,
-                            'id' => $id
-                        ]);
-                        if ($result){
-                            Session::initialize($id, $key);
-                            Cookie::create($id, $key);
-                        }
-                    }else{
-                        //Неверный пароль
-                    }
-                }else{
-                    //Пользователь не найден
+        $accountData = $this->checkUser($login);
+        if ($accountData !== false){
+            $hash = $accountData['password_hash'];
+            $id = $accountData['id'];
+            /*
+             * Если пользователь найден, то проверяю правильный ли он ввел пароль
+             */
+            if (password_verify($password, $hash)){
+                /*
+                 * Дальше мне нужно каждый установить уникальный ключ, который будет потом сверятс яс сессией и
+                 * Cookie для того, чтобы знать. Был ли выполнен вход в эту учетную запись на другой машине.
+                 * При каждом новом логине ключ обновляется, а значит, на старом устройстве будет log off.
+                 * --------------------------------------------------------------------------------------------
+                 * Если пароль прошел, то обновляю ключ
+                 */
+                $key = sha1(uniqid().$login);
+                $query = ("UPDATE `user_accounts` SET `secret_key` = :secret_key WHERE `id` = :id");
+                $result = $this->_dbConnection->prepare($query);
+                $result->execute([
+                    'secret_key' => $key,
+                    'id' => $id
+                ]);
+                if ($result){
+                    Session::initialize($id, $key);
+                    Cookie::create($id, $key);
+                    $response->success();
+                    $message = $response->message('success', 'Вы авторизованны');
+                    $response->complete('response', ['message' => $message]);
                 }
             }else{
-                //Недопустимый синтаксис в пароле
+                $response->failed();
+                $message = $response->message('fail', 'Введенный вами пароль не совпадает с учетной записью');
+                $response->incomplete('response', ['message' => $message]);
             }
         }else{
-            //Недопустимый синтаксис в логине
+            $response->failed();
+            $message = $response->message('fail', 'Пользователь с такой учетной записью не найден. Я гарантирую это.');
+            $response->incomplete('response', ['message' => $message]);
         }
         return $response;
     }
-
-
 }
