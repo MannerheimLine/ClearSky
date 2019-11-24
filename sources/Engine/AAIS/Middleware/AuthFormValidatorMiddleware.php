@@ -1,5 +1,6 @@
 <?php
 
+declare(strict_types = 1);
 
 namespace Engine\AAIS\Middleware;
 
@@ -11,6 +12,13 @@ use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 use Zend\Diactoros\Response\JsonResponse;
 
+/**
+ * Задача класса:
+ * - Провести проверку полей на соответсвие правилам системы авторизации
+ *
+ * Class AuthFormValidatorMiddleware
+ * @package Engine\AAIS\Middleware
+ */
 class AuthFormValidatorMiddleware implements MiddlewareInterface
 {
     private $_structuredResponse;
@@ -20,22 +28,32 @@ class AuthFormValidatorMiddleware implements MiddlewareInterface
         $this->_structuredResponse = new StructuredResponse();
     }
 
+    /**
+     * Проверка полей на пустоту. Проверка идет до первого не заполненого поля из двух, в случае чего возвращает ошибку
+     *
+     * @param array $fields
+     * @return bool
+     */
     private function validateRequired(array $fields) : bool {
         foreach ($fields as $field){
             if (empty($field)){
                 $this->_structuredResponse->failed();
-                $message = $this->_structuredResponse->message('fail', 'Поле должно быть заполнено');
+                $message = $this->_structuredResponse->message($this->_structuredResponse::FAIL, 'Поля не должны быть пустыми');
                 $this->_structuredResponse->incomplete('response', ['message' => $message]);
+                return false;
             }else{
                 $this->_structuredResponse->success();
             }
         }
-        if ($this->_structuredResponse->_status === 'fail'){
-            return false;
-        }
         return true;
     }
 
+    /**
+     * Проверка имени учетной записи на соответсвие
+     *
+     * @param string $userName
+     * @return bool
+     */
     private function validateUserName(string $userName) : bool {
         $string = trim($userName);
         if(preg_match("(^[A-Za-z0-9]+$)", $string)){
@@ -43,11 +61,17 @@ class AuthFormValidatorMiddleware implements MiddlewareInterface
             return true;
         }
         $this->_structuredResponse->failed();
-        $message = $this->_structuredResponse->message('fail', 'Учетная запись не допускает наличия спецсимволов типа: !@#$%^&&*(.');
+        $message = $this->_structuredResponse->message($this->_structuredResponse::FAIL, 'Учетная запись не допускает наличия спецсимволов типа: !@#$%^&&*(.');
         $this->_structuredResponse->incomplete('response', ['message' => $message]);
         return false;
     }
 
+    /**
+     * Проверка пароля
+     *
+     * @param string $password
+     * @return bool
+     */
     private function validatePassword(string $password) : bool {
         $string = trim($password);
         if(preg_match("(^[A-Za-z0-9!@#$%^&*()-]+$)", $string)){
@@ -55,11 +79,10 @@ class AuthFormValidatorMiddleware implements MiddlewareInterface
             return true;
         }
         $this->_structuredResponse->failed();
-        $message = $this->_structuredResponse->message('fail', 'Недопустимые символы в пароле! Разрешены: буквы и !@#$%^&*()- символы');
+        $message = $this->_structuredResponse->message($this->_structuredResponse::FAIL, 'Недопустимые символы в пароле! Разрешены: буквы и !@#$%^&*()- символы');
         $this->_structuredResponse->incomplete('response', ['message' => $message]);
         return false;
     }
-
 
     /**
      * Process an incoming server request.
@@ -76,14 +99,8 @@ class AuthFormValidatorMiddleware implements MiddlewareInterface
             if ($this->validateUserName($userName)){
                 if ($this->validatePassword($password)){
                     return $response = $handler->handle($request);
-                }else{
-                    //Недопустимые символы в пароле
                 }
-            }else{
-                //Не допустимые символы в имени
             }
-        }else{
-            //поля не заполнены
         }
         return new JsonResponse($this->_structuredResponse);
     }

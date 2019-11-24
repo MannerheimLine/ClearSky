@@ -1,5 +1,9 @@
 /*
  *
+ *
+ *
+ *
+ *
  */
 
 const loginButton = $('#login-button');
@@ -14,24 +18,29 @@ loginButton.on('click', function () {
         cache: false
     });
     request.done(function (response) {
-        $('#message').remove();
+        $('.login-error-message').remove();
+
         if (response.status === 'success'){
+            $('.login').empty();
             setTimeout(function () {
                 window.location.href = '/patient-card';
             },1000);
-            $('#login-form').prepend(`<div id="message">${response.complete.response[0].message.text}</div>`);
+            preload(response.complete.response[0].message.text);
         }else {
-            switch (errorType) {
-                case 'emptyFields' : emptyFields(); break;
-                default : $('#login-form').prepend(`<div id="message">${response.complete.response[0].message.text}</div>`);
-            }
-
+            $('#login-errors').append(`<div class="login-error-message">${response.incomplete.response[0].message.text}</div>`);
         }
     });
 });
 
-const emptyFields = function (data) {
-    $.each(data, function (key, value) {
-        $('#login-form').prepend(`<div id="message">${value.message.text}</div>`);
-    })
+const preload = function (text) {
+    let message = `<div class="login-redirect-message">${text}</div>`;
+    let loader = `<div class="loader-wrapper">
+        <div class="loader"></div>
+      </div>`;
+    let login = $('.login');
+    login.append(message);
+    setTimeout(function () {
+        $('.login-redirect-message').text('Переадресация');
+        login.prepend(loader);
+    },500)
 };

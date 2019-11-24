@@ -17,6 +17,11 @@ class LoginIndexResponder
         $this->_template = new LoginTemplate();
     }
 
+    /**
+     * Подгрузка страницы авторизации
+     *
+     * @return Response
+     */
     public function respond() : Response {
         $this->_template->setTitle('Авторизация');
         $html = $this->_template->render();

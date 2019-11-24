@@ -7,12 +7,12 @@
         <title id="title"><?=$this->_title?></title>
     </head>
     <body>
-    <!-- partial:index.partial.html -->
         <div class="login">
             <h1>Авторизация</h1>
+            <div id="login-errors"></div>
             <div id="login-form">
-                <input type="text" name="user-name" placeholder="Имя пользователя" required="required" />
-                <input type="password" name="password" placeholder="Пароль" required="required" />
+                <input type="text" name="user-name" placeholder="Имя пользователя" required/>
+                <input type="password" name="password" placeholder="Пароль" required/>
                 <button type="button" id="login-button" class="btn btn-primary btn-block btn-large">Вход</button>
             </div>
         </div>

@@ -22,6 +22,8 @@ namespace Engine\DataStructures;
  */
 class StructuredResponse implements \JsonSerializable
 {
+    const FAIL = 'fail';
+    const SUCCESS = 'success';
     protected $_status;
     protected $_complete = [];
     protected $_errors = [];
@@ -48,12 +50,12 @@ class StructuredResponse implements \JsonSerializable
     }
 
     public function failed() : StructuredResponse {
-        $this->_status = 'fail';
+        $this->_status = $this::FAIL;
         return $this;
     }
 
     public function success() : StructuredResponse {
-        $this->_status = 'success';
+        $this->_status = $this::SUCCESS;
         return $this;
     }
 

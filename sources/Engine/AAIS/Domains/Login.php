@@ -53,11 +53,11 @@ class Login
         if ($accountData !== false){
             $hash = $accountData['password_hash'];
             $id = $accountData['id'];
-            /*
+            /**
              * Если пользователь найден, то проверяю правильный ли он ввел пароль
              */
             if (password_verify($password, $hash)){
-                /*
+                /**
                  * Дальше мне нужно каждый установить уникальный ключ, который будет потом сверятс яс сессией и
                  * Cookie для того, чтобы знать. Был ли выполнен вход в эту учетную запись на другой машине.
                  * При каждом новом логине ключ обновляется, а значит, на старом устройстве будет log off.
@@ -75,19 +75,35 @@ class Login
                     Session::initialize($id, $key);
                     Cookie::create($id, $key);
                     $response->success();
-                    $message = $response->message('success', 'Вы авторизованны');
+                    $message = $response->message($response::SUCCESS, 'Вы авторизованны');
                     $response->complete('response', ['message' => $message]);
                 }
             }else{
                 $response->failed();
-                $message = $response->message('fail', 'Введенный вами пароль не совпадает с учетной записью');
+                $message = $response->message($response::FAIL, 'Введенный вами пароль не совпадает с учетной записью');
                 $response->incomplete('response', ['message' => $message]);
             }
         }else{
             $response->failed();
-            $message = $response->message('fail', 'Пользователь с такой учетной записью не найден. Я гарантирую это.');
+            $message = $response->message($response::FAIL, 'Пользователь с такой учетной записью не найден. Я гарантирую это.');
             $response->incomplete('response', ['message' => $message]);
         }
+        return $response;
+    }
+
+    /**
+     * Выход из системы
+     *
+     * @return StructuredResponse
+     */
+    public function doLogout() : StructuredResponse {
+        setcookie('AuthUserRestrictedArea',"",time() - 86400,'/');
+        session_unset();
+        session_destroy();
+        $response = new StructuredResponse();
+        $response->success();
+        $message = $response->message($response::SUCCESS, 'Вы вышли из системы!');
+        $response->complete('message', $message);
         return $response;
     }
 }

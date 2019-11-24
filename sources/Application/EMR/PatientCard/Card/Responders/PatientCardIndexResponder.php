@@ -19,7 +19,7 @@ class PatientCardIndexResponder extends AppResponder
     public function respond(ServerRequestInterface $request, $payload = null): Response
     {
         $this->_template->setTitle('Карта пациента');
-        $html = $this->_template->render('patient_card/index.page', $payload);
+        $html = $this->_template->render('patient_card/index.page');
         return new Response\HtmlResponse($html);
     }
 }

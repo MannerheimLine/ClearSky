@@ -1,22 +1,21 @@
 <?php
 
-declare(strict_types = 1);
 
 namespace Engine\AAIS\Actions;
 
 
 use Engine\AAIS\Domains\Login;
-use Engine\AAIS\Responders\LoginDoResponder;
+use Engine\AAIS\Responders\LogoutResponder;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 
-class LoginDoAction implements RequestHandlerInterface
+class LogoutAction implements RequestHandlerInterface
 {
     private $_login;
     private $_responder;
 
-    public function __construct(Login $login, LoginDoResponder $responder)
+    public function __construct(Login $login, LogoutResponder $responder)
     {
         $this->_login = $login;
         $this->_responder = $responder;
@@ -29,9 +28,7 @@ class LoginDoAction implements RequestHandlerInterface
      */
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
-        $userName = $request->getParsedBody()['login'];
-        $password = $request->getParsedBody()['password'];
-        $payload = $this->_login->doLogin($userName, $password);
+        $payload = $this->_login->doLogout();
         $response = $this->_responder->respond($request, $payload);
         return $response;
     }

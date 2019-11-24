@@ -15,15 +15,16 @@ use Application\EMR\PatientCard\Search\DispositionSearch\Actions\LocalitySearchA
 use Application\EMR\PatientCard\Search\DispositionSearch\Actions\RegionSearchAction;
 use Aura\Router\RouterContainer;
 use DI\ContainerBuilder;
-use Engine\AAIS\Actions\LoginDoAction;
+use Engine\AAIS\Actions\LoginAction;
 use Engine\AAIS\Actions\LoginIndexAction;
+use Engine\AAIS\Actions\LogoutAction;
 use Engine\AAIS\Middleware\AuthFormValidatorMiddleware;
 use Engine\AAIS\Middleware\AuthMiddleware;
+use Engine\AAIS\Middleware\LoginMiddleware;
 use Engine\Base\App;
 use Engine\Database\Connectors\ConnectorInterface;
 use Engine\Database\Connectors\MySQLConnector;
 use Engine\Http\MimeType\MimeTypeResolver;
-use Engine\Middleware\BasicAuthMiddleware;
 use Engine\Middleware\ClientIpMiddleware;
 use Engine\Middleware\MemoryUsageMiddleware;
 use Engine\Middleware\ModifyMiddleware;
@@ -56,7 +57,8 @@ $map->post('patient-card/search-street', '/patient-card/search-street', StreetSe
 $map->post('patient-card/search-insurance-company', '/patient-card/search-insurance-company', InsuranceCompanySearchAction::class)->tokens(['searchString' => '\w+']);
 //$map->get('catalog/detail', '/blog/{id}/view/{number}-{detail}', Application\Blog\Action\DetailsIndexAction::class)->tokens(['id' => '\d+', 'number' => '\d+', 'detail' => '\d+']);
 $map->get('login', '/login', LoginIndexAction::class);
-$map->post('login/do', '/login/do', LoginDoAction::class);
+$map->get('logout', '/logout', LogoutAction::class);
+$map->post('login/do', '/login/do', LoginAction::class);
 
 #DI Container
 $definitions = [
@@ -105,10 +107,10 @@ if ($route){
     $pipeline->pipe(path('/', new ProfilerMiddleware()));
     $pipeline->pipe(path('/', new ClientIpMiddleware()));
     $pipeline->pipe(path('/', new MemoryUsageMiddleware()));
+    $pipeline->pipe(path('/login', new LoginMiddleware()));
     $pipeline->pipe(path('/login/do', new AuthFormValidatorMiddleware()));
     $pipeline->pipe(path('patient-card', new AuthMiddleware()));
     $pipeline->pipe(path('patient-card/update', new CardValidatorMiddleware()));
-    //$pipeline->pipe(path('patient-card/add', new CardValidatorMiddleware()));
     $pipeline->pipe(new PathMiddlewareDecorator('patient_card', new ModifyMiddleware()));
 #Запуск трубопровода
     $response = $pipeline->process($request, $action);

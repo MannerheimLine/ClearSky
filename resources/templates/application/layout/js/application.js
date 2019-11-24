@@ -1002,3 +1002,18 @@ const notOwnerAccessHandler = function (value) {
     alert(value.message.text);
 };
 
+const logOut = function () {
+    let request = $.ajax({
+        type: "GET",
+        url: "/logout",
+        cache: false
+    });
+    request.done(function (response) {
+        if (response.status === 'success'){
+            window.location.href = '/login';
+        } else {
+            alert(response.incomplete.message);
+        }
+    });
+};
+
