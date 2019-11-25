@@ -5,14 +5,14 @@
   "require": {
     "php": ">=7.3",
     "ext-json": "*",
+    "ext-mbstring": "*",
+    "ext-pdo": "*",
     "aura/router": "^3.1",
     "php-di/php-di": "^6.0",
     "psr/http-message": "^1.0",
     "zendframework/zend-diactoros": "^2.1",
     "zendframework/zend-httphandlerrunner": "^1.1",
-    "zendframework/zend-stratigility": "^3.2",
-    "ext-pdo": "*",
-    "ext-mbstring": "*"
+    "zendframework/zend-stratigility": "^3.2"
   },
   "autoload": {
       "psr-4": {

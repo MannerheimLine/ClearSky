@@ -26,7 +26,7 @@ class StructuredResponse implements \JsonSerializable
     const SUCCESS = 'success';
     protected $_status;
     protected $_complete = [];
-    protected $_errors = [];
+    protected $_incomplete = [];
 
     /**
      * Specify data which should be serialized to JSON
@@ -40,7 +40,7 @@ class StructuredResponse implements \JsonSerializable
         return [
             'status' => $this->_status,
             'complete' => $this->_complete,
-            'incomplete' => $this->_errors
+            'incomplete' => $this->_incomplete
         ];
     }
 
@@ -68,7 +68,7 @@ class StructuredResponse implements \JsonSerializable
     }
 
     public function incomplete(string $field, $data) : void {
-        $this->_errors[$field][] = $data;
+        $this->_incomplete[$field][] = $data;
     }
 
 }

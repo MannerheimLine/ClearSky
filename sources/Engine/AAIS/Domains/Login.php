@@ -18,6 +18,8 @@ use Engine\DataStructures\StructuredResponse;
  */
 class Login
 {
+    private $_dbConnection;
+
     public function __construct(ConnectorInterface $dbConnector)
     {
         $this->_dbConnection = $dbConnector->getConnection();
@@ -97,13 +99,24 @@ class Login
      * @return StructuredResponse
      */
     public function doLogout() : StructuredResponse {
-        setcookie('AuthUserRestrictedArea',"",time() - 86400,'/');
-        session_unset();
-        session_destroy();
         $response = new StructuredResponse();
-        $response->success();
-        $message = $response->message($response::SUCCESS, 'Вы вышли из системы!');
-        $response->complete('message', $message);
+        if (setcookie('AuthUserRestrictedArea',"",time() - 86400,'/')){
+            if (session_unset()){
+                if (session_destroy()){
+                    $message = $response->message($response::SUCCESS, 'Вы вышли из системы!');
+                    $response->success()->complete('message', $message);
+                }else{
+                    $message = $response->message($response::FAIL, 'Не удалось удалить сессию');
+                    $response->failed()->incomplete('message', $message);
+                }
+            }else{
+                $message = $response->message($response::FAIL, 'Не удалось очистить переменные сессии');
+                $response->failed()->incomplete('message', $message);
+            }
+        }else{
+            $message = $response->message($response::FAIL, 'Не удалось очистить куки');
+            $response->failed()->incomplete('message', $message);
+        }
         return $response;
     }
 }

@@ -7,6 +7,7 @@ namespace Application\EMR\PatientCard\Card\Domains;
 
 use Application\Base\AppDomain;
 use DateTime;
+use Engine\AAIS\Domains\Session;
 use Engine\Database\Connectors\ConnectorInterface;
 use Engine\DataStructures\StructuredResponse;
 
@@ -149,7 +150,7 @@ class PatientCard extends AppDomain implements \JsonSerializable
         ]);
         if ($result->rowCount() > 0){
             $data = $result->fetch();
-            if ($data['user_account'] === 1){ //Пользовтаель (id) должен браться из сессии
+            if ($data['user_account'] === Session::getId()){ //Пользовтаель (id) должен браться из сессии
                 $result = 'owner';
             }else{
                 $result = 'other';
@@ -160,7 +161,7 @@ class PatientCard extends AppDomain implements \JsonSerializable
         return $result;
     }
 
-    private function setOnEdit(int $patient_card_id, $user = 1) : bool {
+    private function setOnEdit(int $patient_card_id, $user) : bool {
         $query = ("INSERT INTO `being_edited_patient_cards` (`patient_card_id`, `user_account`) VALUES (:patient_card_id, :user_account)");
         $result = $this->_dbConnection->prepare($query);
         if ($result->execute([
@@ -413,7 +414,7 @@ class PatientCard extends AppDomain implements \JsonSerializable
                 $response->incomplete('errors', ['message' => $message, 'cardId' => $id]);
                 break;
             default : //free
-                $this->setOnEdit($id);
+                $this->setOnEdit($id, Session::getId());
                 $response->success();
                 $message = $response->message('success', 'Начато редактирование карты');
                 $response->complete('content', ['message' => $message, 'cardId' => $id]);
