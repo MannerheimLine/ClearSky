@@ -6,7 +6,6 @@ namespace Engine\RBAC\Domains;
 
 
 use Engine\AAIS\Domains\Session;
-use phpDocumentor\Reflection\Types\This;
 
 class PrivilegedUser
 {
