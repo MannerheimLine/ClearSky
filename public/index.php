@@ -83,6 +83,7 @@ if ($route){
     foreach ($route->attributes as $key => $val) {
         $request = $request->withAttribute($key, $val);
     }
+
     $actionClass = $route->handler;
     $action = $container->get($actionClass);
 
@@ -111,7 +112,7 @@ if ($route){
     $pipeline->pipe(path('/login', new LoginMiddleware()));
     $pipeline->pipe(path('/login/do', new AuthFormValidatorMiddleware()));
     $pipeline->pipe(path('patient-card', new AuthMiddleware()));
-    $pipeline->pipe(path('patient-card', new PermissionMiddleware()));
+    $pipeline->pipe(path('patient-card', new PermissionMiddleware(App::getDependency(ConnectorInterface::class))));
     $pipeline->pipe(path('patient-card/update', new CardValidatorMiddleware()));
     $pipeline->pipe(new PathMiddlewareDecorator('patient-card', new ModifyMiddleware()));
 #Запуск трубопровода
