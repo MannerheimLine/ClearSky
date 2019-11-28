@@ -25,6 +25,7 @@ use Engine\Base\App;
 use Engine\Database\Connectors\ConnectorInterface;
 use Engine\Database\Connectors\MySQLConnector;
 use Engine\Http\MimeType\MimeTypeResolver;
+use Engine\Menu\Actions\MenuIndexAction;
 use Engine\Middleware\ClientIpMiddleware;
 use Engine\Middleware\MemoryUsageMiddleware;
 use Engine\Middleware\ModifyMiddleware;
@@ -61,9 +62,11 @@ $map->get('login', '/login', LoginIndexAction::class);
 $map->get('logout', '/logout', LogoutAction::class);
 $map->post('login/do', '/login/do', LoginAction::class);
 
+$map->post('menu/get', '/menu/get', MenuIndexAction::class);
+
 #DI Container
 $definitions = [
-    ConnectorInterface::class => DI\create(MySQLConnector::class),//->method('getConnection'),
+    ConnectorInterface::class => DI\create(MySQLConnector::class),
 ];
 $builder = new ContainerBuilder();
 $builder->addDefinitions($definitions);
@@ -106,12 +109,12 @@ if ($route){
      */
 #Загрузка в трубопровод
     $pipeline = new MiddlewarePipe();
-    $pipeline->pipe(path('/app', new ProfilerMiddleware()));
+    $pipeline->pipe(path('/', new ProfilerMiddleware()));
     $pipeline->pipe(path('/admin', new ClientIpMiddleware()));
     $pipeline->pipe(path('/', new MemoryUsageMiddleware()));
     $pipeline->pipe(path('/login', new LoginMiddleware()));
     $pipeline->pipe(path('/login/do', new AuthFormValidatorMiddleware()));
-    $pipeline->pipe(path('patient-card', new AuthMiddleware()));
+    $pipeline->pipe(path('patient-card', new AuthMiddleware(App::getDependency(ConnectorInterface::class))));
     $pipeline->pipe(path('patient-card', new PermissionMiddleware(App::getDependency(ConnectorInterface::class))));
     $pipeline->pipe(path('patient-card/update', new CardValidatorMiddleware()));
     $pipeline->pipe(new PathMiddlewareDecorator('patient-card', new ModifyMiddleware()));

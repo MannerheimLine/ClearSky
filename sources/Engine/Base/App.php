@@ -1,7 +1,10 @@
 <?php
 
-
 namespace Engine\Base;
+
+
+use Aura\Router\RouterContainer;
+use DI\Container;
 
 /**
  * Фасад приложения
@@ -15,7 +18,14 @@ class App
 
     private function __clone(){}
 
+    /**
+     * @var Container $_container
+     */
     private static $_container;
+
+    /**
+     * @var RouterContainer $_router
+     */
     private static $_router;
 
     public static function initContainer($container) : void {
@@ -34,6 +44,7 @@ class App
      * @return string
      */
     public static function generateUri(string $uriName, array $data = []) : string {
+
         return self::$_router->getGenerator()->generate($uriName, $data);
     }
 

@@ -23,9 +23,22 @@ $(function () {
         loadCardMenu(result);
         loadCardData(result);
     });
+    loadAppMenu(2);
     loadMasksForDynamicInputs();
     loadMasksForStaticInputs();
 });
+
+const loadAppMenu = function (menuId) {
+    let request =  $.ajax({
+        type: "POST",
+        url: "/menu/get",
+        data: {'menuId' : menuId},
+        cache: false
+    });
+    request.done(function (response) {
+        console.log(response);
+    })
+};
 
 const flipAttachStatus = function () {
     let attachedSection = $('#patient-card-attached-section');

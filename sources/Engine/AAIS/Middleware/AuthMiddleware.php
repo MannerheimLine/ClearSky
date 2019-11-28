@@ -7,7 +7,6 @@ namespace Engine\AAIS\Middleware;
 
 use Engine\AAIS\Domains\Cookie;
 use Engine\AAIS\Domains\Session;
-use Engine\Base\App;
 use Engine\Database\Connectors\ConnectorInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -24,6 +23,13 @@ use Zend\Diactoros\Response\RedirectResponse;
  */
 class AuthMiddleware implements MiddlewareInterface
 {
+    private $_dbConnector;
+
+    public function __construct(ConnectorInterface $dbConnection)
+    {
+        $this->_dbConnector = $dbConnection;
+    }
+
     /**
      * Функция создана для проверки ключа сессии с ключем БД созданным при авторизации пользователя
      *
@@ -32,8 +38,7 @@ class AuthMiddleware implements MiddlewareInterface
      */
     private function evaluateKey(int $id) : bool {
         $query = ("SELECT `secret_key` FROM `user_accounts` WHERE `id` = :id");
-        $connector = App::getDependency(ConnectorInterface::class);
-        $result = $connector::getConnection()->prepare($query);
+        $result = $this->_dbConnector::getConnection()->prepare($query);
         /**
              * @var \PDOStatement $result
              */
