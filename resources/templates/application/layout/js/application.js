@@ -15,6 +15,7 @@ const CHILD = 3;
 const patient_card_body = $('#patient-card-body');
 const patient_card_menu = $('#patient-card-menu');
 const modals = $('#modals');
+const sideBar = $('#sidebar_section');
 
 const card_search_input =  $("input[name='card-search']");
 
@@ -28,6 +29,11 @@ $(function () {
     loadMasksForStaticInputs();
 });
 
+
+/**
+ * Загрузка меню, клики по ссылкам меню
+ */
+
 const loadAppMenu = function (menuId) {
     let request =  $.ajax({
         type: "POST",
@@ -36,9 +42,42 @@ const loadAppMenu = function (menuId) {
         cache: false
     });
     request.done(function (response) {
-        console.log(response);
-    })
+        if(response.status === 'success'){
+            let menu = `<nav class="main-menu">
+                    <div class="area">
+                        <ul id="menu-items"></ul>
+                    </div>
+                </nav>`;
+            $('#sidebar_section').append(menu);
+            let menuItems = $('#menu-items');
+            $.each(response.complete.response[0].menu, function (key, value) {
+                let menuItem = `<li id="${value.name}" class="menu-item">
+                     <a href="${value.link}" class="menu-link">
+                        <i class="fa-for-menu ${value.icon}"></i>
+                        <span class="nav-text">${value.title}</span>
+                     </a>
+                 </li>`;
+                menuItems.append(menuItem);
+            });
+        }else {
+            //Пока алерт. Но потом буду выводить в общий лог ошибок
+            alert(response.incomplete.message[0].text);
+        }
+    });
 };
+
+sideBar.on('click', '.menu-item',function () {
+    $(this).addClass('selected');
+});
+
+/*sideBar.on('click', '.menu-link', function () {
+    $('.menu-link').each(function () {
+        $(this).parent().removeClass('menu-item-selected');
+        $(this).removeClass('menu-link-selected')
+    });
+    $(this).addClass('menu-link-selected');
+    $(this).parent().addClass('menu-item-selected');
+});*/
 
 const flipAttachStatus = function () {
     let attachedSection = $('#patient-card-attached-section');

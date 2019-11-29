@@ -8,6 +8,12 @@ namespace Engine\Menu\Domains;
 use Engine\Database\Connectors\ConnectorInterface;
 use Engine\DataStructures\StructuredResponse;
 
+/**
+ * Простое меню. Выводит ссылки для указанного меню
+ *
+ * Class Menu
+ * @package Engine\Menu\Domains
+ */
 class Menu
 {
     private $_dbConnection;
@@ -17,6 +23,13 @@ class Menu
         $this->_dbConnection = $dbConnector->getConnection();
     }
 
+    /**
+     * Выберет ссылки, для нужного меню. Не имеет зависимостей с RBAC. А значит будет показывать все ссылки для
+     * выбранного меню. Допуск по ссылкам возлагается на систему RBAC. Позже будет модифицировано.
+     *
+     * @param int $menuId
+     * @return StructuredResponse
+     */
     public function getMenuLinks(int $menuId) : StructuredResponse {
         $query = ("SELECT * FROM `menu_links` WHERE `menu` = :menuId");
         $result = $this->_dbConnection->prepare($query);
