@@ -2,6 +2,7 @@
 
 use Application\EMR\PatientCard\Card\Actions\PatientCardAddAction;
 use Application\EMR\PatientCard\Card\Actions\PatientCardEditAction;
+use Application\EMR\PatientCard\Card\Actions\PatientCardGetAction;
 use Application\EMR\PatientCard\Card\Actions\PatientCardIndexAction;
 use Application\EMR\PatientCard\Card\Actions\PatientCardShowAction;
 use Application\EMR\PatientCard\Card\Actions\PatientCardUnblockAction;
@@ -45,23 +46,23 @@ require "vendor/autoload.php";
 #Коллекция маршрутов
 $aura = new RouterContainer();
 $map = $aura->getMap();
-$map->get('patient-card', '/patient-card', PatientCardIndexAction::class);
-$map->post('patient-card/update', '/patient-card/update', PatientCardUpdateAction::class);
-$map->post('patient-card/unblock', '/patient-card/unblock', PatientCardUnblockAction::class);
-$map->post('patient-card/edit', '/patient-card/edit', PatientCardEditAction::class);
-$map->post('patient-card/add', '/patient-card/add', PatientCardAddAction::class);
-$map->get('patient-card/show', '/patient-card/show/{id}', PatientCardShowAction::class)->tokens(['id' => '\d+']);
-$map->post('patient-card/search-cards', '/patient-card/search-cards', PatientCardsSearchAction::class)->tokens(['searchString' => '\w+']);
-$map->post('patient-card/search-region', '/patient-card/search-region', RegionSearchAction::class)->tokens(['searchString' => '\w+']);
-$map->post('patient-card/search-district', '/patient-card/search-district', DistrictSearchAction::class)->tokens(['searchString' => '\w+']);
-$map->post('patient-card/search-locality', '/patient-card/search-locality', LocalitySearchAction::class)->tokens(['searchString' => '\w+']);
-$map->post('patient-card/search-street', '/patient-card/search-street', StreetSearchAction::class)->tokens(['searchString' => '\w+']);
-$map->post('patient-card/search-insurance-company', '/patient-card/search-insurance-company', InsuranceCompanySearchAction::class)->tokens(['searchString' => '\w+']);
+$map->get('patient-card', '/app/patient-card', PatientCardIndexAction::class);
+$map->get('app/patient-card/get', '/app/patient-card/get/{id}', PatientCardGetAction::class)->tokens(['id' => '\d+']);
+$map->post('app/patient-card/update', '/app/patient-card/update', PatientCardUpdateAction::class);
+$map->post('app/patient-card/unblock', '/app/patient-card/unblock', PatientCardUnblockAction::class);
+$map->post('app/patient-card/edit', '/app/patient-card/edit', PatientCardEditAction::class);
+$map->post('app/patient-card/add', '/app/patient-card/add', PatientCardAddAction::class);
+$map->get('app/patient-card/show', '/app/patient-card/show/{id}', PatientCardShowAction::class)->tokens(['id' => '\d+']);
+$map->post('app/patient-card/search-cards', '/app/patient-card/search-cards', PatientCardsSearchAction::class)->tokens(['searchString' => '\w+']);
+$map->post('app/patient-card/search-region', '/app/patient-card/search-region', RegionSearchAction::class)->tokens(['searchString' => '\w+']);
+$map->post('app/patient-card/search-district', '/app/patient-card/search-district', DistrictSearchAction::class)->tokens(['searchString' => '\w+']);
+$map->post('app/patient-card/search-locality', '/app/patient-card/search-locality', LocalitySearchAction::class)->tokens(['searchString' => '\w+']);
+$map->post('app/patient-card/search-street', '/app/patient-card/search-street', StreetSearchAction::class)->tokens(['searchString' => '\w+']);
+$map->post('app/patient-card/search-insurance-company', '/app/patient-card/search-insurance-company', InsuranceCompanySearchAction::class)->tokens(['searchString' => '\w+']);
 //$map->get('catalog/detail', '/blog/{id}/view/{number}-{detail}', Application\Blog\Action\DetailsIndexAction::class)->tokens(['id' => '\d+', 'number' => '\d+', 'detail' => '\d+']);
 $map->get('login', '/login', LoginIndexAction::class);
 $map->get('logout', '/logout', LogoutAction::class);
 $map->post('login/do', '/login/do', LoginAction::class);
-
 $map->post('menu/get', '/menu/get', MenuIndexAction::class);
 
 #DI Container
@@ -110,14 +111,14 @@ if ($route){
 #Загрузка в трубопровод
     $pipeline = new MiddlewarePipe();
     $pipeline->pipe(path('/', new ProfilerMiddleware()));
-    $pipeline->pipe(path('/admin', new ClientIpMiddleware()));
     $pipeline->pipe(path('/', new MemoryUsageMiddleware()));
     $pipeline->pipe(path('/login', new LoginMiddleware()));
     $pipeline->pipe(path('/login/do', new AuthFormValidatorMiddleware()));
-    $pipeline->pipe(path('patient-card', new AuthMiddleware(App::getDependency(ConnectorInterface::class))));
-    $pipeline->pipe(path('patient-card', new PermissionMiddleware(App::getDependency(ConnectorInterface::class))));
-    $pipeline->pipe(path('patient-card/update', new CardValidatorMiddleware()));
-    $pipeline->pipe(new PathMiddlewareDecorator('patient-card', new ModifyMiddleware()));
+    $pipeline->pipe(path('/app', new AuthMiddleware(App::getDependency(ConnectorInterface::class))));
+    $pipeline->pipe(path('/app', new PermissionMiddleware(App::getDependency(ConnectorInterface::class))));
+    $pipeline->pipe(path('/app/patient-card/update', new CardValidatorMiddleware()));
+    $pipeline->pipe(path('/app/control-panel', new ClientIpMiddleware()));
+    $pipeline->pipe(new PathMiddlewareDecorator('/app/patient-card', new ModifyMiddleware()));
 #Запуск трубопровода
     $response = $pipeline->process($request, $action);
 #Добавление пост-заголовков

@@ -543,4 +543,9 @@ class PatientCard extends AppDomain implements \JsonSerializable
         ];
     }
 
+    public function __get($name)
+    {
+        return $this->$name;
+    }
+
 }

@@ -17,7 +17,7 @@ html, body {
     background-color: #0b2e13;
 }
 #sidebar_section{
-    width: 250px;
+    width: 270px;
     background-color: darkblue;
     float: left;
     height: calc(100vh - 50px);
@@ -188,7 +188,7 @@ html, body {
     bottom:0;
     min-height:100px;
     left:0;
-    width:250px;
+    width:270px;
     overflow:hidden;
     opacity:1;
     z-index: 15; /*Чтоб явно была выше TinyMCE*/
@@ -200,7 +200,7 @@ html, body {
 .main-menu li {
     position:relative;
     display:block;
-    width:250px;
+    width:270px;
 }
 .main-menu li>a {
     position:relative;
@@ -230,7 +230,7 @@ html, body {
     position:relative;
     display:table-cell;
     vertical-align:middle;
-    width:190px;
+    width:215px;
     font-family: 'Titillium Web', sans-serif;
 }
 .main-menu .share {
