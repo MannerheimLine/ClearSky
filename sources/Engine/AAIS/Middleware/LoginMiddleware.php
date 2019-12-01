@@ -34,10 +34,10 @@ class LoginMiddleware implements MiddlewareInterface
             if (Cookie::isValid() === false){
                 return $response = $handler->handle($request);
             }else{
-                return new RedirectResponse('/patient-card', 302);
+                return new RedirectResponse('/app/patient-card', 302);
             }
         }else{
-            return new RedirectResponse('/patient-card', 302);
+            return new RedirectResponse('/app/patient-card', 302);
         }
     }
 }

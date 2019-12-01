@@ -176,8 +176,6 @@ const updateCardData = function () {
     let workplace = $("input[name='workplace']").val();
     let profession = $("input[name='profession']").val();
     let notation = $("textarea[name='notation']").val();
-    console.log(isAttachId);
-    console.log(isAliveId);
     return $.ajax({
         type: "POST",
         url: "/app/patient-card/update",
@@ -246,7 +244,6 @@ const addCardData = function () {
     let date_birth_value = $("input[name='add-date-birth']").val();
     let insurance_certificate_value = $("input[name='add-insurance-certificate']").val();
     let policy_number_value = $("input[name='add-policy-number']").val();
-    let insurance_company_value = $("input[name='add-insurance-company-id']").val();
     let request = $.ajax({
         type: "POST",
         url: "/app/patient-card/add",
@@ -255,15 +252,32 @@ const addCardData = function () {
             'fullName' : full_name_value,
             'gender' : gender_value,
             'dateBirth' : date_birth_value,
-            'insurance' : insurance_certificate_value,
+            'insuranceCertificate' : insurance_certificate_value,
             'policyNumber' : policy_number_value,
-            'insuranceCompany' : insurance_company_value
         },
         cache: false
     });
     request.done(function (response) {
-        $("#addPatientCardModal").modal('hide');
-        loadCard(response);
+        if (response.status === 'success'){
+            $("#addPatientCardModal").modal('hide');
+            loadCard(response.complete.response[0].id);
+            modals.each(function () {
+                $(this).find(':input').val('');
+            });
+        }else {
+            $('.incorrect-input-message').remove();
+            modals.each(function () {
+                $(this).find(':input').removeClass('incorrect-input-border');
+                $(this).find($(".input-group-text")).removeClass('incorrect-input-group');
+            });
+            $.each(response.incomplete.errors, function (key, value) {
+                switch (value.errorType) {
+                    case 'Duplicate Key Entrance' : duplicateErrorHandle(value, 'add-'); break;
+                    case 'Required Field Is Empty' : drawIncorrectInputMessage(value, 'add-'); break;
+                    case 'Wrong Full Name' : drawIncorrectInputMessage(value, 'add-'); break;
+                }
+            });
+        }
     });
 };
 
@@ -779,7 +793,6 @@ const loadCardTemplate = function () {
 
 const showCardStatuses = function (data) {
     let card_data = data.card_data;
-    console.log(card_data);
     /*
      * Значки fontawesome для статусов
      */
@@ -992,8 +1005,8 @@ const loadSearchInSectionLine = function (response) {
 /**
  * Обработка ошибок
  */
-const drawIncorrectInputMessage = function (value) {
-    let parent = $(`#${value.field}`).parent();
+const drawIncorrectInputMessage = function (value, fieldPrefix = '') {
+    let parent = $(`#${fieldPrefix+value.fieldName}`).parent();
     let panel = `<div class="incorrect-input-message"><i>${value.message.text}</i></div>`;
     let input_group_text = parent.find($(".input-group-text"));
     let input = parent.find('input');
@@ -1002,10 +1015,11 @@ const drawIncorrectInputMessage = function (value) {
     input.addClass('incorrect-input-border');
 };
 
-const duplicateErrorHandle = function (value) {
-    drawIncorrectInputMessage(value);
-    let button = `<div class="input-group-append"><button class="btn btn-danger btn-sm"><i class="fa fa-clipboard"></i> Смотреть</button></div>`;
-    $(`#${value.field}`).parent().find('input').after(button);
+const duplicateErrorHandle = function (value, fieldPrefix = '') {
+    $('#watch-duplicated-card-button').parent().remove();
+    drawIncorrectInputMessage(value, fieldPrefix);
+    let button = `<div class="input-group-append"><button id="watch-duplicated-card-button" class="btn btn-danger btn-sm"><i class="fa fa-clipboard"></i> Смотреть</button></div>`;
+    $(`#${value.fieldName}`).parent().find('input').after(button);
 };
 
 const notOwnerAccessHandler = function (value) {

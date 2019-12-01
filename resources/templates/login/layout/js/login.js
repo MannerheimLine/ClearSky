@@ -23,7 +23,7 @@ loginButton.on('click', function () {
         if (response.status === 'success'){
             $('.login').empty();
             setTimeout(function () {
-                window.location.href = '/patient-card';
+                window.location.href = '/app/patient-card';
             },1000);
             preload(response.complete.response[0].message.text);
         }else {

@@ -6,9 +6,12 @@ namespace Application\EMR\PatientCard\Card\Domains;
 
 
 use Application\Base\AppDomain;
+use Application\EMR\PatientCard\Card\ErrorHandlers\DBErrorsHandlerDecorator;
 use DateTime;
 use Engine\AAIS\Domains\Session;
+use Engine\Base\App;
 use Engine\Database\Connectors\ConnectorInterface;
+use Engine\Database\ErrorHandlers\DBErrorsHandlerInterface;
 use Engine\DataStructures\StructuredResponse;
 
 class PatientCard extends AppDomain implements \JsonSerializable
@@ -78,7 +81,7 @@ class PatientCard extends AppDomain implements \JsonSerializable
         $fullName = explode(' ', rtrim($updatingData['fullName']));
         $castedData['surname'] = $fullName[0];
         $castedData['firstName'] = $fullName[1];
-        $castedData['secondName'] = $fullName[2];
+        $castedData['secondName'] = $fullName[2] ?: '';
         $castedData['gender'] = (int)$updatingData['gender'];
         $castedData['dateBirth'] = $updatingData['dateBirth'];
         $castedData['telephone'] = $updatingData['telephone'];
@@ -111,10 +114,10 @@ class PatientCard extends AppDomain implements \JsonSerializable
         $fullName = explode(' ',$addingData['fullName']);
         $castedData['surname'] = $this->sanitize($fullName[0]);
         $castedData['firstName'] = $this->sanitize($fullName[1]);
-        $castedData['secondName'] = $this->sanitize($fullName[2]);
+        $castedData['secondName'] = $this->sanitize($fullName[2]) ?: '';
         $castedData['gender'] = $this->sanitize($addingData['gender']);
         $castedData['dateBirth'] = $this->sanitize($addingData['dateBirth']);
-        $castedData['insurance'] = $this->sanitize($addingData['insurance']);
+        $castedData['insurance'] = $this->sanitize($addingData['insuranceCertificate']);
         $castedData['policyNumber'] = $this->sanitize($addingData['policyNumber']);
         return $castedData;
     }
@@ -367,31 +370,18 @@ class PatientCard extends AppDomain implements \JsonSerializable
                 }
             }else{
                 $message = $response->message('fail', 'Попытка обновить заблокированную запись');
-                $response->failed()->incomplete(
-                    'errors', ['message' => $message, 'errorType' => 'Not Owner Access']);
+                $response->failed()->errors(['message' => $message, 'errorType' => 'Not Owner Access']);
             }
             return $response;
         }catch (\Exception $e){
             /**
-             * Пока что я не отслеживаю ошибку по коду и не разбираю варианты действий через switch, case
-             * Я знаю пока о существовании всего одной ошибки на дублирование записи "on duplicate key"
-             * Ее я и обрабатываю
+             * Получаю в любом случае объект StructuredResponse
+             * Декоратор обрабатывает базовое представление ошибки созданное обработчиком реализующим интерфейс
+             * Какая бы не была ошибка, есть ее обработчик или нет. декоратор вернет ответ StructuredResponse,
+             * заполненный либо результатом выполнения метода с кодом ошибки (handle_1062 например), либо unhandled().
              */
-            $response = new StructuredResponse();
-            $response->failed();
-            $errorInfo = $result->errorInfo(); //[23000, 1062, "Duplicate entry ..."]
-            if (preg_match_all('/\'([^\']+)+\'/', $errorInfo[2], $matches)) {
-                $fields = ['policy-number' => 'полисом', 'insurance-certificate' => 'СНИЛС'];
-                $match =  $matches[1];
-                $field = str_replace('_', '-', $match[1]);
-                $fieldValue = $match[0];
-                $message = $response->message('fail', "Карта с таким $fields[$field] уже существует");
-            }
-            $response->incomplete(
-                'errors', ['message' => $message,
-                'field' => $field,
-                'fieldValue' => $fieldValue,
-                'errorType' => 'Duplicate Key Entrance']);
+            $baseErrorsHandler = App::getDependency(DBErrorsHandlerInterface::class);
+            $response = (new DBErrorsHandlerDecorator($baseErrorsHandler))->handleException($result);
             return $response;
         }
     }
@@ -423,39 +413,57 @@ class PatientCard extends AppDomain implements \JsonSerializable
         return $response;
     }
 
-    public function add(array $addingData) : string {
-        $castedData = $this->prepareAddingData($addingData);
-        $query = ("INSERT INTO `patient_cards` 
-        (`card_number`,  
-         `surname`, 
-         `firstname`, 
-         `secondname`, 
-         `gender`, 
-         `date_birth`, 
-         `insurance_certificate`, 
-         `policy_number`) 
-         VALUES (
-        :cardNumber,
-        :surname,
-        :firstName,
-        :secondName,
-        :gender,
-        :dateBirth,
-        :insurance,
-        :policyNumber)");
-        $result = $this->_dbConnection->prepare($query);
-        $result->execute([
-            'cardNumber' => $castedData['cardNumber'],
-            'surname' => $castedData['surname'],
-            'firstName' => $castedData['firstName'],
-            'secondName' => $castedData['secondName'],
-            'gender' => $castedData['gender'],
-            'dateBirth' => $castedData['dateBirth'],
-            'insurance' => $castedData['insurance'],
-            'policyNumber' => $castedData['policyNumber']
-        ]);
-        if ($result){
-            return $this->_dbConnection->lastInsertId();
+    public function add(array $addingData) : StructuredResponse {
+        try{
+            $castedData = $this->prepareAddingData($addingData);
+            $query = ("INSERT INTO `patient_cards` 
+            (`card_number`,  
+             `surname`, 
+             `firstname`, 
+             `secondname`, 
+             `gender`, 
+             `date_birth`, 
+             `insurance_certificate`, 
+             `policy_number`) 
+             VALUES (
+            :cardNumber,
+            :surname,
+            :firstName,
+            :secondName,
+            :gender,
+            :dateBirth,
+            :insurance,
+            :policyNumber)");
+            $result = $this->_dbConnection->prepare($query);
+            $result->execute([
+                'cardNumber' => $castedData['cardNumber'],
+                'surname' => $castedData['surname'],
+                'firstName' => $castedData['firstName'],
+                'secondName' => $castedData['secondName'],
+                'gender' => $castedData['gender'],
+                'dateBirth' => $castedData['dateBirth'],
+                'insurance' => $castedData['insurance'],
+                'policyNumber' => $castedData['policyNumber']
+            ]);
+            if ($result){
+                $structuredResponse = new StructuredResponse();
+                $message = $structuredResponse->message($structuredResponse::SUCCESS, 'Карта пациента добавлена в систему');
+                $structuredResponse->success()->complete('response', ['message' => $message, 'id' => $this->_dbConnection->lastInsertId()]);
+                return $structuredResponse;
+            }
+        }catch (\Exception $e){
+            /*$response = new StructuredResponse();
+            $response->failed();
+            $handled = (App::getDependency(DBErrorsHandlerInterface::class))->handleException($result);
+            $response->incomplete(
+                'errors', ['message' => $message,
+                'fieldName' => 'add-'.(str_replace('_', '-', $handled['fieldName'])),
+                'fieldValue' => $handled['fieldValue'],
+                'errorType' => 'Duplicate Key Entrance']);
+            return $response;*/
+            $baseErrorsHandler = App::getDependency(DBErrorsHandlerInterface::class);
+            $response = (new DBErrorsHandlerDecorator($baseErrorsHandler))->handleException($result);
+            return $response;
         }
     }
 

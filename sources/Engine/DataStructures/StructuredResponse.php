@@ -71,6 +71,14 @@ class StructuredResponse implements \JsonSerializable
         $this->_incomplete[$field][] = $data;
     }
 
+    public function errors($errors){
+        $this->_incomplete['errors'][] = $errors;
+    }
+
+    public function error($error){
+        $this->_incomplete['error'] = $error;
+    }
+
 }
 
 

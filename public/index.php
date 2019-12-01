@@ -25,6 +25,8 @@ use Engine\AAIS\Middleware\LoginMiddleware;
 use Engine\Base\App;
 use Engine\Database\Connectors\ConnectorInterface;
 use Engine\Database\Connectors\MySQLConnector;
+use Engine\Database\ErrorHandlers\DBErrorsHandlerInterface;
+use Engine\Database\ErrorHandlers\MySQLErrorsHandler;
 use Engine\Http\MimeType\MimeTypeResolver;
 use Engine\Menu\Actions\MenuIndexAction;
 use Engine\Middleware\ClientIpMiddleware;
@@ -68,10 +70,12 @@ $map->post('menu/get', '/menu/get', MenuIndexAction::class);
 #DI Container
 $definitions = [
     ConnectorInterface::class => DI\create(MySQLConnector::class),
+    DBErrorsHandlerInterface::class => DI\create(MySQLErrorsHandler::class),
 ];
 $builder = new ContainerBuilder();
 $builder->addDefinitions($definitions);
 $container = $builder->build();
+
 App::initContainer($container);
 App::initRouter($aura);
 #Запуск
@@ -117,6 +121,7 @@ if ($route){
     $pipeline->pipe(path('/app', new AuthMiddleware(App::getDependency(ConnectorInterface::class))));
     $pipeline->pipe(path('/app', new PermissionMiddleware(App::getDependency(ConnectorInterface::class))));
     $pipeline->pipe(path('/app/patient-card/update', new CardValidatorMiddleware()));
+    $pipeline->pipe(path('/app/patient-card/add', new CardValidatorMiddleware()));
     $pipeline->pipe(path('/app/control-panel', new ClientIpMiddleware()));
     $pipeline->pipe(new PathMiddlewareDecorator('/app/patient-card', new ModifyMiddleware()));
 #Запуск трубопровода
