@@ -3,7 +3,7 @@
     <head>
         <link rel="stylesheet" type="text/css" href="/resources/assets/bootstrap/css/bootstrap.css"/>
         <link rel="stylesheet" type="text/css" href="/resources/assets/fontawesome/css/all.css"/>
-        <link rel="stylesheet" type="text/css" href="/resources/templates/application/layout/css/style.css"/>
+        <link rel="stylesheet" type="text/css" href="/resources/templates/application/layout/css/template.css"/>
         <script type="application/javascript" src="/resources/assets/jquery/jquery-3.4.1.min.js"></script>
         <title id="title"><?=$this->_title?></title>
     </head>

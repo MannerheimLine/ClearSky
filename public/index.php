@@ -14,6 +14,8 @@ use Application\EMR\PatientCard\Search\DispositionSearch\Actions\StreetSearchAct
 use Application\EMR\PatientCard\Search\OrganisationsSearch\Actions\InsuranceCompanySearchAction;
 use Application\EMR\PatientCard\Search\DispositionSearch\Actions\LocalitySearchAction;
 use Application\EMR\PatientCard\Search\DispositionSearch\Actions\RegionSearchAction;
+use Application\EMR\Talons\Actions\OutPatientTalonPrintAction;
+use Application\EMR\Talons\Actions\OutPatientTalonSaveAction;
 use Aura\Router\RouterContainer;
 use DI\ContainerBuilder;
 use Engine\AAIS\Actions\LoginAction;
@@ -66,6 +68,9 @@ $map->get('login', '/login', LoginIndexAction::class);
 $map->get('logout', '/logout', LogoutAction::class);
 $map->post('login/do', '/login/do', LoginAction::class);
 $map->post('menu/get', '/menu/get', MenuIndexAction::class);
+
+$map->get('app/patient-card/talon', '/app/patient-card/talon/{id}', OutPatientTalonPrintAction::class)->tokens(['id' => '\d+']);
+$map->get('app/patient-card/talon/save', '/app/patient-card/talon/save', OutPatientTalonSaveAction::class);
 
 #DI Container
 $definitions = [
