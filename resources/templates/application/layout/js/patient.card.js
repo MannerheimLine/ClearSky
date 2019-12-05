@@ -112,6 +112,10 @@ patient_card_menu.on('click', '#unblock-card-button', function () {
     unblockCardData();
 });
 
+patient_card_menu.on('click', '#talon-button', function () {
+    window.open('/app/patient-card/talon/ambulatory/show/' + $("input[name='id']").val(), '_blank');
+});
+
 modals.on('click', '#add-card-button', function () {
     addCardData();
 });
@@ -136,9 +140,9 @@ const saveCardData = function () {
             $('#save-card-button').delay(500).fadeOut(500, function () {
                 $(this).remove();
             });
-            let buttons_panel = $('#buttons');
-            let edit_button = $(`<button id="edit-card-button" class="btn btn-info btn-sm mr-1" ><i class="fa fa-edit"></i> Изменить</button>`).hide().fadeIn(1000);
-            buttons_panel.append(edit_button);
+            let controlButtonsPanel = $('#card-control-buttons');
+            let editButton = $(`<button id="edit-card-button" class="btn btn-dark btn-sm mr-1" ><i class="fa fa-edit"></i> Изменить</button>`).hide().fadeIn(1000);
+            controlButtonsPanel.append(editButton);
             $('.incorrect-input-message').remove();
             patient_card_body.each(function() {
                 $(this).find(':input').attr('disabled', 'true');
@@ -223,9 +227,9 @@ const editCardData = function () {
             $('#edit-card-button').delay(500).fadeOut(500, function () {
                 $(this).remove();
             });
-            let buttons_panel = $('#buttons');
+            let controlButtonsPanel = $('#card-control-buttons');
             let save_button = $(`<button id="save-card-button" class="btn btn-success btn-sm mr-1"><i class="fa fa-save"></i> Сохранить</button>`).hide().fadeIn(1000);
-            buttons_panel.append(save_button);
+            controlButtonsPanel.append(save_button);
             console.log(response.complete.content[0].message.text + ' ' + response.complete.content[0].cardId);
             patient_card_body.each(function(){
                 $(this).find(':input').removeAttr('disabled');
@@ -295,9 +299,9 @@ const unblockCardData = function () {
         $('#unblock-card-button').delay(500).fadeOut(500, function () {
             $(this).remove();
         });
-        let buttons_panel = $('#buttons');
-        let edit_button = $(`<button id="edit-card-button" class="btn btn-info btn-sm mr-1" ><i class="fa fa-edit"></i> Изменить</button>`).hide().fadeIn(1000);
-        buttons_panel.append(edit_button);
+        let controlButtonsPanel = $('#card-control-buttons');
+        let editButton = $(`<button id="edit-card-button" class="btn btn-dark btn-sm mr-1" ><i class="fa fa-edit"></i> Изменить</button>`).hide().fadeIn(1000);
+        controlButtonsPanel.append(editButton);
     });
 };
 
@@ -836,21 +840,25 @@ const showCardStatuses = function (data) {
 
 const loadCardMenu = function (cardData) {
     let status = cardData.card_data.status;
-    let buttons_panel = $('#buttons');
-    buttons_panel.empty();
-    let create_button = $(`<button id="create-card-button" class="btn btn-primary btn-sm mr-1" data-toggle="modal" data-target="#addPatientCardModal"><i class="fa fa-plus-circle"></i> Создать</button>`).hide().fadeIn(1000);
-    let edit_button = $(`<button id="edit-card-button" class="btn btn-info btn-sm mr-1" ><i class="fa fa-edit"></i> Изменить</button>`).hide().fadeIn(1000);
+    let controlButtonsPanel = $('#card-control-buttons');
+    let auxiliaryButtonsPanel = $('#card-auxiliary-buttons');
+    controlButtonsPanel.empty();
+    auxiliaryButtonsPanel.empty();
+    let create_button = $(`<button id="create-card-button" class="btn btn-dark btn-sm mr-1" data-toggle="modal" data-target="#addPatientCardModal"><i class="fa fa-plus-circle"></i> Создать</button>`).hide().fadeIn(1000);
+    let edit_button = $(`<button id="edit-card-button" class="btn btn-dark btn-sm mr-1" ><i class="fa fa-edit"></i> Изменить</button>`).hide().fadeIn(1000);
     let unblock_button = $(`<button id="unblock-card-button" class="btn btn-danger btn-sm mr-1"><i class="fa fa-save"></i> Разблокировать</button>`).hide().fadeIn(1000);
-    buttons_panel.append(create_button);
+    let talon_button = $(`<button id="talon-button" class="btn btn-dark btn-sm mr-1"><i class="fa fa-print"></i> Печать талона</button>`).hide().fadeIn(1000);
+    controlButtonsPanel.append(create_button);
     switch (status) {
         case 'owner' :
-            buttons_panel.append(unblock_button);
+            controlButtonsPanel.append(unblock_button);
             break;
         case 'other' :
-            buttons_panel.append(edit_button.attr('disabled', 'true'));
+            controlButtonsPanel.append(edit_button.attr('disabled', 'true'));
             break;
-        default : buttons_panel.append(edit_button);
+        default : controlButtonsPanel.append(edit_button);
     }
+    auxiliaryButtonsPanel.append(talon_button);
 };
 
 

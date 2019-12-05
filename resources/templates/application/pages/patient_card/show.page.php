@@ -3,8 +3,13 @@
         <div class="module-wrapper">
             <div id="patient-card-menu">
                 <div class="row">
-                    <div id="buttons" class="col-6 right-border"></div>
-                    <div id="search" class="col-6 right-border">
+                    <div id="buttons" class="col-6">
+                        <div class="row">
+                            <div id="card-control-buttons" class="col-8"></div>
+                            <div id="card-auxiliary-buttons" class="col-4"></div>
+                        </div>
+                    </div>
+                    <div id="search" class="col-6">
                         <div class="input-group mb-2">
                             <div class="input-group-prepend">
                                 <div class="input-group-text"><i class="fa fa-search"></i> </div>
@@ -181,7 +186,7 @@
                             <div class='patient-card-information-section-body'>
                                 <label for="region">Регион:</label>
                                 <div  class="input-group mb-2">
-                                    <input name="region-id" hidden>
+                                    <input name="region-id" value="<?=($data['card_data']->_regionId) ?: '';?>" hidden>
                                     <div class="input-group-prepend">
                                         <div class="input-group-text"><i class="fa fa-address-book"></i> </div>
                                     </div>
@@ -190,7 +195,7 @@
                                 </div>
                                 <label for="district">Район:</label>
                                 <div class="input-group mb-2">
-                                    <input name="district-id" hidden>
+                                    <input name="district-id" value="<?=($data['card_data']->_districtId) ?: '';?>" hidden>
                                     <div class="input-group-prepend">
                                         <div class="input-group-text"><i class="fa fa-address-book"></i> </div>
                                     </div>
@@ -199,7 +204,7 @@
                                 </div>
                                 <label for="locality">Населенный пункт:</label>
                                 <div class="input-group mb-2">
-                                    <input name="locality-id" hidden>
+                                    <input name="locality-id" value="<?=($data['card_data']->_localityId) ?: '';?>" hidden>
                                     <div class="input-group-prepend">
                                         <div class="input-group-text"><i class="fa fa-address-book"></i> </div>
                                     </div>
@@ -208,7 +213,7 @@
                                 </div>
                                 <label for="street">Улица:</label>
                                 <div class="input-group mb-2">
-                                    <input name="street-id" hidden>
+                                    <input name="street-id" value="<?=($data['card_data']->_streetId) ?: '';?>"hidden>
                                     <div class="input-group-prepend">
                                         <div class="input-group-text"><i class="fa fa-address-book"></i> </div>
                                     </div>
@@ -256,7 +261,7 @@
                                     <div class="input-group-prepend">
                                         <div class="input-group-text"><i class="fa fa-info-circle"></i> </div>
                                     </div>
-                                    <input type="text" class="form-control" id="profession" name="profession" placeholder="Место работы" value="<?=($data['card_data']->_profession) ?: '';?>" disabled>
+                                    <input type="text" class="form-control" id="profession" name="profession" placeholder="Профессия" value="<?=($data['card_data']->_profession) ?: '';?>" disabled>
                                 </div>
                                 <hr>
                                 <label for="notation">Примечание:</label>

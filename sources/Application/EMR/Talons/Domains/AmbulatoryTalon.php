@@ -1,5 +1,6 @@
 <?php
 
+declare(strict_types = 1);
 
 namespace Application\EMR\Talons\Domains;
 
@@ -8,15 +9,32 @@ use Application\EMR\Talons\Base\Talon;
 use Engine\Database\Connectors\ConnectorInterface;
 use Mpdf\Mpdf;
 
-class OutpatientTalon extends Talon
+/**
+ * Талон амбулаторного пациента
+ *
+ * Class AmbulatoryTalon
+ * @package Application\EMR\Talons\Domains
+ */
+class AmbulatoryTalon extends Talon
 {
     private $_dbConnection;
 
+    /**
+     * AmbulatoryTalon constructor.
+     * @param ConnectorInterface $connector
+     */
     public function __construct(ConnectorInterface $connector)
     {
         parent::__construct();
-        $this->setTemplate('outpatient.talon');
         $this->_dbConnection = $connector::getConnection();
+        $this->setTemplate('ambulatory.talon');
+        $this->setPdfConfigs([
+            'format' => 'A5-P',
+            'margin_left' => 5,
+            'margin_right' => 5,
+            'margin_top' => 5,
+            'margin_bottom' => 5,
+        ]);
     }
 
     /**
@@ -24,7 +42,7 @@ class OutpatientTalon extends Talon
      *
      * @return mixed
      */
-    protected function getTalonData(int $cardId)
+    protected function getTalonData(int $cardId) : array
     {
         $query = ("SELECT `patient_cards`.`id`, `patient_cards`.`card_number`, `patient_cards`.`surname`, 
        `patient_cards`.`firstname`, `patient_cards`.`secondname`, `gender`.`description` as gender, 
@@ -71,7 +89,7 @@ class OutpatientTalon extends Talon
                 $talonData['address'][4] = $row['house_number'];
                 $talonData['address'][5] = $row['apartment'];
                 $talonData['address'] = implode(', ', array_diff($talonData['address'], array('', null)));
-                $talonData['workplace'] = $row['workplace'];
+                $talonData['workplace'] = $row['work_place'];
                 $talonData['profession'] = $row['profession'];
             }
             return $talonData;
@@ -79,7 +97,7 @@ class OutpatientTalon extends Talon
     }
 
     /**
-     * Вывод на печать готового PDF талона
+     * Создает PDF файл с заданными параметрами
      *
      * @return mixed
      */
@@ -87,13 +105,7 @@ class OutpatientTalon extends Talon
     {
         $talonData = $this->getTalonData($cardId);
         $html = $this->prepareHtml($talonData);
-        $mpdf = new Mpdf([
-            'format' => 'A5-P',
-            'margin_left' => 5,
-            'margin_right' => 5,
-            'margin_top' => 5,
-            'margin_bottom' => 5,
-        ]);
+        $mpdf = new Mpdf($this->_pdfConfigs);
         $stylesheet = file_get_contents($this->_talonStyle);
         $mpdf->SetTitle('Карта № '.$talonData['cardNumber']);
         $mpdf->WriteHTML($stylesheet,1);

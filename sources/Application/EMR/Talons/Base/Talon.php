@@ -10,11 +10,16 @@ abstract class Talon
     protected $_talonStyle;
     protected $_talonTemplate;
     protected $_talonsFolder;
+    protected $_pdfConfigs = [];
 
     public function __construct()
     {
         $this->setFolder('resources/templates/application/pages/talons');
         $this->setStylesheet('resources/templates/application/layout/css/talon.css');
+    }
+
+    protected function setPdfConfigs(array $params){
+        $this->_pdfConfigs = $params;
     }
 
     /**

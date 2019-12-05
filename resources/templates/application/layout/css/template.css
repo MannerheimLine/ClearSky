@@ -18,7 +18,7 @@ html, body {
 }
 #sidebar_section{
     width: 270px;
-    background-color: darkblue;
+    background-color: #37474f;
     float: left;
     height: calc(100vh - 50px);
 }
@@ -47,7 +47,6 @@ html, body {
 }
 #patient-card-body{
     width: 100%;
-    /*background-color: white;*/
     padding: 10px;
 }
 .patient-card-information-section{
@@ -98,11 +97,6 @@ html, body {
 }
 .editable-status:hover i{
     color: #37474F;
-}
-.right-border{
-    border-right: solid 1px;
-    border-color: #dce1e5;
-    height: 37px;
 }
 .table-mine{
     border-collapse: separate;
@@ -191,8 +185,10 @@ html, body {
     width:270px;
     overflow:hidden;
     opacity:1;
-    z-index: 15; /*Чтоб явно была выше TinyMCE*/
     font-weight: bold;
+    border-bottom-right-radius: 10px;
+    border-bottom: solid 1px;
+    border-color: #bcb8c3;
 }
 .main-menu>ul {
     margin:7px 0;
@@ -309,5 +305,14 @@ nav ul,nav li {
     background-color: #37474f !important;
 }
 .menu-item.selected a{
-    color: yellow !important;
+    color: #e8e857 !important;
+}
+#card-auxiliary-buttons{
+    padding: 2px;
+    text-align: right;
+    height: 37px;
+    background: #eeeeee;
+    border-radius: 5px;
+    border: solid 1px;
+    border-color: #dce1e5;
 }
