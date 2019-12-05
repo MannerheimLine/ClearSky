@@ -3,5 +3,11 @@ p{
 }
 
 .talon-line{
-    font-size: 12px;
+    font-size: 11px;
+}
+
+table {
+    margin-top: 10px;
+    font-size: 11px;
+    width: 100%;
 }
