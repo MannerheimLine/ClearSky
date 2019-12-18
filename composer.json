@@ -18,7 +18,8 @@
   "autoload": {
       "psr-4": {
           "Engine\\": "sources/engine/",
-          "Application\\": "sources/application/"
+          "Application\\": "sources/application/",
+          "Administrator\\": "sources/administrator/"
       }
   },
   "require-dev": {

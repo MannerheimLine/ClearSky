@@ -551,6 +551,15 @@ class PatientCard extends AppDomain implements \JsonSerializable
         ];
     }
 
+    public function getFirstRecordId() : int {
+        $query = ("SELECT * FROM `patient_cards` LIMIT 1");
+        $result = $this->_dbConnection->prepare($query);
+        $result->execute();
+        if ($result->rowCount() > 0){
+            return $result->fetch()['id'];
+        }
+    }
+
     public function __get($name)
     {
         return $this->$name;

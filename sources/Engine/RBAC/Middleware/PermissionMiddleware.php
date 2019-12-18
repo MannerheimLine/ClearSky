@@ -22,7 +22,7 @@ class PermissionMiddleware implements MiddlewareInterface
 {
     const PERMIT_MODE = 0;
     const REDIRECT_MODE = 1;
-    const RESPONSE_MODE = 2;
+    const FORBIDDEN_MODE = 2;
     private $_dbConnector;
 
     /**
@@ -94,11 +94,11 @@ class PermissionMiddleware implements MiddlewareInterface
         $permission = $this->getPermission($url);
         switch ($this->getMode($permission)){
             case self::REDIRECT_MODE : return new RedirectResponse('/', 302); break;
-            case self::RESPONSE_MODE :
+            case self::FORBIDDEN_MODE :
                 $response = new StructuredResponse();
                 $message = $response->message($response::FAIL, $permission->_message);
                 $response->failed()->incomplete('message', $message);
-                return new JsonResponse($response, 401);
+                return new JsonResponse($response, 403); //Forbidden, запрещено, неуполномочен
                 break;
         }
         return $response = $handler->handle($request);

@@ -1,15 +1,11 @@
-/*
- *
- *
- *
- *
+/**
  *
  */
 
 const sideBar = $('#sidebar_section');
 
 $(function () {
-    loadAppMenu(2);
+    loadAdminMenu(1);
 });
 
 
@@ -17,7 +13,7 @@ $(function () {
  * Загрузка меню, клики по ссылкам меню
  */
 
-const loadAppMenu = function (menuId) {
+const loadAdminMenu = function (menuId) {
     let request =  $.ajax({
         type: "POST",
         url: "/menu/get",
@@ -77,4 +73,3 @@ const logOut = function () {
         }
     });
 };
-

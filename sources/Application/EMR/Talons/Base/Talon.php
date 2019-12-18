@@ -66,7 +66,7 @@ abstract class Talon
      *
      * @return mixed
      */
-    abstract protected function getTalonData(int $cardId);
+    abstract public function getTalonData(int $cardId);
 
     /**
      * Вывод на печать готового PDF талона

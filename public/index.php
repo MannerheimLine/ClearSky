@@ -1,5 +1,10 @@
 <?php
 
+use Administrator\Desktop\Actions\DesktopShowAction;
+use Administrator\RBAC\Actions\PermissionsShowAction;
+use Administrator\RBAC\Actions\RolesShowAction;
+use Administrator\Users\Actions\UsersIndexAction;
+use Administrator\Users\Actions\UsersShowAction;
 use Application\EMR\PatientCard\Card\Actions\PatientCardAddAction;
 use Application\EMR\PatientCard\Card\Actions\PatientCardEditAction;
 use Application\EMR\PatientCard\Card\Actions\PatientCardGetAction;
@@ -72,6 +77,14 @@ $map->post('menu/get', '/menu/get', MenuIndexAction::class);
 $map->get('app/patient-card/talon', '/app/patient-card/talon/ambulatory/show/{id}', AmbulatoryTalonShowAction::class)->tokens(['id' => '\d+']);
 $map->get('app/patient-card/talon/save', '/app/patient-card/talon/ambulatory/save/{id}', AmbulatoryTalonSaveAction::class)->tokens(['id' => '\d+']);
 
+/*
+ * Административная часть
+ */
+$map->get('administrator/desktop', '/administrator/desktop', DesktopShowAction::class);
+$map->get('administrator/users', '/administrator/users', UsersIndexAction::class);
+$map->get('administrator/rbac/roles', '/administrator/rbac/roles', RolesShowAction::class);
+$map->get('administrator/rbac/permissions', '/administrator/rbac/permissions', PermissionsShowAction::class);
+
 #DI Container
 $definitions = [
     ConnectorInterface::class => DI\create(MySQLConnector::class),
@@ -124,11 +137,13 @@ if ($route){
     $pipeline->pipe(path('/login', new LoginMiddleware()));
     $pipeline->pipe(path('/login/do', new AuthFormValidatorMiddleware()));
     $pipeline->pipe(path('/app', new AuthMiddleware(App::getDependency(ConnectorInterface::class))));
+    $pipeline->pipe(path('/administrator', new AuthMiddleware(App::getDependency(ConnectorInterface::class))));
     $pipeline->pipe(path('/app', new PermissionMiddleware(App::getDependency(ConnectorInterface::class))));
+    $pipeline->pipe(path('/administrator', new PermissionMiddleware(App::getDependency(ConnectorInterface::class))));
     $pipeline->pipe(path('/app/patient-card/update', new CardValidatorMiddleware()));
     $pipeline->pipe(path('/app/patient-card/add', new CardValidatorMiddleware()));
-    $pipeline->pipe(path('/app/control-panel', new ClientIpMiddleware()));
-    $pipeline->pipe(new PathMiddlewareDecorator('/app/patient-card', new ModifyMiddleware()));
+    //$pipeline->pipe(path('/app/control-panel', new ClientIpMiddleware()));
+    //$pipeline->pipe(new PathMiddlewareDecorator('/app/patient-card', new ModifyMiddleware()));
 #Запуск трубопровода
     $response = $pipeline->process($request, $action);
 #Добавление пост-заголовков

@@ -15,7 +15,7 @@ class PermissionsCollection
 {
     const PERMIT_MODE = 0;
     const REDIRECT_MODE = 1;
-    const RESPONSE_MODE = 2;
+    const FORBIDDEN_MODE = 2;
 
     private static $_permissions = [
         'default' => [
@@ -26,19 +26,19 @@ class PermissionsCollection
 
         'patient-card' => [
             'name' => 'patientCardAccess',
-            'mode' => 2,
+            'mode' => self::FORBIDDEN_MODE,
             'message' => 'Доступ в разде карт Вам закрыт'
         ],
 
         'patient-card/edit' => [
             'name' => 'patientCardEdit',
-            'mode' => self::RESPONSE_MODE,
+            'mode' => self::FORBIDDEN_MODE,
             'message' => 'Редактирование карты Вам запрещено'
         ],
 
         'patient-card/delete' => [
             'name' => 'patientCardDelete',
-            'mode' => self::RESPONSE_MODE,
+            'mode' => self::FORBIDDEN_MODE,
             'message' => 'Удалять карты Вам запрещено'
         ]
     ];

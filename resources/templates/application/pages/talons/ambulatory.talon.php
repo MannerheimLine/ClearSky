@@ -13,60 +13,60 @@
         </table>
     </div>
     <div class="talon-line">
-        <b>1. Ф.И.О</b> <?=$talonData['fullName'];?>
-        <b>2. Пол:</b> <?=$talonData['gender']; ?>
-        <b>3. Дата рождения:</b> <?=$talonData['dateBirth']; ?>
+        1. Ф.И.О <b><?=$talonData['fullName'];?></b>
+        2. Пол: <b><?=$talonData['gender']; ?></b>
+        3. Дата рождения: <b><?=$talonData['dateBirth']; ?></b>
     </div>
     <div class="talon-line">
-        <b>4. Паспортные данные:</b> <?=$talonData['passportSerial'].' '.$talonData['passportNumber']; ?>
-        <b>5. Выдан:</b> <?=$talonData['fmsDepartment']?>
+        4. Паспортные данные: <b><?=$talonData['passportSerial'].' '.$talonData['passportNumber']; ?></b>
+        5. Выдан: <b><?=$talonData['fmsDepartment']?></b>
     </div>
     <div class="talon-line">
-        <b>6. Свидетельство о рождении:</b> <?=$talonData['birthCertificateSerial'].' '.$talonData['birthCertificateNumber']; ?>
-        <b>7. Выдано:</b> <?=$talonData['registryOffice'];?>
+        6. Свидетельство о рождении: <b><?=$talonData['birthCertificateSerial'].' '.$talonData['birthCertificateNumber']; ?></b>
+        7. Выдано: <b><?=$talonData['registryOffice'];?></b>
     </div>
     <div class="talon-line">
-        <b>8. СНИЛС:</b> <?=$talonData['insuranceCertificate'];?>
-        <b>9. Полис:</b> <?=$talonData['policyNumber'];?>
+        8. СНИЛС: <b><?=$talonData['insuranceCertificate'];?></b>
+        9. Полис: <b><?=$talonData['policyNumber'];?></b>
     </div>
     <div class="talon-line">
-        <b>10. Страховая компания:</b> <?=$talonData['insuranceCompany'];?>
-        <b>11. Код страховщика:</b> <?=$talonData['insurerCode'];?>
+        10. Страховая компания: <b><?=$talonData['insuranceCompany'];?></b>
+        11. Код страховщика: <b><?=$talonData['insurerCode'];?></b>
     </div>
     <div class="talon-line">
-        <b>12. Категория:</b> ___________
-        <b>13. Источник финансирования:</b> ________
+        12. Категория: ___________
+        13. Источник финансирования: ________
     </div>
     <div class="talon-line">
-        <b>14. Адрес:</b>  <?=$talonData['address']; ?>
+        14. Адрес: <b><?=$talonData['address']; ?></b>
     </div>
     <?php if(isset($talonData['workplace'])) : ?>
     <div class="talon-line">
         <b>15. Работает</b>
-        <b>16. Место работы:</b> <?=$talonData['workplace']; ?>
-        <b>17. Профессия:</b> <?=$talonData['profession']; ?>
+        16. Место работы: <b><?=$talonData['workplace']; ?></b>
+        17. Профессия: <b><?=$talonData['profession']; ?></b>
     </div>
     <?php else :?>
         <div class="talon-line">
             <b>15. Не работает</b>
-            <b>16. Место работы:</b> отсутствует
-            <b>17. Статус:</b> <i>Пенсионер</i> / <i>Безработный</i>
+            16. Место работы: <b>отсутствует</b>
+            17. Статус: <b><i>Пенсионер</i> / <i>Безработный</i></b>
         </div>
     <?php endif; ?>
     <div class="talon-line">
-        <b>18. Категория льготы:</b> _____
-        <b>19. Цель обслуживания:</b> ______________________________
+        18. Категория льготы: _____
+        19. Цель обслуживания: ______________________________
     </div>
     <div class="talon-line">
-        <b>20. Принят на долечивание (код ЛПУ):</b> ______________________________________________
+        20. Принят на долечивание (код ЛПУ): ______________________________________________
     </div>
     <div class="talon-line">
-        <b>21. Случай обслуживания:</b> 1 - Первичный / 2 - Повторный
-        <b>22. Экстренный:</b> 1 - Да / 2 - Нет
+        21. Случай обслуживания: 1 - Первичный / 2 - Повторный
+        22. Экстренный: 1 - Да / 2 - Нет
     </div>
     <div class="talon-line">
-        <b>23. Дата начала:</b> _______________________
-        <b>24. Дата закрытия:</b> _______________________
+        23. Дата начала: _______________________
+        24. Дата закрытия: _______________________
     </div>
     <div class="talon-line">
         <table class="talon-table">

@@ -34,6 +34,7 @@
                             </div>
                             <div class='patient-card-information-section-body'>
                                 <div class="row">
+                                    <input name="human-type" value="<?=$data['card_data']->_humanType;?>" hidden>
                                     <div class="col-6">
                                         <div id="patient-card-alive-section" class="patient-card-status blocked-status">
                                             <input name="is-alive-id" value="<?=$data['card_data']->_isAliveId;?>" hidden>
@@ -350,5 +351,3 @@
     </div>
 </div>
 <script type="application/javascript" src="/resources/templates/application/layout/js/patient.card.js"></script>
-
-

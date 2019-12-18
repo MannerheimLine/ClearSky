@@ -1,0 +1,204 @@
+html, body {
+    margin:0;
+    padding:0;
+}
+
+#header_section{
+    height: 50px;
+    background-color: grey;
+}
+#main_section{
+    background-color: #6f42c1;
+    color: royalblue;
+}
+#footer_section{
+    height: 200px;
+    background-color: #0b2e13;
+}
+#sidebar_section{
+    width: 270px;
+    background-color: #37474f;
+    float: left;
+    height: calc(100vh - 50px);
+}
+#content_section{
+    width: 100%;
+    min-height: calc(100vh - 50px); /*Учитывая размер хидера, должен отнять*/
+    background-color: white;
+}
+.module-wrapper{
+    background-color: #eeeeee;
+    border: solid 1px;
+    border-color: #c1c1c1;
+    border-radius: 10px;
+    width: 100%;
+    padding: 15px;
+}
+#users-menu{
+    height: 50px;
+    width: 100%;
+    background-color: white;
+    margin-bottom: 10px;
+    padding: 6px;
+    border: solid 1px;
+    border-radius: 5px;
+    border-color: #dce1e5;
+}
+#users-body{
+    width: 100%;
+    padding: 10px;
+    background-color: white;
+    border: solid 1px;
+    border-radius: 5px;
+    border-color: #dce1e5;
+}
+
+/* MENU */
+.fa-for-menu {
+    position: relative;
+    display: table-cell;
+    width: 55px;
+    height: 36px;
+    text-align: center;
+    vertical-align: middle;
+    font-size:20px;
+}
+.main-menu {
+    top:0;
+    bottom:0;
+    min-height:100px;
+    left:0;
+    width:270px;
+    overflow:hidden;
+    opacity:1;
+    font-weight: bold;
+    border-bottom-right-radius: 10px;
+    border-bottom: solid 1px;
+    border-color: #bcb8c3;
+}
+.main-menu>ul {
+    margin:7px 0;
+}
+.main-menu li {
+    position:relative;
+    display:block;
+    width:270px;
+}
+.main-menu li>a {
+    position:relative;
+    display:table;
+    border-collapse:collapse;
+    border-spacing:0;
+    /*color: #e2ddea;*/
+    font-size: 16px;
+    text-decoration:none;
+    -webkit-transform:translateZ(0) scale(1,1);
+    -webkit-transition:all .14s linear;
+    transition:all .14s linear;
+    font-family: 'Strait', sans-serif;
+    border-top:1px solid #1a2129;
+    text-shadow: 1px 1px 1px  #000;
+}
+.main-menu .nav-icon {
+    position:relative;
+    display:table-cell;
+    width:55px;
+    height:36px;
+    text-align:center;
+    vertical-align:middle;
+    font-size:18px;
+}
+.main-menu .nav-text  {
+    position:relative;
+    display:table-cell;
+    vertical-align:middle;
+    width:215px;
+    font-family: 'Titillium Web', sans-serif;
+}
+.main-menu .share {
+}
+.main-menu .fb-like {
+    left: 180px;
+    position:absolute;
+    top: 15px;
+}
+.main-menu>ul.logout {
+    position:absolute;
+    left:0;
+    bottom:0;
+}
+.no-touch .scrollable.hover {
+    overflow-y:hidden;
+}
+.no-touch .scrollable.hover:hover {
+    overflow-y:auto;
+    overflow:visible;
+}
+a:hover,a:focus {
+    text-decoration:none;
+    border-left:0px solid #F7F7F7;
+}
+nav {
+    -webkit-user-select:none;
+    -moz-user-select:none;
+    -ms-user-select:none;
+    -o-user-select:none;
+    user-select:none;
+}
+nav ul,nav li {
+    outline:0;
+    margin:0;
+    padding:0;
+    text-transform: uppercase;
+}
+/* Darker element side menu Start*/
+.darkerli
+{
+    background-color:#ededed;
+    text-transform:capitalize;
+}
+.darkerlishadow
+{
+    background-color:#ededed;
+    text-transform:capitalize;
+    -webkit-box-shadow: inset 0px 5px 5px -4px rgba(50, 50, 50, 0.55);
+    -moz-box-shadow:    inset 0px 5px 5px -4px rgba(50, 50, 50, 0.55);
+    box-shadow:         inset 0px 5px 5px -4px rgba(50, 50, 50, 0.55);
+}
+.darkerlishadowdown
+{
+    background-color:#ededed;
+    text-transform:capitalize;
+    -webkit-box-shadow: inset 0px -4px 5px -4px rgba(50, 50, 50, 0.55);
+    -moz-box-shadow:    inset 0px -4px 5px -4px rgba(50, 50, 50, 0.55);
+    box-shadow:         inset 0px -4px 5px -4px rgba(50, 50, 50, 0.55);
+}
+/* Darker element side menu End*/
+.main-menu li:hover>a,nav.main-menu li.active>a,.dropdown-menu>li>a:hover,.dropdown-menu>li>a:focus,.dropdown-menu>.active>a,.dropdown-menu>.active>a:hover,.dropdown-menu>.active>a:focus,.no-touch .dashboard-page nav.dashboard-menu ul li:hover a,.dashboard-page nav.dashboard-menu ul li.active a {
+    color:#fff;
+    background-color: #37474f;
+    text-shadow: 0px 0px 0px;
+}
+.area {
+    float: left;
+    background: #263238;
+    width: 100%;
+}
+.menu-link{
+    color: #e2ddea;
+}
+.menu-item.selected{
+    background-color: #37474f !important;
+}
+.menu-item.selected a{
+    color: #e8e857 !important;
+}
+#card-auxiliary-buttons{
+    padding: 2px;
+    text-align: right;
+    height: 37px;
+    background: #eeeeee;
+    border-radius: 5px;
+    border: solid 1px;
+    border-color: #dce1e5;
+}

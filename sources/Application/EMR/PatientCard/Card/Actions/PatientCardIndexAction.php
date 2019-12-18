@@ -28,7 +28,8 @@ class PatientCardIndexAction extends AppAction implements RequestHandlerInterfac
          * Можно не использовать Payload а напрямую передавать объект patient_card
          * Request используется для пердачи параметров
          */
-        $response = $this->_responder->respond($request);
+        $payload = $this->_patientCard->getFirstRecordId();
+        $response = $this->_responder->respond($request, $payload);
         return $response;
     }
 

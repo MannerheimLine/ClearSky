@@ -20,6 +20,7 @@ $(function () {
     let data = {
         "card_data": {
             "status": $("input[name='status']").val(),
+            "humanType": parseInt($("input[name='human-type']").val()),
             "isAliveId": parseInt($("input[name='is-alive-id']").val()),
             "isAttachId": parseInt($("input[name='is-attach-id']").val())
         }
@@ -809,7 +810,6 @@ const showCardStatuses = function (data) {
      */
     $('#patient-alive-status').text(card_data.isAlive);
     $('#patient-attached-status').text(card_data.isAttached);
-
     switch (card_data.isAliveId) {
         //Если пациент жив.
         case 1 :
@@ -984,7 +984,6 @@ const searchInSection = function(field, params){
             cache: false
         });
         request.done(function (response) {
-            console.log(response);
             SearchResultArea.empty();
             $(`#${field}-search-result-area`).append(`<div id="${field}-search-result" class="search-result-container"></div>`);
             if (Array.isArray(response)) {

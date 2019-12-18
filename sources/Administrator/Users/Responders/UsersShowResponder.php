@@ -1,16 +1,16 @@
 <?php
 
-declare(strict_types = 1);
 
-namespace Application\EMR\PatientCard\Card\Responders;
+namespace Administrator\Users\Responders;
 
 
-use Application\Base\AppResponder;
+use Administrator\Base\AdminResponder;
 use Psr\Http\Message\ServerRequestInterface;
 use Zend\Diactoros\Response;
 
-class PatientCardIndexResponder extends AppResponder
+class UsersShowResponder extends AdminResponder
 {
+
     /**
      * @param ServerRequestInterface $request
      * @param null $payload
@@ -18,6 +18,6 @@ class PatientCardIndexResponder extends AppResponder
      */
     public function respond(ServerRequestInterface $request, $payload = null): Response
     {
-        return new Response\RedirectResponse('/app/patient-card/show/'.$payload);
+        return new Response\JsonResponse($payload); //JSON
     }
 }

@@ -42,7 +42,7 @@ class AmbulatoryTalon extends Talon
      *
      * @return mixed
      */
-    protected function getTalonData(int $cardId) : array
+    public function getTalonData(int $cardId) : array
     {
         $query = ("SELECT `patient_cards`.`id`, `patient_cards`.`card_number`, `patient_cards`.`surname`, 
        `patient_cards`.`firstname`, `patient_cards`.`secondname`, `gender`.`description` as gender, 
