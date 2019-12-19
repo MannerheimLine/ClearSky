@@ -52,6 +52,12 @@ html, body {
     border-radius: 5px;
     border-color: #dce1e5;
 }
+#users-menu-section{
+    width: 100%;
+    height: 40px;
+    border-bottom: solid 1px;
+    border-bottom-color: #c1c1c1;
+}
 
 /* MENU */
 .fa-for-menu {
@@ -201,4 +207,35 @@ nav ul,nav li {
     border-radius: 5px;
     border: solid 1px;
     border-color: #dce1e5;
+}
+/* TABLE */
+.table-mine{
+    border-collapse: separate;
+    border-spacing: 1px;
+    margin-bottom: 5px;
+    width: 100%;
+}
+.table-mine thead{
+    background-color: #37474F;
+    color: white;
+    font-size: 12px;
+}
+.table-mine > thead > tr > th,
+.table-mine > tbody > tr > th,
+.table-mine > tfoot > tr > th,
+.table-mine > thead > tr > td,
+.table-mine > tbody > tr > td,
+.table-mine > tfoot > tr > td {
+    padding: 8px;
+    line-height: 1.42857143;
+    text-align: center;
+}
+.table-mine tbody{
+    color: #37474F;
+    background-color: white;
+    font-size: 12px;
+}
+
+.pagination-center{
+    justify-content: center;
 }

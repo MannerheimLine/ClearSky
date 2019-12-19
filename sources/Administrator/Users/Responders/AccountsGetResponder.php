@@ -8,7 +8,7 @@ use Administrator\Base\AdminResponder;
 use Psr\Http\Message\ServerRequestInterface;
 use Zend\Diactoros\Response;
 
-class UsersShowResponder extends AdminResponder
+class AccountsGetResponder extends AdminResponder
 {
 
     /**
@@ -18,6 +18,6 @@ class UsersShowResponder extends AdminResponder
      */
     public function respond(ServerRequestInterface $request, $payload = null): Response
     {
-        return new Response\JsonResponse($payload); //JSON
+        return new Response\JsonResponse($payload);
     }
 }

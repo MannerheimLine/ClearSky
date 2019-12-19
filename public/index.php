@@ -3,6 +3,7 @@
 use Administrator\Desktop\Actions\DesktopShowAction;
 use Administrator\RBAC\Actions\PermissionsShowAction;
 use Administrator\RBAC\Actions\RolesShowAction;
+use Administrator\Users\Actions\AccountsGetAction;
 use Administrator\Users\Actions\UsersIndexAction;
 use Administrator\Users\Actions\UsersShowAction;
 use Application\EMR\PatientCard\Card\Actions\PatientCardAddAction;
@@ -82,8 +83,9 @@ $map->get('app/patient-card/talon/save', '/app/patient-card/talon/ambulatory/sav
  */
 $map->get('administrator/desktop', '/administrator/desktop', DesktopShowAction::class);
 $map->get('administrator/users', '/administrator/users', UsersIndexAction::class);
-$map->get('administrator/rbac/roles', '/administrator/rbac/roles', RolesShowAction::class);
-$map->get('administrator/rbac/permissions', '/administrator/rbac/permissions', PermissionsShowAction::class);
+$map->get('administrator/accounts/get', '/administrator/accounts/get', AccountsGetAction::class);
+//$map->get('administrator/rbac/roles', '/administrator/rbac/roles', RolesShowAction::class);
+//$map->get('administrator/rbac/permissions', '/administrator/rbac/permissions', PermissionsShowAction::class);
 
 #DI Container
 $definitions = [

@@ -31,7 +31,7 @@ class PatientCardShowAction extends AppAction implements RequestHandlerInterface
     {
         $id = $request->getAttribute('id');
         $payload['genders'] = $this->_patientCard->getGenders();
-        $payload['card_data'] = $this->_patientCard->get($id); //return json
+        $payload['card_data'] = $this->_patientCard->get($id);
         $response = $this->_responder->respond($request, $payload);
         return $response;
     }

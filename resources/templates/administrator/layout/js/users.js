@@ -12,11 +12,28 @@ $(function () {
     loadMenu();
     let state = localStorage.getItem("usersState");
     switch (state){
-        case "users": loadUsers(); break;
-        case "rbac":  loadRBAC(); break;
-        default: loadUsers(); break; //Если состояние еще не установлено, будет подгружаться заданная страница
+        case "accounts": loadAccounts(); break;
+        case "roles":  loadRoles(); break;
+        case "permissions":  loadPermissions(); break;
+        default: loadAccounts(); break; //Если состояние еще не установлено, будет подгружаться заданная страница
     }
 });
+
+const loadMenu = function () {
+    let usersButton = $(`<button id="accounts-button" class="btn btn-outline-dark btn-sm mr-1"><i class="fa fa-user"></i> Учетные записи</button>`).hide().fadeIn(1000);
+    let rolesButton = $(`<button id="roles-button" class="btn btn-outline-dark btn-sm mr-1"><i class="fa fa-user-tag"></i> Роли</button>`).hide().fadeIn(1000);
+    let permissionsButton = $(`<button id="permissions-button" class="btn btn-outline-dark btn-sm mr-1"><i class="fa fa-user-check"></i> Привелегии</button>`).hide().fadeIn(1000);
+    usersMenu.append(usersButton);
+    usersMenu.append(rolesButton);
+    usersMenu.append(permissionsButton);
+};
+
+const flipButtons = function (buttonId) {
+    //usersMenu.each(function () {
+    //$('.btn').addClass('btn-outline-dark').removeClass('btn-dark');
+    //});
+    $(buttonId).addClass('btn-dark').removeClass('btn-outline-dark');
+};
 
 usersMenu.on('click','.btn', function () {
     usersMenu.each(function () {
@@ -25,41 +42,115 @@ usersMenu.on('click','.btn', function () {
     $(this).addClass('btn-dark').removeClass('btn-outline-dark');
 });
 
-usersMenu.on('click', '#users-button', function () {
-    loadUsers();
+usersMenu.on('click', '#accounts-button', function () {
+    loadAccounts();
 });
 
-usersMenu.on('click', '#rbac-button', function () {
-    loadRBAC();
+usersMenu.on('click', '#roles-button', function () {
+    loadRoles();
 });
 
-const loadUsers = function () {
-    flipButtons('#users-button');
+usersMenu.on('click', '#permissions-button', function () {
+    loadPermissions();
+});
+
+
+/**
+ * Вкладка пользователи
+ */
+
+const loadAccounts = function () {
+    flipButtons('#accounts-button');
     usersBody.empty();
-    let line = `<div>Тут будут пользователи</div>`;
+    let line = `<div id="accounts-tab-menu">
+                    <button class="btn btn-success btn-sm"><i class="fa fa-plus-circle"></i> Добавить</button>
+                    <button class="btn btn-danger btn-sm"><i class="fa fa-trash"></i> Удалить выбранные</button>
+                </div>`;
     usersBody.append(line);
-    localStorage.setItem('usersState', 'users');
-};
-
-const loadRBAC = function () {
-    flipButtons('#rbac-button');
-    usersBody.empty();
-    let line = `<div>Тут будут привелегии и роли</div>`;
-    usersBody.append(line);
-    localStorage.setItem('usersState', 'rbac');
-};
-
-const loadMenu = function () {
-    let usersButton = $(`<button id="users-button" class="btn btn-outline-dark btn-sm mr-1"><i class="fa fa-user"></i> Пользователи</button>`).hide().fadeIn(1000);
-    let rbacButton = $(`<button id="rbac-button" class="btn btn-outline-dark btn-sm mr-1"><i class="fa fa-user-tag"></i> Роли и привелегии</button>`).hide().fadeIn(1000);
-
-    usersMenu.append(usersButton);
-    usersMenu.append(rbacButton);
-};
-
-const flipButtons = function (buttonId) {
-    usersMenu.each(function () {
-        $('.btn').addClass('btn-outline-dark').removeClass('btn-dark');
+    usersBody.append(loadAccountsTableTemplate());
+    localStorage.setItem('usersState', 'accounts');
+    let request = $.ajax({
+        type: "GET",
+        url: "/administrator/accounts/get",
+        cache: false
     });
-    $(buttonId).addClass('btn-dark').removeClass('btn-outline-dark');
+    request.done(function (response) {
+        let tableContent = $('#accounts-table-content');
+        $.each(response, function (key, value) {
+           let line = loadAccountsTableContentLine(value);
+           tableContent.append(line);
+        });
+    });
 };
+
+const loadAccountsTableTemplate = function () {
+    return `
+        <div id="accounts-tab-content" class="row" style="padding: 10px;">
+            <table id="accounts-data-table" class="table-striped table-mine full-width box-shadow--2dp">
+                 <thead>
+                     <tr>
+                         <th style="width: 5%;"><input type="checkbox"></th>
+                         <th style="width: 20%;">Имя учетной записи</th>
+                         <th style="width: 30%;">ФИО</th>
+                         <th style="width: 30%;">Роли</th>
+                         <th style="width: 15%;">Действия</th>
+                     </tr>
+                 </thead>
+                 <tbody id="accounts-table-content"></tbody>
+            </table>
+        </div>
+        <div id="accounts-tab-pagination">
+        <div class="text-xs-center">
+            <ul class="pagination pagination-center">
+                <input id="current-page" name="current-page" hidden>
+                <li class="page-item"><a id="previous-page" class="page-link" href="#">Предыдущая</a></li>
+                <li class="page-item"><a id="next-page" class="page-link" href="#">Следующая</a></li>
+            </ul>
+        </div>
+    </div>`
+};
+
+const loadAccountsTableContentLine = function (response) {
+    return $(`<tr class="tr-table-content">
+                    <td><input type="checkbox"></td>
+                    <td>${response.login}</td>
+                    <td>${response.surname ? response.surname : ''} ${response.firstname ? response.firstname : ''} ${response.secondname ? response.secondname : ''}</td>
+                    <td>тут будет список ролей</td>
+                    <td>
+                        <button class="btn btn-outline-warning btn-sm mr-1" onclick="loadCard(${response.id})">
+                            <i class="fa fa-edit"></i> 
+                        </button>
+                        <button class="btn btn-outline-danger btn-sm mr-1" onclick="loadCard(${response.id})">
+                            <i class="fa fa-trash"></i> 
+                        </button>
+                    </td>
+                </tr>`).hide().fadeIn(1000);
+};
+
+/**
+ * Вкладка роли
+ */
+
+const loadRoles = function () {
+    flipButtons('#roles-button');
+    usersBody.empty();
+    let line = `<div>Тут будут роли</div>`;
+    usersBody.append(line);
+    localStorage.setItem('usersState', 'roles');
+};
+
+/**
+ * Вкладка привелегии
+ */
+const loadPermissions = function () {
+    flipButtons('#permissions-button');
+    usersBody.empty();
+    let line = `<div>Тут будут привелегии</div>`;
+    usersBody.append(line);
+    localStorage.setItem('usersState', 'permissions');
+};
+
+
+
+
+
