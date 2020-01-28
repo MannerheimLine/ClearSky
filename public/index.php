@@ -138,7 +138,7 @@ if ($route){
     $pipeline->pipe(path('/', new MemoryUsageMiddleware()));
     $pipeline->pipe(path('/login', new LoginMiddleware()));
     $pipeline->pipe(path('/login/do', new AuthFormValidatorMiddleware()));
-    $pipeline->pipe(path('/app', new AuthMiddleware(App::getDependency(ConnectorInterface::class))));
+    //$pipeline->pipe(path('/app', new AuthMiddleware(App::getDependency(ConnectorInterface::class))));
     $pipeline->pipe(path('/administrator', new AuthMiddleware(App::getDependency(ConnectorInterface::class))));
     $pipeline->pipe(path('/app', new PermissionMiddleware(App::getDependency(ConnectorInterface::class))));
     $pipeline->pipe(path('/administrator', new PermissionMiddleware(App::getDependency(ConnectorInterface::class))));

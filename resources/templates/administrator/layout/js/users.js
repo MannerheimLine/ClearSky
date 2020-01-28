@@ -107,17 +107,40 @@ const loadAccountsTableTemplate = function () {
                 <li class="page-item"><a id="next-page" class="page-link" href="#">Следующая</a></li>
             </ul>
         </div>
+        <div id="modals">
+            <!-- Modal -->
+            <div class="modal fade" id="editUserModal" tabindex="-1" role="dialog">
+              <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <h5 class="modal-title"><i class="fa fa-edit"></i> Редактирование пользователя: {Login}</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                      <span aria-hidden="true">&times;</span>
+                    </button>
+                  </div>
+                  <div class="modal-body">
+                    ...
+                  </div>
+                  <div class="modal-footer">
+                    <button type="button" class="btn btn-primary btn-sm">Сохранить</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- Modal -->
+        </div>
     </div>`
 };
 
 const loadAccountsTableContentLine = function (response) {
     return $(`<tr class="tr-table-content">
+                    <td hidden><input name="user-id" value="${response.id}"></td>
                     <td><input type="checkbox"></td>
                     <td>${response.login}</td>
                     <td>${response.surname ? response.surname : ''} ${response.firstname ? response.firstname : ''} ${response.secondname ? response.secondname : ''}</td>
-                    <td>тут будет список ролей</td>
+                    <td>${formRolesCell(response)}</td>
                     <td>
-                        <button class="btn btn-outline-warning btn-sm mr-1" onclick="loadCard(${response.id})">
+                        <button class="btn btn-outline-warning btn-sm mr-1" data-toggle="modal" data-target="#editUserModal">
                             <i class="fa fa-edit"></i> 
                         </button>
                         <button class="btn btn-outline-danger btn-sm mr-1" onclick="loadCard(${response.id})">
@@ -125,6 +148,14 @@ const loadAccountsTableContentLine = function (response) {
                         </button>
                     </td>
                 </tr>`).hide().fadeIn(1000);
+};
+
+const formRolesCell = function (response) {
+    let result = '';
+    $.each(response.roles,function (index, value) {
+        result += `<span class="badge badge-primary mr-1">${value.role_description}</span>`;
+    });
+    return result;
 };
 
 /**

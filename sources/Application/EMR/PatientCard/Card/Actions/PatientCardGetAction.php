@@ -33,6 +33,13 @@ class PatientCardGetAction extends AppAction implements RequestHandlerInterface
         $payload['genders'] = $this->_patientCard->getGenders();
         $payload['card_data'] = $this->_patientCard->get($id); //return json
         $response = $this->_responder->respond($request, $payload);
-        return $response;
+        /**
+         * Сайт с которого идет запрос
+         */
+        $site = $_SERVER['HTTP_ORIGIN'];
+        /**
+         * Данный заголовок дает возможность делать запросы от Vue JS приложения
+         */
+        return $response->withHeader('Access-Control-Allow-Origin', 'http://localhost:8080');
     }
 }
