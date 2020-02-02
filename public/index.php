@@ -64,7 +64,12 @@ $map->post('app/patient-card/edit', '/app/patient-card/edit', PatientCardEditAct
 $map->post('app/patient-card/add', '/app/patient-card/add', PatientCardAddAction::class);
 $map->get('app/patient-card/show', '/app/patient-card/show/{id}', PatientCardShowAction::class)->tokens(['id' => '\d+']);
 $map->post('app/patient-card/search-cards', '/app/patient-card/search-cards', PatientCardsSearchAction::class)->tokens(['searchString' => '\w+']);
-$map->post('app/patient-card/search-region', '/app/patient-card/search-region', RegionSearchAction::class)->tokens(['searchString' => '\w+']);
+
+
+$map->get('app/patient-card/search-region', '/app/patient-card/search-region', RegionSearchAction::class);//->tokens(['region' => '\w+']);
+//$map->post('app/patient-card/search-region', '/app/patient-card/search-region', RegionSearchAction::class)->tokens(['searchString' => '\w+']);
+
+
 $map->post('app/patient-card/search-district', '/app/patient-card/search-district', DistrictSearchAction::class)->tokens(['searchString' => '\w+']);
 $map->post('app/patient-card/search-locality', '/app/patient-card/search-locality', LocalitySearchAction::class)->tokens(['searchString' => '\w+']);
 $map->post('app/patient-card/search-street', '/app/patient-card/search-street', StreetSearchAction::class)->tokens(['searchString' => '\w+']);
@@ -107,31 +112,26 @@ $resolver->resolve($request);
 #Парсинг роутов
 $matcher = $aura->getMatcher();
 $route = $matcher->match($request);
+
+
+
+//$url = $_SERVER['REQUEST_URI'];
+//$l = parse_url($url);
+//parse_str($l['query'], $output);
+
+//$request = $request->withAttribute('data', $output);
+//$a = 1;
+
 if ($route){
     foreach ($route->attributes as $key => $val) {
         $request = $request->withAttribute($key, $val);
     }
-
     $actionClass = $route->handler;
     $action = $container->get($actionClass);
 
-
-
-
-    //$db = $container->get(\Engine\Database\Creators\DbCreator::class);
-    //$db->createDataBase('db');
-    //$db->createTable('table');
-    //$collection = new SchemeCollection('sources/Engine/Database/Creators/Schemes');
-    //$tableCreator = $container->get(TableCreator::class);
-    //foreach ($collection->getSchemes() as $scheme){
-    //    $tableCreator->create($scheme);
-    //}
-
-
-
-    /**
-     * @var ResponseInterface $response
-     */
+#Донастройка request для поулчения get параметров, передаваемых как массив
+parse_str(parse_url($_SERVER['REQUEST_URI'])['query'], $output);
+$request = $request->withAttribute('getParams', $output);
 #Загрузка в трубопровод
     $pipeline = new MiddlewarePipe();
     $pipeline->pipe(path('/', new ProfilerMiddleware()));

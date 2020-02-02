@@ -26,19 +26,21 @@ class DispositionSearch extends AppDomain
 
     public function searchRegion(string $searchString){
         $searchString = $this->sanitize($searchString);
-        $query = ("SELECT * FROM `regions` WHERE `region_name` LIKE '%$searchString%' LIMIT $this->_limit;");
-        $result = $this->_dbConnection->prepare($query);
-        $result->execute();
-        if ($result->rowCount() > 0){
-            $i = 0;
-            while ($row = $result->fetch()){
-                $data[$i]['id'] = $row['id'];
-                $data[$i]['value'] = $row['region_name'];
-                $i ++;
+        if(!empty($searchString)){
+            $query = ("SELECT * FROM `regions` WHERE `region_name` LIKE '%$searchString%' LIMIT $this->_limit;");
+            $result = $this->_dbConnection->prepare($query);
+            $result->execute();
+            if ($result->rowCount() > 0){
+                $i = 0;
+                while ($row = $result->fetch()){
+                    $data[$i]['id'] = $row['id'];
+                    $data[$i]['value'] = $row['region_name'];
+                    $i ++;
+                }
+                return $data;
             }
-            return $data;
         }
-        return 'Nothing found';
+        return null;//'Nothing found';
     }
 
     public function searchDistrict(array $searchData){
