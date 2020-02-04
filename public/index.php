@@ -66,13 +66,11 @@ $map->get('app/patient-card/show', '/app/patient-card/show/{id}', PatientCardSho
 $map->post('app/patient-card/search-cards', '/app/patient-card/search-cards', PatientCardsSearchAction::class)->tokens(['searchString' => '\w+']);
 
 
-$map->get('app/patient-card/search-region', '/app/patient-card/search-region', RegionSearchAction::class);//->tokens(['region' => '\w+']);
-//$map->post('app/patient-card/search-region', '/app/patient-card/search-region', RegionSearchAction::class)->tokens(['searchString' => '\w+']);
+$map->get('app/patient-card/search-region', '/app/patient-card/search-region', RegionSearchAction::class);
+$map->get('app/patient-card/search-district', '/app/patient-card/search-district', DistrictSearchAction::class);
+$map->get('app/patient-card/search-locality', '/app/patient-card/search-locality', LocalitySearchAction::class);
+$map->get('app/patient-card/search-street', '/app/patient-card/search-street', StreetSearchAction::class);
 
-
-$map->post('app/patient-card/search-district', '/app/patient-card/search-district', DistrictSearchAction::class)->tokens(['searchString' => '\w+']);
-$map->post('app/patient-card/search-locality', '/app/patient-card/search-locality', LocalitySearchAction::class)->tokens(['searchString' => '\w+']);
-$map->post('app/patient-card/search-street', '/app/patient-card/search-street', StreetSearchAction::class)->tokens(['searchString' => '\w+']);
 $map->post('app/patient-card/search-insurance-company', '/app/patient-card/search-insurance-company', InsuranceCompanySearchAction::class)->tokens(['searchString' => '\w+']);
 //$map->get('catalog/detail', '/blog/{id}/view/{number}-{detail}', Application\Blog\Action\DetailsIndexAction::class)->tokens(['id' => '\d+', 'number' => '\d+', 'detail' => '\d+']);
 $map->get('login', '/login', LoginIndexAction::class);

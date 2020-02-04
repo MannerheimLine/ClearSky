@@ -28,10 +28,10 @@ class LocalitySearchAction extends AppAction implements RequestHandlerInterface
      */
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
-        $searchData = $request->getParsedBody();
+        $searchData = $request->getAttribute('getParams');
         $payload = $this->_dispositionSearch->searchLocality($searchData);
         $response = $this->_responder->respond($request, $payload);
 
-        return $response;
+        return $response->withHeader('Access-Control-Allow-Origin', 'http://localhost:8080');
     }
 }

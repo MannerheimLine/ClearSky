@@ -45,64 +45,70 @@ class DispositionSearch extends AppDomain
 
     public function searchDistrict(array $searchData){
         $searchString = $this->sanitize($searchData['searchString']);
-        $searchId = $searchData['params']['searchId'];
-        $query = ("SELECT * FROM `districts` WHERE `district_name` LIKE '%$searchString%' AND `region` = :searchId LIMIT $this->_limit;");
-        $result = $this->_dbConnection->prepare($query);
-        $result->execute([
-            'searchId' => $searchId
-        ]);
-        if ($result->rowCount() > 0){
-            $i = 0;
-            while ($row = $result->fetch()){
-                $data[$i]['id'] = $row['id'];
-                $data[$i]['value'] = $row['district_name'];
-                $i ++;
+        if (!empty($searchString)){
+            $searchId = $searchData['searchParams'];
+            $query = ("SELECT * FROM `districts` WHERE `district_name` LIKE '%$searchString%' AND `region` = :searchId LIMIT $this->_limit;");
+            $result = $this->_dbConnection->prepare($query);
+            $result->execute([
+                'searchId' => $searchId
+            ]);
+            if ($result->rowCount() > 0){
+                $i = 0;
+                while ($row = $result->fetch()){
+                    $data[$i]['id'] = $row['id'];
+                    $data[$i]['value'] = $row['district_name'];
+                    $i ++;
+                }
+                return $data;
             }
-            return $data;
         }
-        return 'Nothing found';
+        return null;
     }
 
     public function searchLocality(array $searchData){
         $searchString = $this->sanitize($searchData['searchString']);
-        $searchId = $searchData['params']['searchId'];
-        $query = ("SELECT * FROM `localities` WHERE `locality_name` LIKE '%$searchString%' AND `district` = :searchId LIMIT $this->_limit;");
-        $result = $this->_dbConnection->prepare($query);
-        $result->execute([
-            'searchId' => $searchId
-        ]);
-        if ($result->rowCount() > 0){
-            $i = 0;
-            while ($row = $result->fetch()){
-                $data[$i]['id'] = $row['id'];
-                $data[$i]['value'] = $row['locality_name'];
-                $i ++;
+        if (!empty($searchString)){
+            $searchId = $searchData['searchParams'];
+            $query = ("SELECT * FROM `localities` WHERE `locality_name` LIKE '%$searchString%' AND `district` = :searchId LIMIT $this->_limit;");
+            $result = $this->_dbConnection->prepare($query);
+            $result->execute([
+                'searchId' => $searchId
+            ]);
+            if ($result->rowCount() > 0){
+                $i = 0;
+                while ($row = $result->fetch()){
+                    $data[$i]['id'] = $row['id'];
+                    $data[$i]['value'] = $row['locality_name'];
+                    $i ++;
+                }
+                return $data;
             }
-            return $data;
         }
-        return 'Nothing found';
+        return null;
     }
 
     public function searchStreet(array $searchData){
         $searchString = $this->sanitize($searchData['searchString']);
-        $searchId = $searchData['params']['searchId'];
-        $query = ("SELECT `streets`.`id`, `streets`.`street_name` FROM `streets_localities`
+        if (!empty($searchString)){
+            $searchId = $searchData['searchParams'];
+            $query = ("SELECT `streets`.`id`, `streets`.`street_name` FROM `streets_localities`
                   INNER JOIN `streets` ON streets_localities.street_id = streets.id
                   WHERE `street_name` LIKE '%$searchString%' AND `locality_id` = :searchId");
-        $result = $this->_dbConnection->prepare($query);
-        $result->execute([
-            'searchId' => $searchId
-        ]);
-        if ($result->rowCount() > 0){
-            $i = 0;
-            while ($row = $result->fetch()){
-                $data[$i]['id'] = $row['id'];
-                $data[$i]['value'] = $row['street_name'];
-                $i ++;
+            $result = $this->_dbConnection->prepare($query);
+            $result->execute([
+                'searchId' => $searchId
+            ]);
+            if ($result->rowCount() > 0){
+                $i = 0;
+                while ($row = $result->fetch()){
+                    $data[$i]['id'] = $row['id'];
+                    $data[$i]['value'] = $row['street_name'];
+                    $i ++;
+                }
+                return $data;
             }
-            return $data;
         }
-        return 'Nothing found';
+        return null;
     }
 
 }
