@@ -58,20 +58,24 @@ $aura = new RouterContainer();
 $map = $aura->getMap();
 $map->get('patient-card', '/app/patient-card', PatientCardIndexAction::class);
 $map->get('app/patient-card/get', '/app/patient-card/get/{id}', PatientCardGetAction::class)->tokens(['id' => '\d+']);
-$map->post('app/patient-card/update', '/app/patient-card/update', PatientCardUpdateAction::class);
+
+
+$map->put('app/patient-card/update', '/app/patient-card/update', PatientCardUpdateAction::class);
+
+
 $map->post('app/patient-card/unblock', '/app/patient-card/unblock', PatientCardUnblockAction::class);
 $map->post('app/patient-card/edit', '/app/patient-card/edit', PatientCardEditAction::class);
 $map->post('app/patient-card/add', '/app/patient-card/add', PatientCardAddAction::class);
 $map->get('app/patient-card/show', '/app/patient-card/show/{id}', PatientCardShowAction::class)->tokens(['id' => '\d+']);
-$map->post('app/patient-card/search-cards', '/app/patient-card/search-cards', PatientCardsSearchAction::class)->tokens(['searchString' => '\w+']);
+$map->post('app/patient-card/search-cards', '/app/patient-card/search-cards', PatientCardsSearchAction::class);//->tokens(['searchString' => '\w+']);
 
 
 $map->get('app/patient-card/search-region', '/app/patient-card/search-region', RegionSearchAction::class);
 $map->get('app/patient-card/search-district', '/app/patient-card/search-district', DistrictSearchAction::class);
 $map->get('app/patient-card/search-locality', '/app/patient-card/search-locality', LocalitySearchAction::class);
 $map->get('app/patient-card/search-street', '/app/patient-card/search-street', StreetSearchAction::class);
+$map->get('app/patient-card/search-insurance-company', '/app/patient-card/search-insurance-company', InsuranceCompanySearchAction::class);
 
-$map->post('app/patient-card/search-insurance-company', '/app/patient-card/search-insurance-company', InsuranceCompanySearchAction::class)->tokens(['searchString' => '\w+']);
 //$map->get('catalog/detail', '/blog/{id}/view/{number}-{detail}', Application\Blog\Action\DetailsIndexAction::class)->tokens(['id' => '\d+', 'number' => '\d+', 'detail' => '\d+']);
 $map->get('login', '/login', LoginIndexAction::class);
 $map->get('logout', '/logout', LogoutAction::class);
@@ -110,16 +114,6 @@ $resolver->resolve($request);
 #Парсинг роутов
 $matcher = $aura->getMatcher();
 $route = $matcher->match($request);
-
-
-
-//$url = $_SERVER['REQUEST_URI'];
-//$l = parse_url($url);
-//parse_str($l['query'], $output);
-
-//$request = $request->withAttribute('data', $output);
-//$a = 1;
-
 if ($route){
     foreach ($route->attributes as $key => $val) {
         $request = $request->withAttribute($key, $val);
@@ -140,7 +134,7 @@ $request = $request->withAttribute('getParams', $output);
     $pipeline->pipe(path('/administrator', new AuthMiddleware(App::getDependency(ConnectorInterface::class))));
     $pipeline->pipe(path('/app', new PermissionMiddleware(App::getDependency(ConnectorInterface::class))));
     $pipeline->pipe(path('/administrator', new PermissionMiddleware(App::getDependency(ConnectorInterface::class))));
-    $pipeline->pipe(path('/app/patient-card/update', new CardValidatorMiddleware()));
+    //$pipeline->pipe(path('/app/patient-card/update', new CardValidatorMiddleware()));
     $pipeline->pipe(path('/app/patient-card/add', new CardValidatorMiddleware()));
     //$pipeline->pipe(path('/app/control-panel', new ClientIpMiddleware()));
     //$pipeline->pipe(new PathMiddlewareDecorator('/app/patient-card', new ModifyMiddleware()));

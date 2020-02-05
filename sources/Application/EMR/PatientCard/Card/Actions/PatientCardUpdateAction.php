@@ -29,10 +29,10 @@ class PatientCardUpdateAction extends AppAction implements RequestHandlerInterfa
      */
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
-        $updatingData = $request->getParsedBody();
-        $payload = $this->_patientCard->update($updatingData);
+        $updatingCard = json_decode(file_get_contents("php://input"),true);
+        $payload = $this->_patientCard->update($updatingCard);
         $response = $this->_responder->respond($request, $payload);
 
-        return $response;
+        return $response->withHeader('Access-Control-Allow-Origin', 'http://localhost:8080');
     }
 }

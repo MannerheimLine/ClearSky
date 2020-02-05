@@ -28,10 +28,10 @@ class InsuranceCompanySearchAction extends AppAction implements RequestHandlerIn
      */
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
-        $searchString = $request->getParsedBody()['searchString'];
+        $searchString = $request->getAttribute('getParams')['searchString'];
         $payload = $this->_searchInsuranceCompany->searchInsuranceCompany($searchString);
         $response = $this->_responder->respond($request, $payload);
 
-        return $response;
+        return $response->withHeader('Access-Control-Allow-Origin', 'http://localhost:8080');
     }
 }
