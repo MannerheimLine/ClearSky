@@ -5,7 +5,6 @@ use Administrator\RBAC\Actions\PermissionsShowAction;
 use Administrator\RBAC\Actions\RolesShowAction;
 use Administrator\Users\Actions\AccountsGetAction;
 use Administrator\Users\Actions\UsersIndexAction;
-use Administrator\Users\Actions\UsersShowAction;
 use Application\EMR\PatientCard\Card\Actions\PatientCardAddAction;
 use Application\EMR\PatientCard\Card\Actions\PatientCardEditAction;
 use Application\EMR\PatientCard\Card\Actions\PatientCardGetAction;
@@ -45,7 +44,6 @@ use Engine\RBAC\Middleware\PermissionMiddleware;
 use Psr\Http\Message\ResponseInterface;
 use Zend\Diactoros\ServerRequestFactory;
 use Zend\HttpHandlerRunner\Emitter\SapiEmitter;
-use Zend\Stratigility\Middleware\PathMiddlewareDecorator;
 use Zend\Stratigility\MiddlewarePipe;
 use function Zend\Stratigility\path;
 
@@ -56,19 +54,13 @@ require "vendor/autoload.php";
 #Коллекция маршрутов
 $aura = new RouterContainer();
 $map = $aura->getMap();
-$map->get('patient-card', '/app/patient-card', PatientCardIndexAction::class);
-$map->get('app/patient-card/get', '/app/patient-card/get/{id}', PatientCardGetAction::class)->tokens(['id' => '\d+']);
 
-
-$map->put('app/patient-card/update', '/app/patient-card/update', PatientCardUpdateAction::class);
-
-
-$map->post('app/patient-card/unblock', '/app/patient-card/unblock', PatientCardUnblockAction::class);
-$map->post('app/patient-card/edit', '/app/patient-card/edit', PatientCardEditAction::class);
-$map->post('app/patient-card/add', '/app/patient-card/add', PatientCardAddAction::class);
-$map->get('app/patient-card/show', '/app/patient-card/show/{id}', PatientCardShowAction::class)->tokens(['id' => '\d+']);
-$map->post('app/patient-card/search-cards', '/app/patient-card/search-cards', PatientCardsSearchAction::class);//->tokens(['searchString' => '\w+']);
-
+$map->get('app/patient-card/get', '/app/patient-cards/{id}', PatientCardGetAction::class)->tokens(['id' => '\d+']);
+$map->get('app/patient-cards/get', '/app/patient-cards', PatientCardsSearchAction::class);
+$map->post('app/patient-card/add', '/app/patient-cards', PatientCardAddAction::class);
+$map->put('app/patient-card/update', '/app/patient-cards/{id}', PatientCardUpdateAction::class);
+$map->patch('app/patient-card/unblock', '/app/patient-cards/{id}', PatientCardUnblockAction::class);
+$map->delete('app/patient-card/delete', '/app/patient-cards/{id}', PatientCardDeleteAction::class);
 
 $map->get('app/patient-card/search-region', '/app/patient-card/search-region', RegionSearchAction::class);
 $map->get('app/patient-card/search-district', '/app/patient-card/search-district', DistrictSearchAction::class);
@@ -76,14 +68,21 @@ $map->get('app/patient-card/search-locality', '/app/patient-card/search-locality
 $map->get('app/patient-card/search-street', '/app/patient-card/search-street', StreetSearchAction::class);
 $map->get('app/patient-card/search-insurance-company', '/app/patient-card/search-insurance-company', InsuranceCompanySearchAction::class);
 
-//$map->get('catalog/detail', '/blog/{id}/view/{number}-{detail}', Application\Blog\Action\DetailsIndexAction::class)->tokens(['id' => '\d+', 'number' => '\d+', 'detail' => '\d+']);
-$map->get('login', '/login', LoginIndexAction::class);
-$map->get('logout', '/logout', LogoutAction::class);
-$map->post('login/do', '/login/do', LoginAction::class);
-$map->post('menu/get', '/menu/get', MenuIndexAction::class);
+$map->get('app/patient-card/talon', '/app/patient-card/talons/{id}', AmbulatoryTalonShowAction::class)->tokens(['id' => '\d+']);
 
-$map->get('app/patient-card/talon', '/app/patient-card/talon/ambulatory/show/{id}', AmbulatoryTalonShowAction::class)->tokens(['id' => '\d+']);
-$map->get('app/patient-card/talon/save', '/app/patient-card/talon/ambulatory/save/{id}', AmbulatoryTalonSaveAction::class)->tokens(['id' => '\d+']);
+//$map->get('patient-card', '/app/patient-card', PatientCardIndexAction::class);
+//$map->get('app/patient-card/get', '/app/patient-card/get/{id}', PatientCardGetAction::class)->tokens(['id' => '\d+']);
+//$map->put('app/patient-card/update', '/app/patient-card/update', PatientCardUpdateAction::class);
+//$map->post('app/patient-card/unblock', '/app/patient-card/unblock', PatientCardUnblockAction::class);
+//$map->post('app/patient-card/edit', '/app/patient-card/edit', PatientCardEditAction::class);
+//$map->get('app/patient-card/show', '/app/patient-card/show/{id}', PatientCardShowAction::class)->tokens(['id' => '\d+']);
+//$map->post('app/patient-card/search-cards', '/app/patient-card/search-cards', PatientCardsSearchAction::class);//->tokens(['searchString' => '\w+']);
+//$map->get('catalog/detail', '/blog/{id}/view/{number}-{detail}', Application\Blog\Action\DetailsIndexAction::class)->tokens(['id' => '\d+', 'number' => '\d+', 'detail' => '\d+']);
+//$map->get('login', '/login', LoginIndexAction::class);
+//$map->get('logout', '/logout', LogoutAction::class);
+//$map->post('login/do', '/login/do', LoginAction::class);
+//$map->post('menu/get', '/menu/get', MenuIndexAction::class);
+//$map->get('app/patient-card/talon/save', '/app/patient-card/talon/ambulatory/save/{id}', AmbulatoryTalonSaveAction::class)->tokens(['id' => '\d+']);
 
 /*
  * Административная часть
@@ -91,8 +90,6 @@ $map->get('app/patient-card/talon/save', '/app/patient-card/talon/ambulatory/sav
 $map->get('administrator/desktop', '/administrator/desktop', DesktopShowAction::class);
 $map->get('administrator/users', '/administrator/users', UsersIndexAction::class);
 $map->get('administrator/accounts/get', '/administrator/accounts/get', AccountsGetAction::class);
-//$map->get('administrator/rbac/roles', '/administrator/rbac/roles', RolesShowAction::class);
-//$map->get('administrator/rbac/permissions', '/administrator/rbac/permissions', PermissionsShowAction::class);
 
 #DI Container
 $definitions = [
@@ -128,8 +125,8 @@ $request = $request->withAttribute('getParams', $output);
     $pipeline = new MiddlewarePipe();
     $pipeline->pipe(path('/', new ProfilerMiddleware()));
     $pipeline->pipe(path('/', new MemoryUsageMiddleware()));
-    $pipeline->pipe(path('/login', new LoginMiddleware()));
-    $pipeline->pipe(path('/login/do', new AuthFormValidatorMiddleware()));
+    //$pipeline->pipe(path('/login', new LoginMiddleware()));
+    //$pipeline->pipe(path('/login/do', new AuthFormValidatorMiddleware()));
     //$pipeline->pipe(path('/app', new AuthMiddleware(App::getDependency(ConnectorInterface::class))));
     $pipeline->pipe(path('/administrator', new AuthMiddleware(App::getDependency(ConnectorInterface::class))));
     $pipeline->pipe(path('/app', new PermissionMiddleware(App::getDependency(ConnectorInterface::class))));

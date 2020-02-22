@@ -29,15 +29,13 @@ class PatientCardsSearchAction extends AppAction implements RequestHandlerInterf
      */
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
-        $data = json_decode(file_get_contents("php://input"),true);
-        $searchString = $data['searchString'];
-        $page = $data['selectedPage'];
-        //$searchString = $request->getParsedBody()['searchString'];
-        //$page = $request->getParsedBody()['selectedPage'];
+        //$data = json_decode(file_get_contents("php://input"),true);
+        $searchString = $request->getAttribute('getParams')['searchString'];
+        $page = $request->getAttribute('getParams')['selectedPage'];
         $payload = $this->_patientCards->getCardsData($searchString, (int)$page);
         $response = $this->_responder->respond($request, $payload);
 
-        //return $response;
-        return $response->withHeader('Access-Control-Allow-Origin', 'http://localhost:8080');
+        return $response;
+        //return $response->withHeader('Access-Control-Allow-Origin', 'http://localhost:8080');
     }
 }
