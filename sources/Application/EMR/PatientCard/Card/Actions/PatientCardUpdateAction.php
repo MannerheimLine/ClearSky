@@ -33,6 +33,6 @@ class PatientCardUpdateAction extends AppAction implements RequestHandlerInterfa
         $payload = $this->_patientCard->update($updatingCard);
         $response = $this->_responder->respond($request, $payload);
 
-        return $response->withHeader('Access-Control-Allow-Origin', 'http://localhost:8080');
+        return $response;
     }
 }

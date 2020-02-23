@@ -55,7 +55,7 @@ class PatientCard extends AppDomain implements \JsonSerializable
     private $_street;
     private $_houseNumber;
     private $_apartment;
-    private $_workPlace;
+    private $_workplace;
     private $_profession;
     private $_notation;
     private $_status;
@@ -75,32 +75,31 @@ class PatientCard extends AppDomain implements \JsonSerializable
      */
     private function prepareUpdatingData(array $updatingData) : array {
         $castedData['id'] = (int)$updatingData['id'];
-        $castedData['cardNumber'] = $updatingData['cardNumber'];
-        $castedData['isAlive'] = (int)$updatingData['isAlive'];
-        $castedData['isAttach'] = (int)$updatingData['isAttach'];
-        $fullName = explode(' ', rtrim($updatingData['fullName']));
-        $castedData['surname'] = $fullName[0];
-        $castedData['firstName'] = $fullName[1];
-        $castedData['secondName'] = $fullName[2] ?: '';
-        $castedData['gender'] = (int)$updatingData['gender'];
+        $castedData['cardNumber'] = (int)$updatingData['cardNumber'];
+        $castedData['isAlive'] = (int)$updatingData['isAliveId'];
+        $castedData['isAttach'] = (int)$updatingData['isAttachId'];
+        $castedData['surname'] = $updatingData['surname'];
+        $castedData['firstName'] = $updatingData['firstName'];
+        $castedData['secondName'] = $updatingData['secondName'];
+        $castedData['gender'] = (int)$updatingData['genderId'];
         $castedData['dateBirth'] = $updatingData['dateBirth'];
-        $castedData['telephone'] = $updatingData['telephone'];
+        $castedData['telephone'] = $this->sanitizeToString($updatingData['telephone']);
         $castedData['email'] = $updatingData['email'];
-        $castedData['insuranceCertificate'] = $updatingData['insuranceCertificate'] ?: null;
-        $castedData['policyNumber'] = $updatingData['policyNumber'];
-        $castedData['insuranceCompany'] = (int)$updatingData['insuranceCompany'];
-        $passport = explode(' ',$updatingData['passport']);
-        $castedData['passportSerial'] = $passport[0] ?: null;
-        $castedData['passportNumber'] = $passport[1] ?: null;
+        $castedData['insuranceCertificate'] = $this->sanitizeToString($updatingData['insuranceCertificate']);
+        $castedData['policyNumber'] = $this->sanitizeToString($updatingData['policyNumber']);
+        $castedData['insuranceCompany'] = (int)$updatingData['insuranceCompanyId'];
+        $passportFull = explode(' ', rtrim($updatingData['passport']));
+        $castedData['passportSerial'] = $passportFull[0];
+        $castedData['passportNumber'] = $passportFull[1];
         $castedData['fmsDepartment'] = $updatingData['fmsDepartment'];
-        $birthCertificate = explode(' ', $updatingData['birthCertificate']);
-        $castedData['birthCertificateSerial'] = $birthCertificate[0] ?: null;
-        $castedData['birthCertificateNumber'] = $birthCertificate[1] ?: null;
+        $birthCertificateFull = explode(' ', rtrim($updatingData['birthCertificate']));
+        $castedData['birthCertificateSerial'] = $birthCertificateFull[0];
+        $castedData['birthCertificateNumber'] = $birthCertificateFull[1];
         $castedData['registryOffice'] = $updatingData['registryOffice'];
-        $castedData['region'] = (int)$updatingData['region'] ?: null;
-        $castedData['district'] = (int)$updatingData['district'] ?: null;
-        $castedData['locality'] = (int)$updatingData['locality'] ?: null;
-        $castedData['street'] = (int)$updatingData['street'] ?: null;
+        $castedData['region'] = (int)$updatingData['regionId'] ?: null;
+        $castedData['district'] = (int)$updatingData['districtId'] ?: null;
+        $castedData['locality'] = (int)$updatingData['localityId'] ?: null;
+        $castedData['street'] = (int)$updatingData['streetId'] ?: null;
         $castedData['houseNumber'] = $updatingData['houseNumber'];
         $castedData['apartment'] = $updatingData['apartment'];
         $castedData['workplace'] = $updatingData['workplace'];
@@ -279,7 +278,7 @@ class PatientCard extends AppDomain implements \JsonSerializable
                 $this->_street = $row['street'];
                 $this->_houseNumber = $row['house_number'];
                 $this->_apartment = $row['apartment'];
-                $this->_workPlace = $row['work_place'];
+                $this->_workplace = $row['work_place'];
                 $this->_profession = $row['profession'];
                 $this->_notation = $row['notation'];
             }
@@ -328,7 +327,7 @@ class PatientCard extends AppDomain implements \JsonSerializable
                     `street` = :street,
                     `house_number` = :houseNumber,
                     `apartment` = :apartment,
-                    `work_place` = :workPlace,
+                    `work_place` = :workplace,
                     `profession` = :profession,
                     `notation` = :notation
                 WHERE `patient_cards`.`id` = :id;");
@@ -360,7 +359,7 @@ class PatientCard extends AppDomain implements \JsonSerializable
                     'street' => $castedData['street'],
                     'houseNumber' => $castedData['houseNumber'],
                     'apartment' => $castedData['apartment'],
-                    'workPlace' => $castedData['workplace'],
+                    'workplace' => $castedData['workplace'],
                     'profession' => $castedData['profession'],
                     'notation' => $castedData['notation'],
                 ])){
@@ -544,7 +543,7 @@ class PatientCard extends AppDomain implements \JsonSerializable
             'street' => $this->_street,
             'houseNumber' => $this->_houseNumber,
             'apartment' => $this->_apartment,
-            'workPlace' => $this->_workPlace,
+            'workplace' => $this->_workplace,
             'profession' => $this->_profession,
             'notation' => $this->_notation,
             'status' => $this->_status

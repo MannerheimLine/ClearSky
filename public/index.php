@@ -62,11 +62,11 @@ $map->put('app/patient-card/update', '/app/patient-cards/{id}', PatientCardUpdat
 $map->patch('app/patient-card/unblock', '/app/patient-cards/{id}', PatientCardUnblockAction::class);
 $map->delete('app/patient-card/delete', '/app/patient-cards/{id}', PatientCardDeleteAction::class);
 
-$map->get('app/patient-card/search-region', '/app/patient-card/search-region', RegionSearchAction::class);
-$map->get('app/patient-card/search-district', '/app/patient-card/search-district', DistrictSearchAction::class);
-$map->get('app/patient-card/search-locality', '/app/patient-card/search-locality', LocalitySearchAction::class);
-$map->get('app/patient-card/search-street', '/app/patient-card/search-street', StreetSearchAction::class);
-$map->get('app/patient-card/search-insurance-company', '/app/patient-card/search-insurance-company', InsuranceCompanySearchAction::class);
+$map->get('app/patient-card/search-region', '/app/patient-card/regions', RegionSearchAction::class);
+$map->get('app/patient-card/search-district', '/app/patient-card/districts', DistrictSearchAction::class);
+$map->get('app/patient-card/search-locality', '/app/patient-card/localities', LocalitySearchAction::class);
+$map->get('app/patient-card/search-street', '/app/patient-card/streets', StreetSearchAction::class);
+$map->get('app/patient-card/search-insurance-company', '/app/patient-card/insurance-companies', InsuranceCompanySearchAction::class);
 
 $map->get('app/patient-card/talon', '/app/patient-card/talons/{id}', AmbulatoryTalonShowAction::class)->tokens(['id' => '\d+']);
 
